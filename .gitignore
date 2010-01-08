@@ -1,0 +1,10 @@
+# backup versions
+*~
+
+# vim swap-files
+*.swp
+
+# ghc+gcc noise
+*.hi
+*.o
+
