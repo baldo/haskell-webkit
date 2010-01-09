@@ -17,6 +17,16 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , withWebSettings
     , mkWebSettings
     , unWebSettings
+
+    , WebHistoryItem (..)
+    , withWebHistoryItem
+    , mkWebHistoryItem
+    , unWebHistoryItem
+
+    , WebBackForwardList
+    , withWebBackForwardList
+    , mkWebBackForwardList
+    , unWebBackForwardList
     ) where
 
 #include <webkit/webkit.h>
@@ -69,3 +79,28 @@ instance GObjectClass WebSettings where
 
 mkWebSettings = WebSettings
 unWebSettings (WebSettings o) = o
+
+-- WebHistoryItem -------------------------------------------------------------
+
+{#pointer *WebHistoryItem foreign newtype#}
+
+instance ObjectClass WebHistoryItem
+instance GObjectClass WebHistoryItem where
+  toGObject = mkGObject . castForeignPtr . unWebHistoryItem
+  unsafeCastGObject = mkWebHistoryItem . castForeignPtr . unGObject
+
+mkWebHistoryItem = WebHistoryItem
+unWebHistoryItem (WebHistoryItem o) = o
+
+-- WebBackForwardList ---------------------------------------------------------
+
+{#pointer *WebBackForwardList foreign newtype#}
+
+instance ObjectClass WebBackForwardList
+instance GObjectClass WebBackForwardList where
+  toGObject = mkGObject . castForeignPtr . unWebBackForwardList
+  unsafeCastGObject = mkWebBackForwardList . castForeignPtr . unGObject
+
+mkWebBackForwardList = WebBackForwardList
+unWebBackForwardList (WebBackForwardList o) = o
+
