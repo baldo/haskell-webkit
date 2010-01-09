@@ -12,6 +12,7 @@ module Graphics.UI.Gtk.WebKit.General.Enums
     , NavigationReason (..)
     , NavigationResponse (..)
     , WebViewTargetInfo (..)
+    , WebKitEditingBehavior (..)
     ) where
 
 #include <webkit/webkit.h>
@@ -35,3 +36,4 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 
 {#enum WebViewTargetInfo {underscoreToCase} deriving (Eq, Show)#}
 
+{#enum WebKitEditingBehavior {underscoreToCase} deriving (Eq,Show)#}
