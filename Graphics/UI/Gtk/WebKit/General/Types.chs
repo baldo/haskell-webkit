@@ -12,6 +12,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , withWebView
     , mkWebView
     , unWebView
+
+    , WebSettings (..)
+    , withWebSettings
+    , mkWebSettings
+    , unWebSettings
     ) where
 
 #include <webkit/webkit.h>
@@ -52,3 +57,15 @@ instance GObjectClass WebView where
 
 mkWebView = WebView
 unWebView (WebView o) = o
+
+-- WebSettings ----------------------------------------------------------------
+
+{#pointer *WebSettings foreign newtype#}
+
+instance ObjectClass WebSettings
+instance GObjectClass WebSettings where
+  toGObject = mkGObject . castForeignPtr . unWebSettings
+  unsafeCastGObject = mkWebSettings . castForeignPtr . unGObject
+
+mkWebSettings = WebSettings
+unWebSettings (WebSettings o) = o
