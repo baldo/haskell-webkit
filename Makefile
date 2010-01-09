@@ -2,6 +2,7 @@ bin = Test
 
 from_chs = \
 	Graphics/UI/Gtk/WebKit/WebFrame.hs \
+	Graphics/UI/Gtk/WebKit/WebSettings.hs \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
@@ -10,6 +11,7 @@ from_chs = \
 hs_files = \
 	Graphics/UI/Gtk/WebKit.hs \
 	Graphics/UI/Gtk/WebKit/WebFrame.hs \
+	Graphics/UI/Gtk/WebKit/WebSettings.hs \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
