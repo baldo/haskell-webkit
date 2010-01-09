@@ -61,7 +61,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     --, webViewGetPasteTargetList
 
     , webViewSetSettings
-    --, webViewGetSettings
+    , webViewGetSettings
 
     --, webViewGetInspector
 
@@ -166,6 +166,7 @@ import Graphics.UI.Gtk.Signals
     , unWebFrame
     , mkWebView
     , unWebView
+    , mkWebSettings
     , unWebSettings
     )
 
@@ -391,14 +392,17 @@ GtkTargetList * webkit_web_view_get_paste_target_list (WebKitWebView *web_view);
 -}
 
 webViewSetSettings :: WebView -> WebSettings -> IO ()
--- void webkit_web_view_set_settings (WebKitWebView *web_view, WebKitWebSettings *settings);
 webViewSetSettings view settings = 
     withForeignPtr (unWebView view) $ \vptr ->
         withForeignPtr (unWebSettings settings) $ \sptr ->
             {#call web_view_set_settings#} vptr sptr
 
+webViewGetSettings :: WebView -> IO WebSettings 
+webViewGetSettings view =
+    withForeignPtr (unWebView view) $ \ptr ->
+        makeNewObject  mkWebSettings $ {#call web_view_get_settings#} ptr
+
 {- TODO
-WebKitWebSettings* webkit_web_view_get_settings (WebKitWebView *web_view);
 WebKitWebInspector* webkit_web_view_get_inspector (WebKitWebView *web_view);
 WebKitWebWindowFeatures* webkit_web_view_get_window_features (WebKitWebView *web_view);
 -}
