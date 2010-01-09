@@ -11,6 +11,8 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGetUri
 
     , webViewSetMaintainsBackForwardList
+    --, webViewGetBackForwardList
+    --, webViewGoToBackForwardItem 
 
     , webViewCanGoBack
     , webViewCanGoBackOrForward
@@ -28,6 +30,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewLoadUri
     , webViewLoadString
     , webViewLoadHtmlString
+    --, webViewLoadRequest 
 
     , webViewSearchText
     , webViewMarkTextMatches
@@ -54,6 +57,16 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGetEditable
     , webViewSetEditable
 
+    --, webViewGetCopyTargetList
+    --, webViewGetPasteTargetList
+
+    --, webViewSetSettings
+    --, webViewGetSettings
+
+    --, webViewGetInspector
+
+    --, webViewGetWindowFeatures
+
     , webViewCanShowMimeType
 
     , webViewGetTransparent
@@ -68,13 +81,28 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGetFullContentZoom
     , webViewSetFullContentZoom
 
+    --, getDefaultSession
+
     , webViewGetEncoding
 
     , webViewSetCustomEncoding
     , webViewGetCustomEncoding
 
+    --, webViewMoveCursor
+
     , webViewGetLoadStatus
     , webViewGetProgress
+
+    --, webViewUndo
+    --, webViewCanUndo
+
+    --, webViewRedo
+    --, webViewCanRedo
+
+    --, webViewSetViewSourceMode
+    --, webViewGetViewSourceMode
+
+    --, webViewGetHitTestResult
 
     -- Signals -----------------------------------------------------------------
 
@@ -455,9 +483,20 @@ webViewGetProgress web_view =
         liftM realToFrac $
             {#call web_view_get_progress#} ptr
 
+{- TODO
+void webkit_web_view_undo (WebKitWebView *webView);
+gboolean webkit_web_view_can_undo (WebKitWebView *webView);
+void webkit_web_view_redo (WebKitWebView *webView);
+gboolean webkit_web_view_can_redo (WebKitWebView *webView);
+void webkit_web_view_set_view_source_mode (WebKitWebView *web_view, gboolean view_source_mode);
+gboolean webkit_web_view_get_view_source_mode (WebKitWebView *web_view);
+WebKitHitTestResult* webkit_web_view_get_hit_test_result (WebKitWebView *webView, GdkEventButton *event);
+-}
+
 -- Signals ---------------------------------------------------------------------
 
 {- TODO
+"close-web-view" : gboolean user_function (WebKitWebView *web_view, gpointer user_data) : Run Last
 "console-message" : gboolean user_function (WebKitWebView *web_view, gchar *message, gint line, gchar *source_id, gpointer user_data) : Run Last / Action
 -}
 
@@ -469,6 +508,7 @@ afterWebViewCopyClipboard =
     connect_NONE__NONE "copy-clipboard" True
 
 {- TODO
+"create-plugin-widget" : GtkWidget* user_function (WebKitWebView *web_view, gchar *mime_type, gchar *uri, GHashTable *param, gpointer user_data) : Run Last / Action
 "create-web-view" : WebKitWebView* user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer user_data) : Run Last / Action
 -}
 
@@ -478,6 +518,11 @@ onWebViewCutClipboard =
     connect_NONE__NONE "cut-clipboard" False
 afterWebViewCutClipboard =
     connect_NONE__NONE "cut-clipboard" True
+
+{- TODO
+"database-quota-exceeded" : void user_function (WebKitWebView *web_view, GObject *frame, GObject *database, gpointer user_data) : Run Last / Action
+"download-requested" : gboolean user_function (WebKitWebView *web_view, GObject *download, gpointer user_data) : Run Last
+-}
 
 onWebViewHoveringOverLink, afterWebViewHoveringOverLink ::
     WebView -> (String -> String -> IO ()) -> IO (ConnectId WebView)
@@ -500,6 +545,10 @@ onWebViewLoadCommitted =
 afterWebViewLoadCommitted =
     connect_OBJECT__NONE "load-committed" True
 
+{- TODO
+"load-error" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gchar *uri, gpointer web_error, gpointer user_data) : Run Last
+-}
+
 onWebViewLoadFinished, afterWebViewLoadFinished ::
     WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
 onWebViewLoadFinished =
@@ -519,7 +568,11 @@ afterWebViewLoadStarted =
     connect_OBJECT__NONE "load-started" True
 
 {- TODO
+"mime-type-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, gchar *mimetype, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
+"move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
+"navigation-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "navigation-requested" : gint user_function (WebKitWebView *webkitwebview, GObject *arg1, GObject *arg2, gpointer user_data) : Run Last / Action
+"new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
 
 onWebViewPasteClipboard, afterWebViewPasteClipboard ::
@@ -531,6 +584,9 @@ afterWebViewPasteClipboard =
 
 {- TODO
 "populate-popup" : void user_function (WebKitWebView *web_view, GtkMenu *menu, gpointer user_data) : Run Last / Action
+"print-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer user_data) : Run Last
+"redo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
+"resource-request-starting" : void user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, WebKitWebResource *web_resource, WebKitNetworkRequest *request, WebKitNetworkResponse *response, gpointer user_data) : Run Last / Action
 "script-alert" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gpointer user_data) : Run Last / Action
 "script-confirm" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gboolean confirmed, gpointer user_data) : Run Last / Action
 "script-prompt" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gchar *default, gpointer text, gpointer user_data) : Run Last / Action
@@ -569,6 +625,7 @@ afterWebViewTitleChanged =
     connect_OBJECT_STRING__NONE "title-changed" True
 
 {- TODO
+"undo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
 "web-view-ready" : gboolean user_function (WebKitWebView *web_view, gpointer user_data) : Run Last
 "window-object-cleared" : void user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer context, gpointer arg3, gpointer user_data) : Run Last / Action
 -}

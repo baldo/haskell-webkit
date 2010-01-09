@@ -16,15 +16,27 @@ module Graphics.UI.Gtk.WebKit.WebFrame
     , webFrameLoadUri
     , webFrameLoadString
     , webFrameLoadAlternateString
+    --, webFrameLoadRequest
 
     , webFrameStopLoading
     , webFrameReload
 
     , webFrameFindFrame
 
+    --, webFrameGetGlobalContext
+
+    --, webFramePrintFull
     , webFramePrint
 
     , webFrameGetLoadStatus
+
+    --, webFrameGetHorizontalScrollbarPolicy
+    --, webFrameGetVerticalScrollbarPolicy
+
+    --, webFrameGetDataSource
+    --, webFrameGetProvisionalDataSource
+
+    --, webFrameGetSecurityOrigin
     ) where
 
 #include <webkit/webkitwebframe.h>
@@ -143,3 +155,19 @@ webFrameGetLoadStatus frame =
         liftM (toEnum . fromIntegral) $
             {#call web_frame_get_load_status#} ptr
 
+{- TODO
+WEBKIT_API GtkPolicyType
+webkit_web_frame_get_horizontal_scrollbar_policy (WebKitWebFrame        *frame);
+
+WEBKIT_API GtkPolicyType
+webkit_web_frame_get_vertical_scrollbar_policy   (WebKitWebFrame        *frame);
+
+WEBKIT_API WebKitWebDataSource *
+webkit_web_frame_get_data_source             (WebKitWebFrame       *frame);
+
+WEBKIT_API WebKitWebDataSource *
+webkit_web_frame_get_provisional_data_source (WebKitWebFrame       *frame);
+
+WEBKIT_API WebKitSecurityOrigin*
+webkit_web_frame_get_security_origin         (WebKitWebFrame       *frame);
+-}
