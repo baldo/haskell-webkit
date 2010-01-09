@@ -18,13 +18,10 @@ hs_files = \
 %.hs: %.chs
 	@c2hs `pkg-config --cflags webkit-1.0 | sed 's/-[^ ]*/-C &/g'` -o $@ $<
 
-all: Test spplayer
+all: Test
 
 Test: Test.hs $(hs_files) $(generated)
 	@ghc --make Test.hs `pkg-config --libs webkit-1.0`
-
-spplayer: spplayer.hs $(hs_files) $(generated)
-	@ghc --make spplayer.hs `pkg-config --libs webkit-1.0`
 
 Graphics/UI/Gtk/WebKit/WebView.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
 

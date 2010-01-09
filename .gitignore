@@ -8,3 +8,17 @@
 *.hi
 *.o
 
+# c2hs noise
+*.h
+*.chi
+
+# binaries
+Test
+
+# genereated files
+Graphics/UI/Gtk/WebKit/WebFrame.hs
+Graphics/UI/Gtk/WebKit/WebView.hs
+Graphics/UI/Gtk/WebKit/General/General.hs
+Graphics/UI/Gtk/WebKit/General/Types.hs
+Graphics/UI/Gtk/WebKit/General/Enums.hs
+
