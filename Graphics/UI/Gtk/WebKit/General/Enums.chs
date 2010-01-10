@@ -13,6 +13,7 @@ module Graphics.UI.Gtk.WebKit.General.Enums
     , NavigationResponse (..)
     , WebViewTargetInfo (..)
     , EditingBehavior (..)
+    -- , CacheModel (..) -- new in webkit 1.1.18
     ) where
 
 #include <webkit/webkit.h>
@@ -38,3 +39,8 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 
 {#enum EditingBehavior {underscoreToCase}
      with prefix = "WebKit_" deriving (Eq,Show)#}
+
+{- new in webkit 1.1.18
+{#enum CacheModel {underscoreToCase}
+    with prefix = "WebKit_Cache_Model_" deriving (Eq,Show)#}
+-}
