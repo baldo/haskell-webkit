@@ -40,9 +40,23 @@ all: Test
 Test: Test.hs $(hs_files) $(generated)
 	@ghc --make Test.hs `pkg-config --libs webkit-1.0`
 
-Graphics/UI/Gtk/WebKit/WebView.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+Graphics/UI/Gtk/WebKit/NetworkRequest.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+
+Graphics/UI/Gtk/WebKit/NetworkResponse.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebFrame.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+
+Graphics/UI/Gtk/WebKit/WebHistoryItem.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+
+Graphics/UI/Gtk/WebKit/WebSettings.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+
+Graphics/UI/Gtk/WebKit/WebHistoryItem.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+
+Graphics/UI/Gtk/WebKit/WebBackForwardList.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+
+Graphics/UI/Gtk/WebKit/WebView.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+
+Network/Soup/Message.hs: Network/Soup/General/Types.hs
 
 clean:
 	@rm -f Test spplayer *.o *.hi $(bin) $(from_chs)
