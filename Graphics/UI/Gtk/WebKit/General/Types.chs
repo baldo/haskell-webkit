@@ -3,7 +3,12 @@
 {# context lib="libwebkit" prefix="webkit" #}
 
 module Graphics.UI.Gtk.WebKit.General.Types
-    ( WebFrame (..)
+    ( NetworkRequest
+    , withNetworkRequest
+    , mkNetworkRequest
+    , unNetworkRequest
+
+    , WebFrame (..)
     , withWebFrame
     , mkWebFrame
     , unWebFrame
@@ -41,6 +46,19 @@ import Graphics.UI.Gtk.Types
     , mkGObject
     , unGObject
     )
+
+-- NetworkRequest -------------------------------------------------------------
+
+{#pointer *NetworkRequest foreign newtype#}
+
+instance WidgetClass NetworkRequest
+instance ObjectClass NetworkRequest
+instance GObjectClass NetworkRequest where
+  toGObject = mkGObject . castForeignPtr . unNetworkRequest
+  unsafeCastGObject = mkNetworkRequest . castForeignPtr . unGObject
+
+mkNetworkRequest = NetworkRequest
+unNetworkRequest (NetworkRequest o) = o
 
 -- WebFrame --------------------------------------------------------------------
 
