@@ -13,7 +13,6 @@ module Graphics.UI.Gtk.WebKit.WebHistoryItem
     , webHistoryItemGetTitle
     , webHistoryItemGetOrginalUri
     , webHistoryItemGetLastVisitedTime
-    , webHistoryItemNew
     ) where
 
 #include <webkit/webkitwebhistoryitem.h>
@@ -33,6 +32,8 @@ import Graphics.UI.Gtk
 
     , mkWebHistoryItem
     , unWebHistoryItem
+
+    , withWebHistoryItem
     )
 
 -- Property get/set functions are aready provided by WebKit :)
@@ -40,33 +41,33 @@ import Graphics.UI.Gtk
 -- New in WebKit 1.1.18
 --webHistoryItemCopy :: WebHistoryItem -> IO WebHistoryItem 
 --webHistoryItemCopy historyItem =
---    withForeignPtr (unHistoryItem historyItem) $ \ptr ->
+--    withHistoryItem historyItem $ \ptr ->
 --        makeNewObject mkHistoryItem $ {#call web_history_item_copy#} 
 
 
 webHistoryItemGetAlternateTitle :: WebHistoryItem -> IO String
 webHistoryItemGetAlternateTitle  historyItem = 
-    withForeignPtr (unWebHistoryItem historyItem) $ \ptr ->
+    withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_alternate_title#} ptr >>= peekCString
 
 webHistoryItemGetLastVisitedTime :: WebHistoryItem -> IO Double
 webHistoryItemGetLastVisitedTime historyItem =
-    withForeignPtr (unWebHistoryItem historyItem) $ \ptr ->
+    withWebHistoryItem historyItem $ \ptr ->
          liftM realToFrac $ {#call web_history_item_get_last_visited_time#} ptr
 
 webHistoryItemGetOrginalUri :: WebHistoryItem -> IO String
 webHistoryItemGetOrginalUri historyItem =
-    withForeignPtr (unWebHistoryItem historyItem) $ \ptr ->
+    withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_original_uri#} ptr >>= peekCString
 
 webHistoryItemGetTitle :: WebHistoryItem -> IO String
 webHistoryItemGetTitle historyItem =
-    withForeignPtr (unWebHistoryItem historyItem) $ \ptr ->
+    withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_title#} ptr >>= peekCString
 
 webHistoryItemGetUri :: WebHistoryItem -> IO String
 webHistoryItemGetUri historyItem =
-    withForeignPtr (unWebHistoryItem historyItem) $ \ptr ->
+    withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_uri#} ptr >>= peekCString
 
 webHistoryItemNew :: IO WebHistoryItem 
@@ -83,6 +84,6 @@ webHistoryItemNewWithData uri title =
 webHistoryItemSetAlternateTitle :: WebHistoryItem -> String -> IO ()
 webHistoryItemSetAlternateTitle historyItem title =
     withCString title $ \cTitle ->
-        withForeignPtr (unWebHistoryItem historyItem) $ \ptr ->
+        withWebHistoryItem historyItem $ \ptr ->
             {#call web_history_item_set_alternate_title#} ptr cTitle
     

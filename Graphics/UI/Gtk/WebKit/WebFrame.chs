@@ -59,6 +59,8 @@ import Graphics.UI.Gtk
     , unWebFrame
     , mkWebView
     , unWebView
+
+    , withWebFrame
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -67,36 +69,36 @@ import Graphics.UI.Gtk
 
 webFrameGetWebView :: WebFrame -> IO WebView
 webFrameGetWebView frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         makeNewObject mkWebView $ {#call web_frame_get_web_view#} ptr
 
 webFrameGetName :: WebFrame -> IO (Maybe String)
 webFrameGetName frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         {#call web_frame_get_name#} ptr
             >>= maybePeek peekCString
 
 webFrameGetTitle :: WebFrame -> IO (Maybe String)
 webFrameGetTitle frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         {#call web_frame_get_title#} ptr
             >>= maybePeek peekCString
 
 webFrameGetUri :: WebFrame -> IO (Maybe String)
 webFrameGetUri frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         {#call web_frame_get_uri#} ptr
             >>= maybePeek peekCString
 
 webFrameGetParent :: WebFrame -> IO WebFrame
 webFrameGetParent frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         makeNewObject mkWebFrame $ {#call web_frame_get_parent#} ptr
 
 webFrameLoadUri :: WebFrame -> String -> IO ()
 webFrameLoadUri frame uri = do
     withCString uri $ \c_uri ->
-        withForeignPtr (unWebFrame frame) $ \ptr ->
+        withWebFrame frame $ \ptr ->
             {#call web_frame_load_uri#} ptr c_uri
 
 webFrameLoadString :: WebFrame -> String -> String -> String -> String -> IO ()
@@ -105,7 +107,7 @@ webFrameLoadString frame content mime_type encoding base_uri = do
         withCString mime_type $ \c_mime_type ->
             withCString encoding $ \c_encoding ->
                 withCString base_uri $ \c_base_uri ->
-                    withForeignPtr (unWebFrame frame) $ \ptr ->
+                    withWebFrame frame $ \ptr ->
                         {#call web_frame_load_string#}
                             ptr c_content c_mime_type c_encoding c_base_uri
 
@@ -114,7 +116,7 @@ webFrameLoadAlternateString frame content base_url unreachable_url = do
     withCString content $ \c_content ->
         withCString base_url $ \c_base_url->
             withCString unreachable_url $ \c_unreachable_url ->
-                withForeignPtr (unWebFrame frame) $ \ptr ->
+                withWebFrame frame $ \ptr ->
                     {#call web_frame_load_alternate_string#}
                         ptr c_content c_base_url c_unreachable_url
 
@@ -124,18 +126,18 @@ void web_frame_load_request (WebKitWebFrame *frame, WebKitNetworkRequest *reques
 
 webFrameStopLoading :: WebFrame -> IO ()
 webFrameStopLoading frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         {#call web_frame_stop_loading#} ptr
 
 webFrameReload :: WebFrame -> IO ()
 webFrameReload frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         {#call web_frame_reload#} ptr
 
 webFrameFindFrame :: WebFrame -> String -> IO WebFrame
 webFrameFindFrame frame name = do
     withCString name $ \c_name ->
-        withForeignPtr (unWebFrame frame) $ \ptr ->
+        withWebFrame frame $ \ptr ->
             makeNewObject mkWebFrame $
                 {#call web_frame_find_frame#} ptr c_name
 
@@ -146,12 +148,12 @@ GtkPrintOperationResult web_frame_print_full (WebKitWebFrame *frame, GtkPrintOpe
 
 webFramePrint :: WebFrame -> IO ()
 webFramePrint frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         {#call web_frame_print#} ptr
 
 webFrameGetLoadStatus :: WebFrame -> IO LoadStatus
 webFrameGetLoadStatus frame =
-    withForeignPtr (unWebFrame frame) $ \ptr ->
+    withWebFrame frame $ \ptr ->
         liftM (toEnum . fromIntegral) $
             {#call web_frame_get_load_status#} ptr
 

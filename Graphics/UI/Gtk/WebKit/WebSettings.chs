@@ -147,6 +147,8 @@ import Graphics.UI.Gtk
 
     , mkWebSettings
     , unWebSettings 
+
+    , withWebSettings
     )
 
 
@@ -156,7 +158,7 @@ import Graphics.UI.Gtk
 
 webSettingsCopy :: WebSettings -> IO WebSettings
 webSettingsCopy settings = 
-    withForeignPtr (unWebSettings settings) $ \ptr ->
+    withWebSettings settings $ \ptr ->
         makeNewObject mkWebSettings $ {#call web_settings_copy#} ptr 
 
 webSettingsNew :: IO WebSettings 
@@ -166,7 +168,7 @@ webSettingsNew =
 {- Same as property function...
 webSettingsGetUserAgent :: WebSettings -> IO String 
 webSettingsGetUserAgent settings = 
-    withForeignPtr (unWebSettings settings) $ \ptr ->
+    withWebSettings settings $ \ptr ->
        {#call web_settings_get_user_agent#} ptr >>= peekCString
 -}
 

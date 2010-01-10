@@ -211,6 +211,9 @@ import Graphics.UI.Gtk.Signals
     , unWebView
     , mkWebSettings
     , unWebSettings
+
+    , withWebView
+    , withWebSettings
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -229,19 +232,19 @@ webViewNew = do
 
 webViewGetTitle :: WebView -> IO (Maybe String)
 webViewGetTitle web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_get_title#} ptr
             >>= maybePeek peekCString
 
 webViewGetUri :: WebView -> IO (Maybe String)
 webViewGetUri web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_get_uri#} ptr
             >>= maybePeek peekCString
 
 webViewSetMaintainsBackForwardList :: WebView -> Bool -> IO ()
 webViewSetMaintainsBackForwardList web_view flag =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_set_maintains_back_forward_list#}
             ptr $ fromBool flag
 
@@ -252,61 +255,61 @@ gboolean webkit_web_view_go_to_back_forward_item (WebKitWebView *web_view, WebKi
 
 webViewCanGoBack :: WebView -> IO Bool
 webViewCanGoBack web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_go_back#} ptr
 
 webViewCanGoBackOrForward :: WebView -> Int -> IO Bool
 webViewCanGoBackOrForward web_view steps = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $
             {#call web_view_can_go_back_or_forward#}
                 ptr (fromIntegral steps)
 
 webViewCanGoForward :: WebView -> IO Bool
 webViewCanGoForward web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_go_forward#} ptr
 
 webViewGoBack :: WebView -> IO ()
 webViewGoBack web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_go_back#} ptr
 
 webViewGoBackOrForward :: WebView -> Int -> IO ()
 webViewGoBackOrForward web_view steps =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_go_back_or_forward#} ptr (fromIntegral steps)
 
 webViewGoForward :: WebView -> IO ()
 webViewGoForward web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_go_forward#} ptr
 
 webViewStopLoading :: WebView -> IO ()
 webViewStopLoading web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_stop_loading#} ptr
 
 webViewOpen :: WebView -> String -> IO ()
 webViewOpen web_view uri = do
     withCString uri $ \c_uri ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             {#call web_view_open#} ptr c_uri
 
 webViewReload :: WebView -> IO ()
 webViewReload web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_reload#} ptr
 
 webViewReloadBypassCache :: WebView -> IO ()
 webViewReloadBypassCache web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_reload_bypass_cache#} ptr
 
 webViewLoadUri :: WebView -> String -> IO ()
 webViewLoadUri web_view uri = do
     withCString uri $ \c_uri ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             {#call web_view_load_uri#} ptr c_uri
 
 webViewLoadString :: WebView -> String -> String -> String -> String -> IO ()
@@ -315,7 +318,7 @@ webViewLoadString web_view content mime_type encoding base_uri = do
         withCString mime_type $ \c_mime_type ->
             withCString encoding $ \c_encoding ->
                 withCString base_uri $ \c_base_uri ->
-                    withForeignPtr (unWebView web_view) $ \ptr ->
+                    withWebView web_view $ \ptr ->
                         {#call web_view_load_string#}
                             ptr c_content c_mime_type c_encoding c_base_uri
 
@@ -323,7 +326,7 @@ webViewLoadHtmlString :: WebView -> String -> String -> IO ()
 webViewLoadHtmlString web_view content base_uri = do
     withCString content $ \c_content ->
         withCString base_uri $ \c_base_uri ->
-            withForeignPtr (unWebView web_view) $ \ptr ->
+            withWebView web_view $ \ptr ->
                 {#call web_view_load_html_string#}
                     ptr c_content c_base_uri
 
@@ -334,7 +337,7 @@ void webkit_web_view_load_request (WebKitWebView *web_view, WebKitNetworkRequest
 webViewSearchText :: WebView -> String -> Bool -> Bool -> Bool -> IO Bool
 webViewSearchText web_view text case_sensitive forward wrap =
     withCString text $ \c_text ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             liftM toBool $
                 {#call web_view_search_text#}
                     ptr c_text (fromBool case_sensitive)
@@ -343,90 +346,90 @@ webViewSearchText web_view text case_sensitive forward wrap =
 webViewMarkTextMatches :: WebView -> String -> Bool -> Int -> IO Int
 webViewMarkTextMatches web_view string case_sensitive limit =
     withCString string $ \c_string ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             liftM fromIntegral $
                 {#call web_view_mark_text_matches#}
                     ptr c_string (fromBool case_sensitive) (fromIntegral limit)
 
 webViewSetHighlightTextMatches :: WebView -> Bool -> IO ()
 webViewSetHighlightTextMatches web_view highlight =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_set_highlight_text_matches#} ptr $ fromBool highlight
 
 webViewUnmarkTextMatches :: WebView -> IO ()
 webViewUnmarkTextMatches web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_unmark_text_matches#} ptr
 
 webViewGetMainFrame :: WebView -> IO WebFrame
 webViewGetMainFrame web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         makeNewObject mkWebFrame $ {#call web_view_get_main_frame#} ptr
 
 webViewGetFocusedFrame :: WebView -> IO WebFrame
 webViewGetFocusedFrame web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         makeNewObject mkWebFrame $ {#call web_view_get_focused_frame#} ptr
 
 webViewExecuteScript :: WebView -> String -> IO ()
 webViewExecuteScript web_view script = do
     withCString script $ \c_script ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             {#call web_view_execute_script#} ptr c_script
 
 webViewCanCutClipboard :: WebView -> IO Bool
 webViewCanCutClipboard web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_cut_clipboard#} ptr
 
 webViewCanCopyClipboard :: WebView -> IO Bool
 webViewCanCopyClipboard web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_copy_clipboard#} ptr
 
 webViewCanPasteClipboard :: WebView -> IO Bool
 webViewCanPasteClipboard web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_paste_clipboard#} ptr
 
 webViewCutClipboard :: WebView -> IO ()
 webViewCutClipboard web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_cut_clipboard#} ptr
 
 webViewCopyClipboard :: WebView -> IO ()
 webViewCopyClipboard web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_copy_clipboard#} ptr
 
 webViewPasteClipboard :: WebView -> IO ()
 webViewPasteClipboard web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_paste_clipboard#} ptr
 
 webViewDeleteSelection :: WebView -> IO ()
 webViewDeleteSelection web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_delete_selection#} ptr
 
 webViewHasSelection :: WebView -> IO Bool
 webViewHasSelection web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_has_selection#} ptr
 
 webViewSelectAll :: WebView -> IO ()
 webViewSelectAll web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_select_all#} ptr
 
 webViewGetEditable :: WebView -> IO Bool
 webViewGetEditable web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_get_editable#} ptr
 
 webViewSetEditable :: WebView -> Bool -> IO ()
 webViewSetEditable web_view flag =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_set_editable#} ptr $ fromBool flag
 
 {- TODO
@@ -435,14 +438,14 @@ GtkTargetList * webkit_web_view_get_paste_target_list (WebKitWebView *web_view);
 -}
 
 webViewSetSettings :: WebView -> WebSettings -> IO ()
-webViewSetSettings view settings = 
-    withForeignPtr (unWebView view) $ \vptr ->
-        withForeignPtr (unWebSettings settings) $ \sptr ->
+webViewSetSettings web_view settings = 
+    withWebView web_view $ \vptr ->
+        withWebSettings settings $ \sptr ->
             {#call web_view_set_settings#} vptr sptr
 
 webViewGetSettings :: WebView -> IO WebSettings 
-webViewGetSettings view =
-    withForeignPtr (unWebView view) $ \ptr ->
+webViewGetSettings web_view =
+    withWebView web_view $ \ptr ->
         makeNewObject  mkWebSettings $ {#call web_view_get_settings#} ptr
 
 {- TODO
@@ -453,53 +456,53 @@ WebKitWebWindowFeatures* webkit_web_view_get_window_features (WebKitWebView *web
 webViewCanShowMimeType :: WebView -> String -> IO Bool
 webViewCanShowMimeType web_view mime_type = do
     withCString mime_type $ \c_mime_type ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             liftM toBool $
                 {#call web_view_can_show_mime_type#} ptr c_mime_type
 
 webViewGetTransparent :: WebView -> IO Bool
 webViewGetTransparent web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $
             {#call web_view_get_transparent#} ptr
 
 webViewSetTransparent :: WebView -> Bool -> IO ()
 webViewSetTransparent web_view flag =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_set_transparent#} ptr $
             fromBool flag
 
 webViewGetZoomLevel :: WebView -> IO Float
 webViewGetZoomLevel web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM realToFrac $
             {#call web_view_get_zoom_level#} ptr
 
 webViewSetZoomLevel :: WebView -> Float -> IO ()
 webViewSetZoomLevel web_view zoom_level =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_set_zoom_level#} ptr $
             realToFrac zoom_level
 
 webViewZoomIn :: WebView -> IO ()
 webViewZoomIn web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_zoom_in#} ptr
 
 webViewZoomOut :: WebView -> IO ()
 webViewZoomOut web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_zoom_out#} ptr
 
 webViewGetFullContentZoom :: WebView -> IO Bool
 webViewGetFullContentZoom web_view = do
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM toBool $
             {#call web_view_get_full_content_zoom#} ptr
 
 webViewSetFullContentZoom :: WebView -> Bool -> IO ()
 webViewSetFullContentZoom web_view full_content_zoom =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_set_full_content_zoom#} ptr $
             fromBool full_content_zoom
 
@@ -509,19 +512,19 @@ SoupSession* webkit_get_default_session (void);
 
 webViewGetEncoding :: WebView -> IO (Maybe String)
 webViewGetEncoding web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_get_encoding#} ptr
             >>= maybePeek peekCString
 
 webViewSetCustomEncoding :: WebView -> String -> IO ()
 webViewSetCustomEncoding web_view encoding = do
     withCString encoding $ \c_encoding ->
-        withForeignPtr (unWebView web_view) $ \ptr ->
+        withWebView web_view $ \ptr ->
             {#call web_view_set_custom_encoding#} ptr c_encoding
 
 webViewGetCustomEncoding :: WebView -> IO (Maybe String)
 webViewGetCustomEncoding web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         {#call web_view_get_custom_encoding#} ptr
             >>= maybePeek peekCString
 
@@ -531,13 +534,13 @@ void webkit_web_view_move_cursor (WebKitWebView * webView, GtkMovementStep step,
 
 webViewGetLoadStatus :: WebView -> IO LoadStatus
 webViewGetLoadStatus web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM (toEnum . fromIntegral) $
             {#call web_view_get_load_status#} ptr
 
 webViewGetProgress :: WebView -> IO Double
 webViewGetProgress web_view =
-    withForeignPtr (unWebView web_view) $ \ptr ->
+    withWebView web_view $ \ptr ->
         liftM realToFrac $
             {#call web_view_get_progress#} ptr
 
