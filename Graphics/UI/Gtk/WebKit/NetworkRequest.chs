@@ -12,11 +12,11 @@ module Graphics.UI.Gtk.WebKit.NetworkRequest
     , networkRequestSetUri
     , networkRequestGetUri
 
-    --, networkRequestGetMessage
+    , networkRequestGetMessage
 
     -- Properties --------------------------------------------------------------
 
-    --, networkRequestSetMessage
+    , networkRequestSetMessage
     ) where
  
 #include <webkit/webkitnetworkrequest.h>
@@ -42,6 +42,16 @@ import Graphics.UI.Gtk.Signals
     , mkNetworkRequest
     )
 
+{#import Network.Soup.General.Types#}
+    ( Message
+    
+    , mkMessage
+    )
+
+{#import Network.Soup.Message#}
+    ( messageGetType
+    )
+
 -- TODO: GType webkit_network_request_get_type (void);
 
 networkRequestNew :: String -> IO NetworkRequest
@@ -63,10 +73,15 @@ networkRequestSetUri request uri = do
         withNetworkRequest request $ \ptr ->
             {#call network_request_set_uri#} ptr c_uri
 
--- TODO: SoupMessage * webkit_network_request_get_message(WebKitNetworkRequest* request);
+networkRequestGetMessage :: NetworkRequest -> IO Message
+networkRequestGetMessage request =
+    withNetworkRequest request $ \ptr ->
+        makeNewObject mkMessage $ {#call network_request_get_message#} ptr
 
 -- Properties ------------------------------------------------------------------
 
--- TODO: networkRequestSetMessage 
--- "message" SoupMessage* : Read / Write / Construct Only
+networkRequestSetMessage :: NetworkRequest -> Message -> IO ()
+networkRequestSetMessage request message = do
+    mt <- messageGetType
+    objectSetPropertyGObject mt "auto-load-images" request message
 

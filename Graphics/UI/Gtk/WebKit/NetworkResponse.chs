@@ -12,7 +12,7 @@ module Graphics.UI.Gtk.WebKit.NetworkResponse
     , networkResponseSetUri
     , networkResponseGetUri
 
-    --, networkResponseGetMessage
+    , networkResponseGetMessage
     ) where
  
 #include <webkit/webkitnetworkresponse.h>
@@ -38,6 +38,12 @@ import Graphics.UI.Gtk.Signals
     , mkNetworkResponse
     )
 
+{#import Network.Soup.General.Types#}
+    ( Message
+    
+    , mkMessage
+    )
+
 -- TODO: GType webkit_network_response_get_type (void);
 
 networkResponseNew :: String -> IO NetworkResponse
@@ -59,5 +65,8 @@ networkResponseSetUri response uri = do
         withNetworkResponse response $ \ptr ->
             {#call network_response_set_uri#} ptr c_uri
 
--- TODO: SoupMessage * webkit_network_response_get_message(WebKitNetworkResponse* response);
+networkResponseGetMessage :: NetworkResponse -> IO Message
+networkResponseGetMessage response =
+    withNetworkResponse response $ \ptr ->
+        makeNewObject mkMessage $ {#call network_response_get_message#} ptr
 

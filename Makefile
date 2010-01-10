@@ -40,9 +40,9 @@ all: Test
 Test: Test.hs $(hs_files) $(generated)
 	@ghc --make Test.hs `pkg-config --libs webkit-1.0`
 
-Graphics/UI/Gtk/WebKit/NetworkRequest.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+Graphics/UI/Gtk/WebKit/NetworkRequest.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Network/Soup/General/Types.hs Network/Soup/Message.hs
 
-Graphics/UI/Gtk/WebKit/NetworkResponse.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+Graphics/UI/Gtk/WebKit/NetworkResponse.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Network/Soup/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebFrame.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
 
