@@ -13,6 +13,7 @@ module Graphics.UI.Gtk.WebKit.General.Enums
     , NavigationResponse (..)
     , WebViewTargetInfo (..)
     , EditingBehavior (..)
+    , WebNavigationReason (..) 
     -- , CacheModel (..) -- new in webkit 1.1.18
     ) where
 
@@ -44,3 +45,6 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 {#enum CacheModel {underscoreToCase}
     with prefix = "WebKit_Cache_Model_" deriving (Eq,Show)#}
 -}
+
+{#enum WebNavigationReason {underscoreToCase}
+    with prefix = "WebKit_Web_Navigation_Reason_" deriving (Eq,Show) #}
