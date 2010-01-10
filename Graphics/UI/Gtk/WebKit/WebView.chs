@@ -32,7 +32,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewLoadUri
     , webViewLoadString
     , webViewLoadHtmlString
-    --, webViewLoadRequest 
+    , webViewLoadRequest 
 
     , webViewSearchText
     , webViewMarkTextMatches
