@@ -11,8 +11,8 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGetUri
 
     , webViewSetMaintainsBackForwardList
-    --, webViewGetBackForwardList
-    --, webViewGoToBackForwardItem 
+    , webViewGetBackForwardList
+    , webViewGoToBackForwardItem 
 
     , webViewCanGoBack
     , webViewCanGoBackOrForward
@@ -204,13 +204,20 @@ import Graphics.UI.Gtk.Signals
     ( WebFrame
     , WebView
     , WebSettings
+    , WebBackForwardList
+    , WebHistoryItem
 
     , mkWebFrame
     , unWebFrame
+    , withWebView
     , mkWebView
     , unWebView
     , mkWebSettings
     , unWebSettings
+    , withWebBackForwardList 
+    , mkWebBackForwardList
+    , withWebHistoryItem
+    , mkWebHistoryItem
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -245,11 +252,19 @@ webViewSetMaintainsBackForwardList web_view flag =
         {#call web_view_set_maintains_back_forward_list#}
             ptr $ fromBool flag
 
-{- TODO
-WebKitWebBackForwardList * webkit_web_view_get_back_forward_list (WebKitWebView *web_view);
-gboolean webkit_web_view_go_to_back_forward_item (WebKitWebView *web_view, WebKitWebHistoryItem *item);
--}
+webViewGetBackForwardList :: WebView -> IO WebBackForwardList
+webViewGetBackForwardList view =
+    withWebView view $ \ptr ->
+        makeNewObject mkWebBackForwardList $
+            {#call web_view_get_back_forward_list#} ptr
 
+webViewGoToBackForwardItem :: WebView -> WebHistoryItem -> IO Bool
+webViewGoToBackForwardItem view item =
+    withWebView view $ \ptr ->
+        withWebHistoryItem item $ \iptr ->
+            liftM toBool $
+                {#call web_view_go_to_back_forward_item#} ptr iptr 
+ 
 webViewCanGoBack :: WebView -> IO Bool
 webViewCanGoBack web_view = do
     withForeignPtr (unWebView web_view) $ \ptr ->
