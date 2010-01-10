@@ -108,5 +108,10 @@ loadAddress eAddress wvBrowser = do
     -- webViewGetProgress wvBrowser >>= print
     -- webViewGetLoadStatus wvBrowser >>= print
     -- entrySetText eAddress newUri
+
+    ws <- webSettingsNew
+    webSettingsGetUserAgent ws >>= print
+    webViewSetSettings wvBrowser ws 
+
     return ()
 
