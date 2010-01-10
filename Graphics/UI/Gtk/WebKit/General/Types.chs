@@ -27,6 +27,12 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , withWebBackForwardList
     , mkWebBackForwardList
     , unWebBackForwardList
+    
+    , WebNavigationAction
+    , withWebNavigationAction
+    , mkWebNavigationAction
+    , unWebNavigationAction
+
     ) where
 
 #include <webkit/webkit.h>
@@ -104,3 +110,15 @@ instance GObjectClass WebBackForwardList where
 mkWebBackForwardList = WebBackForwardList
 unWebBackForwardList (WebBackForwardList o) = o
 
+-- WebNavigationAction --------------------------------------------------------
+
+{#pointer *WebNavigationAction foreign newtype#}
+
+instance ObjectClass WebNavigationAction
+instance GObjectClass WebNavigationAction where
+  toGObject = mkGObject . castForeignPtr . unWebNavigationAction
+  unsafeCastGObject = mkWebNavigationAction . castForeignPtr . unGObject
+
+mkWebNavigationAction = WebNavigationAction
+unWebNavigationAction (WebNavigationAction o) = o
+ 
