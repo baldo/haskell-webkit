@@ -11,7 +11,9 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
-	Graphics/UI/Gtk/WebKit/General/Enums.hs
+	Graphics/UI/Gtk/WebKit/General/Enums.hs \
+	Network/Soup/Message.hs \
+	Network/Soup/General/Types.hs
 
 hs_files = \
 	Graphics/UI/Gtk/WebKit.hs \
@@ -25,7 +27,10 @@ hs_files = \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
-	Graphics/UI/Gtk/WebKit/General/Enums.hs
+	Graphics/UI/Gtk/WebKit/General/Enums.hs \
+	Network/Soup.hs \
+	Network/Soup/Message.hs \
+	Network/Soup/General/Types.hs
 
 %.hs: %.chs
 	c2hs `pkg-config --cflags webkit-1.0 | sed 's/-[^ ]*/-C &/g'` -o $@ $<
@@ -42,3 +47,4 @@ Graphics/UI/Gtk/WebKit/WebFrame.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Grap
 clean:
 	@rm -f Test spplayer *.o *.hi $(bin) $(from_chs)
 	@make -C Graphics/UI/Gtk clean
+	@make -C Network clean
