@@ -104,7 +104,48 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     --, webViewGetHitTestResult
 
-    -- Signals -----------------------------------------------------------------
+    -- Properties --------------------------------------------------------------
+
+    --, webViewGetCopyTargetList
+
+    --, webViewGetCustomEncoding
+    --, webViewSetCustomEncoding
+
+    --, webViewGetEditable
+    --, webViewSetEditable
+
+    --, webViewGetEncoding
+
+    --, webViewGetFullContentZoom
+    --, webViewSetFullContentZoom
+
+    , webViewGetIconUri
+
+    --, webViewGetLoadStatus
+
+    --, webViewGetPasteTargetList
+
+    --, webViewGetProgress
+
+    --, webViewGetSettings
+    --, webViewSetSettings
+
+    --, webViewGetTitle
+
+    --, webViewGetTransparent
+    --, webViewSetTransparent
+
+    --, webViewGetUri
+
+    -- TODO , webViewGetWebInspector
+
+    --, webViewGetWindowFeatures
+    -- TODO , webViewSetWindowFeatures
+
+    --, webViewGetZoomLevel
+    --, webViewSetZoomLevel
+
+   -- Signals -----------------------------------------------------------------
 
     , onWebViewCopyClipboard
     , afterWebViewCopyClipboard
@@ -148,6 +189,8 @@ module Graphics.UI.Gtk.WebKit.WebView
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+
+import System.Glib.Properties
 
 import Control.Monad
 
@@ -508,6 +551,43 @@ gboolean webkit_web_view_get_view_source_mode (WebKitWebView *web_view);
 WebKitHitTestResult* webkit_web_view_get_hit_test_result (WebKitWebView *webView, GdkEventButton *event);
 -}
 
+-- Properties ------------------------------------------------------------------
+
+{- Not needed...?
+"copy-target-list" GtkTargetList* : Read
+"custom-encoding" gchar* : Read / Write
+"editable" gboolean : Read / Write
+"encoding" gchar* : Read
+"full-content-zoom" gboolean : Read / Write
+-}
+
+webViewGetIconUri :: WebView -> IO String
+webViewGetIconUri =
+    objectGetPropertyString
+        "icon-uri"
+
+{- Not needed...?
+"load-status" WebKitLoadStatus : Read
+"paste-target-list" GtkTargetList* : Read
+"progress" gdouble : Read
+"settings" WebKitWebSettings* : Read / Write
+"title" gchar* : Read
+"transparent" gboolean : Read / Write
+"uri" gchar* : Read
+-}
+
+{- TODO
+webViewGetWebInspector :: WebView -> IO WebInspector
+"web-inspector" WebKitWebInspector* : Read
+
+webViewSetWindowFeatures :: WebView -> WebWindowFeatures -> IO ()
+"window-features" WebKitWebWindowFeatures* : Read / Write
+-}
+
+{- Not needed...?
+"zoom-level" gfloat : Read / Write
+-}
+
 -- Signals ---------------------------------------------------------------------
 
 {- TODO
@@ -522,8 +602,7 @@ onWebViewCopyClipboard =
 afterWebViewCopyClipboard =
     connect_NONE__NONE "copy-clipboard" True
 
-{- TODO
-"create-plugin-widget" : GtkWidget* user_function (WebKitWebView *web_view, gchar *mime_type, gchar *uri, GHashTable *param, gpointer user_data) : Run Last / Action
+{- TODO"create-plugin-widget" : GtkWidget* user_function (WebKitWebView *web_view, gchar *mime_type, gchar *uri, GHashTable *param, gpointer user_data) : Run Last / Action
 "create-web-view" : WebKitWebView* user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer user_data) : Run Last / Action
 -}
 
