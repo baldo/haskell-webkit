@@ -35,6 +35,7 @@ import Graphics.UI.Gtk
     , unWebHistoryItem
     )
 
+-- Property get/set functions are aready provided by WebKit :)
 
 -- New in WebKit 1.1.18
 --webHistoryItemCopy :: WebHistoryItem -> IO WebHistoryItem 
