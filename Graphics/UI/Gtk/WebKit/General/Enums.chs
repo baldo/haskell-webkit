@@ -44,3 +44,6 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 {#enum CacheModel {underscoreToCase}
     with prefix = "WebKit_Cache_Model_" deriving (Eq,Show)#}
 -}
+
+{#enum WebNavigationReason {underscoreToCase}
+    with prefix = "WebKit_Web_Navigation_Reason_" deriving (Eq,Show) #}
