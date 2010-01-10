@@ -5,7 +5,7 @@
 module Graphics.UI.Gtk.WebKit.NetworkRequest
     ( NetworkRequest
 
-    --, networkRequestGetType
+    , networkRequestGetType
 
     , networkRequestNew
 
@@ -25,6 +25,7 @@ import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
 
+import System.Glib.GType
 import System.Glib.Properties
 
 import Control.Monad
@@ -52,7 +53,9 @@ import Graphics.UI.Gtk.Signals
     ( messageGetType
     )
 
--- TODO: GType webkit_network_request_get_type (void);
+networkRequestGetType :: IO GType
+networkRequestGetType =
+    {#call network_request_get_type#}
 
 networkRequestNew :: String -> IO NetworkRequest
 networkRequestNew uri =

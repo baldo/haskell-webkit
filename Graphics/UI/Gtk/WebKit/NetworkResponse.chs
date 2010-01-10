@@ -5,7 +5,7 @@
 module Graphics.UI.Gtk.WebKit.NetworkResponse
     ( NetworkResponse
 
-    --, networkResponseGetType
+    , networkResponseGetType
 
     , networkResponseNew
 
@@ -21,6 +21,7 @@ import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
 
+import System.Glib.GType
 import System.Glib.Properties
 
 import Control.Monad
@@ -44,7 +45,9 @@ import Graphics.UI.Gtk.Signals
     , mkMessage
     )
 
--- TODO: GType webkit_network_response_get_type (void);
+networkResponseGetType :: IO GType
+networkResponseGetType =
+    {#call network_response_get_type#}
 
 networkResponseNew :: String -> IO NetworkResponse
 networkResponseNew uri =
