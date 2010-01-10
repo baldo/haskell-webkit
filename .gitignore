@@ -17,6 +17,7 @@ Test
 
 # genereated files
 Graphics/UI/Gtk/WebKit/NetworkRequest.hs
+Graphics/UI/Gtk/WebKit/NetworkResponse.hs
 Graphics/UI/Gtk/WebKit/WebBackForwardList.hs
 Graphics/UI/Gtk/WebKit/WebFrame.hs
 Graphics/UI/Gtk/WebKit/WebHistoryItem.hs

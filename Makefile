@@ -2,6 +2,7 @@ bin = Test
 
 from_chs = \
 	Graphics/UI/Gtk/WebKit/NetworkRequest.hs \
+	Graphics/UI/Gtk/WebKit/NetworkResponse.hs \
 	Graphics/UI/Gtk/WebKit/WebFrame.hs \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
 	Graphics/UI/Gtk/WebKit/WebSettings.hs \
@@ -15,6 +16,7 @@ from_chs = \
 hs_files = \
 	Graphics/UI/Gtk/WebKit.hs \
 	Graphics/UI/Gtk/WebKit/NetworkRequest.hs \
+	Graphics/UI/Gtk/WebKit/NetworkResponse.hs \
 	Graphics/UI/Gtk/WebKit/WebFrame.hs \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
 	Graphics/UI/Gtk/WebKit/WebSettings.hs \

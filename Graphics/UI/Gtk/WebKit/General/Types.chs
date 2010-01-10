@@ -8,6 +8,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkNetworkRequest
     , unNetworkRequest
 
+    , NetworkResponse
+    , withNetworkResponse
+    , mkNetworkResponse
+    , unNetworkResponse
+
     , WebFrame (..)
     , withWebFrame
     , mkWebFrame
@@ -59,6 +64,19 @@ instance GObjectClass NetworkRequest where
 
 mkNetworkRequest = NetworkRequest
 unNetworkRequest (NetworkRequest o) = o
+
+-- NetworkResponse ------------------------------------------------------------
+
+{#pointer *NetworkResponse foreign newtype#}
+
+instance WidgetClass NetworkResponse
+instance ObjectClass NetworkResponse
+instance GObjectClass NetworkResponse where
+  toGObject = mkGObject . castForeignPtr . unNetworkResponse
+  unsafeCastGObject = mkNetworkResponse . castForeignPtr . unGObject
+
+mkNetworkResponse = NetworkResponse
+unNetworkResponse (NetworkResponse o) = o
 
 -- WebFrame --------------------------------------------------------------------
 

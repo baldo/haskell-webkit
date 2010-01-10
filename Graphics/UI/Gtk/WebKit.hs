@@ -1,5 +1,6 @@
 module Graphics.UI.Gtk.WebKit
     ( module Graphics.UI.Gtk.WebKit.NetworkRequest
+    , module Graphics.UI.Gtk.WebKit.NetworkResponse
     , module Graphics.UI.Gtk.WebKit.WebFrame
     , module Graphics.UI.Gtk.WebKit.WebView
     , module Graphics.UI.Gtk.WebKit.WebSettings
@@ -11,6 +12,7 @@ module Graphics.UI.Gtk.WebKit
     ) where
 
 import Graphics.UI.Gtk.WebKit.NetworkRequest
+import Graphics.UI.Gtk.WebKit.NetworkResponse
 import Graphics.UI.Gtk.WebKit.WebFrame
 import Graphics.UI.Gtk.WebKit.WebView
 import Graphics.UI.Gtk.WebKit.WebSettings
