@@ -56,7 +56,6 @@ import Graphics.UI.Gtk.Types
 
 {#pointer *NetworkRequest foreign newtype#}
 
-instance WidgetClass NetworkRequest
 instance ObjectClass NetworkRequest
 instance GObjectClass NetworkRequest where
   toGObject = mkGObject . castForeignPtr . unNetworkRequest
@@ -69,7 +68,6 @@ unNetworkRequest (NetworkRequest o) = o
 
 {#pointer *NetworkResponse foreign newtype#}
 
-instance WidgetClass NetworkResponse
 instance ObjectClass NetworkResponse
 instance GObjectClass NetworkResponse where
   toGObject = mkGObject . castForeignPtr . unNetworkResponse
