@@ -5,6 +5,7 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
 	Graphics/UI/Gtk/WebKit/WebSettings.hs \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
+   	Graphics/UI/Gtk/WebKit/WebBackForwardList.hs \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
@@ -16,13 +17,14 @@ hs_files = \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
 	Graphics/UI/Gtk/WebKit/WebSettings.hs \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
+   	Graphics/UI/Gtk/WebKit/WebBackForwardList.hs \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs
 
 %.hs: %.chs
-	@c2hs `pkg-config --cflags webkit-1.0 | sed 's/-[^ ]*/-C &/g'` -o $@ $<
+	c2hs `pkg-config --cflags webkit-1.0 | sed 's/-[^ ]*/-C &/g'` -o $@ $<
 
 all: Test
 
