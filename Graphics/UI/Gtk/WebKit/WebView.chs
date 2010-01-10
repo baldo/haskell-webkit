@@ -5,6 +5,8 @@
 module Graphics.UI.Gtk.WebKit.WebView
     ( WebView
 
+    , webViewGetType
+
     , webViewNew
 
     , webViewGetTitle
@@ -190,6 +192,7 @@ import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
 
+import System.Glib.GType
 import System.Glib.Properties
 
 import Control.Monad
@@ -201,12 +204,14 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Signals
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
-    ( WebFrame
+    ( NetworkRequest
+    , WebFrame
     , WebView
     , WebSettings
     , WebBackForwardList
     , WebHistoryItem
 
+    , withNetworkRequest
     , withWebFrame
     , mkWebFrame
     , withWebView
@@ -225,9 +230,9 @@ import Graphics.UI.Gtk.Signals
     ( LoadStatus (..)
     )
 
-{- TODO
-GType webkit_web_view_get_type (void);
--}
+webViewGetType :: IO GType
+webViewGetType =
+    {#call web_view_get_type#}
 
 webViewNew :: IO WebView
 webViewNew = do
@@ -343,9 +348,11 @@ webViewLoadHtmlString web_view content base_uri = do
                 {#call web_view_load_html_string#}
                     ptr c_content c_base_uri
 
-{- TODO
-void webkit_web_view_load_request (WebKitWebView *web_view, WebKitNetworkRequest *request);
--}
+webViewLoadRequest :: WebView -> NetworkRequest -> IO ()
+webViewLoadRequest web_view request =
+    withWebView web_view $ \wv_ptr ->
+        withNetworkRequest request $ \r_ptr ->
+            {#call web_view_load_request#} wv_ptr r_ptr
 
 webViewSearchText :: WebView -> String -> Bool -> Bool -> Bool -> IO Bool
 webViewSearchText web_view text case_sensitive forward wrap =
