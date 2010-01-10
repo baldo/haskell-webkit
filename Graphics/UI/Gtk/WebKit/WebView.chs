@@ -145,7 +145,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     --, webViewGetZoomLevel
     --, webViewSetZoomLevel
 
-   -- Signals -----------------------------------------------------------------
+    -- Signals -----------------------------------------------------------------
 
     , onWebViewCopyClipboard
     , afterWebViewCopyClipboard
