@@ -83,6 +83,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkWebResource
     , unWebResource
 
+    , Download
+    , withDownload
+    , mkDownload
+    , unDownload
+
     , unsafeCastGObject
     , toGObject
     ) where
@@ -293,3 +298,15 @@ instance GObjectClass WebResource where
 
 mkWebResource = WebResource
 unWebResource (WebResource o) = o
+
+-- Download ----------------------------------------------------------
+
+{#pointer *Download foreign newtype#}
+
+instance ObjectClass Download
+instance GObjectClass Download where
+  toGObject = mkGObject . castForeignPtr . unDownload
+  unsafeCastGObject = mkDownload . castForeignPtr . unGObject
+
+mkDownload = Download
+unDownload (Download o) = o
