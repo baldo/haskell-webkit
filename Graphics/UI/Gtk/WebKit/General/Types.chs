@@ -68,7 +68,8 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkSecurityOrigin
     , unSecurityOrigin
 
-
+    , unsafeCastGObject
+    , toGObject
     ) where
 
 #include <webkit/webkit.h>
