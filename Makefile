@@ -9,7 +9,7 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
    	Graphics/UI/Gtk/WebKit/WebBackForwardList.hs \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
-    Graphics/UI/Gtk/WebKit/WebNavigationAction.hs \
+	Graphics/UI/Gtk/WebKit/WebNavigationAction.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
@@ -26,7 +26,7 @@ hs_files = \
 	Graphics/UI/Gtk/WebKit/WebHistoryItem.hs \
    	Graphics/UI/Gtk/WebKit/WebBackForwardList.hs \
 	Graphics/UI/Gtk/WebKit/WebView.hs \
-    Graphics/UI/Gtk/WebKit/WebNavigationAction.hs \
+	Graphics/UI/Gtk/WebKit/WebNavigationAction.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
@@ -57,6 +57,8 @@ Graphics/UI/Gtk/WebKit/WebHistoryItem.hs: Graphics/UI/Gtk/WebKit/General/Types.h
 Graphics/UI/Gtk/WebKit/WebBackForwardList.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebView.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+
+Graphics/UI/Gtk/WebKit/WebNavigationAction.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
 
 Network/Soup/Message.hs: Network/Soup/General/Types.hs
 

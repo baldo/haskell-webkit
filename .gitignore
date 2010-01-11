@@ -22,6 +22,7 @@ Graphics/UI/Gtk/WebKit/WebBackForwardList.hs
 Graphics/UI/Gtk/WebKit/WebFrame.hs
 Graphics/UI/Gtk/WebKit/WebHistoryItem.hs
 Graphics/UI/Gtk/WebKit/WebSettings.hs
+Graphics/UI/Gtk/WebKit/WebNavigationAction.hs
 Graphics/UI/Gtk/WebKit/WebView.hs
 Graphics/UI/Gtk/WebKit/General/General.hs
 Graphics/UI/Gtk/WebKit/General/Types.hs
