@@ -5,6 +5,13 @@
 module Graphics.UI.Gtk.WebKit.WebResource
     ( WebResource
 
+    , webResourceGetNew
+    , webResourceGetUri
+    , webResourceGetType
+    , webResourceGetFrameName
+    , webResourceGetEncoding
+    --, webResourceGetData
+
     ) where
 
 #include <webkit/webkitwebresource.h>
