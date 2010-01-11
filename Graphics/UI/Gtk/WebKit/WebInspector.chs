@@ -71,13 +71,13 @@ webInspectorClose inspector =
 
 
 webInspectorSetJavascriptProfilingEnabled :: WebInspector -> Bool -> IO ()
-webInspectorSetJavascriptProfilingEnabled b =
+webInspectorSetJavascriptProfilingEnabled =
     objectSetPropertyBool 
         "javascript-profiling-enabled" 
 
 webInspectorGetJavascriptProfilingEnabled :: WebInspector -> IO Bool
-webInspectorGetJavascriptProfilingEnabled b =
-    objectgetPropertyBool 
+webInspectorGetJavascriptProfilingEnabled =
+    objectGetPropertyBool 
         "javascript-profiling-enabled" 
 
 
