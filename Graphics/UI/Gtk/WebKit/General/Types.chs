@@ -73,6 +73,16 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkSoupAuthDialog
     , unSoupAuthDialog
 
+    , WebDataSource
+    , withWebDataSource
+    , mkWebDataSource
+    , unWebDataSource
+
+    , WebResource
+    , withWebResource
+    , mkWebResource
+    , unWebResource
+
     , unsafeCastGObject
     , toGObject
     ) where
@@ -259,3 +269,27 @@ instance GObjectClass SoupAuthDialog where
 
 mkSoupAuthDialog = SoupAuthDialog
 unSoupAuthDialog (SoupAuthDialog o) = o
+
+-- WebDataSource ----------------------------------------------------------
+
+{#pointer *WebDataSource foreign newtype#}
+
+instance ObjectClass WebDataSource
+instance GObjectClass WebDataSource where
+  toGObject = mkGObject . castForeignPtr . unWebDataSource
+  unsafeCastGObject = mkWebDataSource . castForeignPtr . unGObject
+
+mkWebDataSource = WebDataSource
+unWebDataSource (WebDataSource o) = o
+
+-- WebResource ----------------------------------------------------------
+
+{#pointer *WebResource foreign newtype#}
+
+instance ObjectClass WebResource
+instance GObjectClass WebResource where
+  toGObject = mkGObject . castForeignPtr . unWebResource
+  unsafeCastGObject = mkWebResource . castForeignPtr . unGObject
+
+mkWebResource = WebResource
+unWebResource (WebResource o) = o
