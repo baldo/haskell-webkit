@@ -12,6 +12,7 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/WebNavigationAction.hs \
     Graphics/UI/Gtk/WebKit/WebPolicyDecision.hs \
     Graphics/UI/Gtk/WebKit/WebInspector.hs \
+    Graphics/UI/Gtk/WebKit/WebDatabase.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
@@ -31,6 +32,7 @@ hs_files = \
 	Graphics/UI/Gtk/WebKit/WebNavigationAction.hs \
     Graphics/UI/Gtk/WebKit/WebPolicyDecision.hs \
     Graphics/UI/Gtk/WebKit/WebInspector.hs \
+    Graphics/UI/Gtk/WebKit/WebDatabase.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
@@ -67,6 +69,8 @@ Graphics/UI/Gtk/WebKit/WebNavigationAction.hs: Graphics/UI/Gtk/WebKit/General/Ty
 Graphics/UI/Gtk/WebKit/WebPolicyDecision.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebInspector.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+
+Graphics/UI/Gtk/WebKit/WebDatabase.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Network/Soup/Message.hs: Network/Soup/General/Types.hs
 

@@ -58,6 +58,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkWebInspector
     , unWebInspector
 
+    , WebDatabase
+    , withWebDatabase
+    , mkWebDatabase
+    , unWebDatabase
+
     ) where
 
 #include <webkit/webkit.h>
@@ -207,4 +212,14 @@ instance GObjectClass WebInspector where
 mkWebInspector = WebInspector
 unWebInspector (WebInspector o) = o
 
+-- WebDatabase ----------------------------------------------------------
 
+{#pointer *WebDatabase foreign newtype#}
+
+instance ObjectClass WebDatabase
+instance GObjectClass WebDatabase where
+  toGObject = mkGObject . castForeignPtr . unWebDatabase
+  unsafeCastGObject = mkWebDatabase . castForeignPtr . unGObject
+
+mkWebDatabase = WebDatabase
+unWebDatabase (WebDatabase o) = o
