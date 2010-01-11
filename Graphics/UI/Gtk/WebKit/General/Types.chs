@@ -68,6 +68,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkSecurityOrigin
     , unSecurityOrigin
 
+    , SoupAuthDialog
+    , withSoupAuthDialog
+    , mkSoupAuthDialog
+    , unSoupAuthDialog
+
     , unsafeCastGObject
     , toGObject
     ) where
@@ -242,3 +247,15 @@ instance GObjectClass SecurityOrigin where
 
 mkSecurityOrigin = SecurityOrigin
 unSecurityOrigin (SecurityOrigin o) = o
+
+-- SoupAuthDialog ----------------------------------------------------------
+
+{#pointer *SoupAuthDialog foreign newtype#}
+
+instance ObjectClass SoupAuthDialog
+instance GObjectClass SoupAuthDialog where
+  toGObject = mkGObject . castForeignPtr . unSoupAuthDialog
+  unsafeCastGObject = mkSoupAuthDialog . castForeignPtr . unGObject
+
+mkSoupAuthDialog = SoupAuthDialog
+unSoupAuthDialog (SoupAuthDialog o) = o
