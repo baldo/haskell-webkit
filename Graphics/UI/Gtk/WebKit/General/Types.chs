@@ -63,6 +63,12 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkWebDatabase
     , unWebDatabase
 
+    , SecurityOrigin
+    , withSecurityOrigin
+    , mkSecurityOrigin
+    , unSecurityOrigin
+
+
     ) where
 
 #include <webkit/webkit.h>
@@ -223,3 +229,15 @@ instance GObjectClass WebDatabase where
 
 mkWebDatabase = WebDatabase
 unWebDatabase (WebDatabase o) = o
+
+-- SecurityOrigin ----------------------------------------------------------
+
+{#pointer *SecurityOrigin foreign newtype#}
+
+instance ObjectClass SecurityOrigin
+instance GObjectClass SecurityOrigin where
+  toGObject = mkGObject . castForeignPtr . unSecurityOrigin
+  unsafeCastGObject = mkSecurityOrigin . castForeignPtr . unGObject
+
+mkSecurityOrigin = SecurityOrigin
+unSecurityOrigin (SecurityOrigin o) = o

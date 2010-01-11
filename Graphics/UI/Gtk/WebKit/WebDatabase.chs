@@ -4,7 +4,15 @@
 
 module Graphics.UI.Gtk.WebKit.WebDatabase
     ( WebDatabase
-
+    
+    , webDatabaseGetSize
+    , webDatabaseRemove
+    , webDatabaseGetSecurityOrigin
+    , webDatabaseGetName
+    , webDatabaseGetFilename
+    , webDatabaseGetExpectedSize
+    , webDatabaseGetDisplayName
+ 
     ) where
 
 #include <webkit/webkitwebdatabase.h>
@@ -21,11 +29,11 @@ import Graphics.UI.Gtk
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebDatabase
-    --, WebSecurityOrigin
+    , SecurityOrigin
 
     , mkWebDatabase
     , withWebDatabase
-    --, mkWebSecurityOrigin
+    , mkSecurityOrigin
     )
 
 
@@ -50,10 +58,12 @@ webDatabaseGetName database =
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_name#} ptr >>= peekCString
 
-{-
-WebKitSecurityOrigin * webkit_web_database_get_security_origin
-                                                        (WebKitWebDatabase *webDatabase);
--}
+webDatabaseGetSecurityOrigin :: WebDatabase -> IO SecurityOrigin
+webDatabaseGetSecurityOrigin database =
+    withWebDatabase database $ \ptr ->
+        makeNewObject mkSecurityOrigin $
+            {#call webkit_web_database_get_security_origin#} ptr
+
 webDatabaseGetSize :: WebDatabase -> IO Integer
 webDatabaseGetSize database =
     withWebDatabase database $ \ptr ->
