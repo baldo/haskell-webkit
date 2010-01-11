@@ -83,16 +83,14 @@ webInspectorGetJavascriptProfilingEnabled =
 
 {- new in webkit 1.1.17
 webInspectorSetTimeLineProfilingEnabled :: WebInspector -> Bool -> IO ()
-webInspectorSetTimeLineProfilingEnabled b =
+webInspectorSetTimeLineProfilingEnabled =
     objectSetPropertyBool 
         "timeline-profiling-enabled" 
 
 webInspectorGetTimeLineProfilingEnabled :: WebInspector -> IO Bool
-webInspectorGetTimeLineProfilingEnabled b =
+webInspectorGetTimeLineProfilingEnabled =
     objectGetPropertyBool 
         "timeline-profiling-enabled" 
-
-
 -}
 
 {- TODO Signals 
