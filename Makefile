@@ -13,6 +13,7 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/WebPolicyDecision.hs \
 	Graphics/UI/Gtk/WebKit/WebInspector.hs \
 	Graphics/UI/Gtk/WebKit/WebDatabase.hs \
+	Graphics/UI/Gtk/WebKit/WebDataSource.hs \
 	Graphics/UI/Gtk/WebKit/SecurityOrigin.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
@@ -34,6 +35,7 @@ hs_files = \
     Graphics/UI/Gtk/WebKit/WebPolicyDecision.hs \
     Graphics/UI/Gtk/WebKit/WebInspector.hs \
     Graphics/UI/Gtk/WebKit/WebDatabase.hs \
+	Graphics/UI/Gtk/WebKit/WebDataSource.hs \
 	Graphics/UI/Gtk/WebKit/SecurityOrigin.hs \
 	Graphics/UI/Gtk/WebKit/General/General.hs \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
@@ -73,6 +75,8 @@ Graphics/UI/Gtk/WebKit/WebPolicyDecision.hs: Graphics/UI/Gtk/WebKit/General/Type
 Graphics/UI/Gtk/WebKit/WebInspector.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebDatabase.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+
+Graphics/UI/Gtk/WebKit/WebDataSource.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/SecurityOrigin.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
