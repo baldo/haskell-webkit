@@ -1,0 +1,31 @@
+Haskell WebKit
+==============
+Haskell WebKit provides lowlevel bindings to WebKitGTK+ (http://webkitgtk.org/).
+
+Installation
+============
+At the moment there is no way to really install Haskell WebKit.
+
+Haskell WebKit depends on:
+
+1. libwebkit >= 1.1.15.4
+2. libsoup >= 2.28.2
+3. gtk2hs >= 0.10.1
+4. ghc >= 6.10 (don't know if it works with 6.12)
+5. c2hs >= 0.16.0
+
+To build Haskell WebKit simply type
+    make
+
+Documentation
+=============
+For now we recommend to have look at http://webkitgtk.org/reference/index.html.
+The bindings are pretty much the same way to use as the C libraries. Also refer
+to the gtk2hs docs at http://haskell.org/gtk2hs/docs/current/ as Haskell WebKit
+won't be very usefull without it.
+
+Licensing
+=========
+Haskell WebKit is provided under the terms of LGPL. The complete license text is
+provided in LICENSE.
+

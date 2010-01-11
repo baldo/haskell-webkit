@@ -6,6 +6,8 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import Graphics.UI.Gtk.WebKit
 
+import Network.Soup
+
 main = startBrowser
 
 startBrowser :: IO ()
