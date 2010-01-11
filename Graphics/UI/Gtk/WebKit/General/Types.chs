@@ -43,6 +43,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkWebNavigationAction
     , unWebNavigationAction
 
+    , WebPolicyDecision
+    , withWebPolicyDecision
+    , mkWebPolicyDecision
+    , unWebPolicyDecision
+
     ) where
 
 #include <webkit/webkit.h>
@@ -156,3 +161,14 @@ instance GObjectClass WebNavigationAction where
 mkWebNavigationAction = WebNavigationAction
 unWebNavigationAction (WebNavigationAction o) = o
  
+-- WebPolicyDecision ----------------------------------------------------------
+
+{#pointer *WebPolicyDecision foreign newtype#}
+
+instance ObjectClass WebPolicyDecision
+instance GObjectClass WebPolicyDecision where
+  toGObject = mkGObject . castForeignPtr . unWebPolicyDecision
+  unsafeCastGObject = mkWebPolicyDecision . castForeignPtr . unGObject
+
+mkWebPolicyDecision = WebPolicyDecision
+unWebPolicyDecision (WebPolicyDecision o) = o
