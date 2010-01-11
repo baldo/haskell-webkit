@@ -11,7 +11,12 @@ module Graphics.UI.Gtk.WebKit.WebInspector
     , webInspectorGetWebView
     , webInspectorGetInspectedUri
 
+    -- Properties -------------------------------------------------------------
+    , webInspectorSetJavascriptProfilingEnabled 
+    , webInspectorGetJavascriptProfilingEnabled 
 
+    -- , webInspectorSetTimeLineProfilingEnabled -- new in webkit 1.1.17
+    -- , webInspectorGetTimeLineProfilingEnabled -- new in webkit 1.1.17
     ) where
 
 #include <webkit/webkitwebinspector.h>
@@ -19,6 +24,7 @@ module Graphics.UI.Gtk.WebKit.WebInspector
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.Properties
 
 import Control.Monad
 
@@ -63,9 +69,30 @@ webInspectorClose inspector =
         {#call  web_inspector_close#} ptr
 -} 
 
-{- TODO Propertys
-  "javascript-profiling-enabled" gboolean              : Read / Write
-  "timeline-profiling-enabled" gboolean              : Read / Write -- new in webkit 1.1.17
+
+webInspectorSetJavascriptProfilingEnabled :: WebInspector -> Bool -> IO ()
+webInspectorSetJavascriptProfilingEnabled b =
+    objectSetPropertyBool 
+        "javascript-profiling-enabled" 
+
+webInspectorGetJavascriptProfilingEnabled :: WebInspector -> IO Bool
+webInspectorGetJavascriptProfilingEnabled b =
+    objectgetPropertyBool 
+        "javascript-profiling-enabled" 
+
+
+{- new in webkit 1.1.17
+webInspectorSetTimeLineProfilingEnabled :: WebInspector -> Bool -> IO ()
+webInspectorSetTimeLineProfilingEnabled b =
+    objectSetPropertyBool 
+        "timeline-profiling-enabled" 
+
+webInspectorGetTimeLineProfilingEnabled :: WebInspector -> IO Bool
+webInspectorGetTimeLineProfilingEnabled b =
+    objectGetPropertyBool 
+        "timeline-profiling-enabled" 
+
+
 -}
 
 {- TODO Signals 
