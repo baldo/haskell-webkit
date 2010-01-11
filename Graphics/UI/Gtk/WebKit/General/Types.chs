@@ -53,6 +53,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkHitTestResult
     , unHitTestResult
 
+    , WebInspector
+    , withWebInspector
+    , mkWebInspector
+    , unWebInspector
+
     ) where
 
 #include <webkit/webkit.h>
@@ -189,5 +194,17 @@ instance GObjectClass HitTestResult where
 
 mkHitTestResult = HitTestResult
 unHitTestResult (HitTestResult o) = o
+
+-- WebInspector ----------------------------------------------------------
+
+{#pointer *WebInspector foreign newtype#}
+
+instance ObjectClass WebInspector
+instance GObjectClass WebInspector where
+  toGObject = mkGObject . castForeignPtr . unWebInspector
+  unsafeCastGObject = mkWebInspector . castForeignPtr . unGObject
+
+mkWebInspector = WebInspector
+unWebInspector (WebInspector o) = o
 
 

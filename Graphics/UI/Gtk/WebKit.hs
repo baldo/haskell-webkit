@@ -8,6 +8,7 @@ module Graphics.UI.Gtk.WebKit
     , module Graphics.UI.Gtk.WebKit.WebBackForwardList
     , module Graphics.UI.Gtk.WebKit.WebNavigationAction
     , module Graphics.UI.Gtk.WebKit.WebPolicyDecision
+    , module Graphics.UI.Gtk.WebKit.WebInspector
     -- , module Graphics.UI.Gtk.WebKit.CacheModel -- new in webkit 1.1.18
     , module Graphics.UI.Gtk.WebKit.General.General
     , module Graphics.UI.Gtk.WebKit.General.Enums
@@ -22,6 +23,7 @@ import Graphics.UI.Gtk.WebKit.WebHistoryItem
 import Graphics.UI.Gtk.WebKit.WebBackForwardList
 import Graphics.UI.Gtk.WebKit.WebNavigationAction
 import Graphics.UI.Gtk.WebKit.WebPolicyDecision
+import Graphics.UI.Gtk.WebKit.WebInspector
 -- import Graphics.UI.Gtk.WebKit.CacheModel -- new in webkit 1.1.18
 import Graphics.UI.Gtk.WebKit.General.General
 import Graphics.UI.Gtk.WebKit.General.Enums
