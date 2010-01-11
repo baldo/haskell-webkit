@@ -14,6 +14,7 @@ module Graphics.UI.Gtk.WebKit.General.Enums
     , WebViewTargetInfo (..)
     , EditingBehavior (..)
     , WebNavigationReason (..) 
+    , HitTestResultContext (..)
     -- , CacheModel (..) -- new in webkit 1.1.18
     ) where
 
@@ -48,3 +49,7 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 
 {#enum WebNavigationReason {underscoreToCase}
     with prefix = "WebKit_Web_Navigation_Reason_" deriving (Eq,Show) #}
+
+{#enum HitTestResultContext {underscoreToCase}
+    with prefix = "WebKit_Hit_Test_Result_Context" deriving (Eq,Show) #}
+

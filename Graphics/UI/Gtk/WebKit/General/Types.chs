@@ -48,6 +48,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkWebPolicyDecision
     , unWebPolicyDecision
 
+    , HitTestResult
+    , withHitTestResult
+    , mkHitTestResult
+    , unHitTestResult
+
     ) where
 
 #include <webkit/webkit.h>
@@ -172,3 +177,17 @@ instance GObjectClass WebPolicyDecision where
 
 mkWebPolicyDecision = WebPolicyDecision
 unWebPolicyDecision (WebPolicyDecision o) = o
+
+-- HitTestResult ----------------------------------------------------------
+
+{#pointer *HitTestResult foreign newtype#}
+
+instance ObjectClass HitTestResult
+instance GObjectClass HitTestResult where
+  toGObject = mkGObject . castForeignPtr . unHitTestResult
+  unsafeCastGObject = mkHitTestResult . castForeignPtr . unGObject
+
+mkHitTestResult = HitTestResult
+unHitTestResult (HitTestResult o) = o
+
+
