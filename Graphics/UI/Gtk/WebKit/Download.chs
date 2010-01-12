@@ -5,6 +5,19 @@
 module Graphics.UI.Gtk.WebKit.Download
     ( Download
 
+    , downloadCancel
+    , downloadStart
+    , downloadGetCurrentSize
+    , downloadSetDestinationUri
+    , downloadGetElapsedTime
+    , downloadGetCurrentSize
+    , downloadGetUri
+    , downloadGetTotalSize
+    , downloadGetSuggestedFileName
+    , downloadGetNetworkResponse
+    , downloadGetNetworkRequest
+    --, downloadGetStatus
+
     ) where
 
 #include <webkit/webkitdownload.h>
@@ -34,23 +47,73 @@ import Graphics.UI.Gtk
 
     )
 
+downloadCancel :: Download -> IO ()
+downloadCancel download =
+    withDownload download $ \ptr ->
+        {#call download_cancel#} ptr
+
+downloadGetCurrentSize :: Download -> IO Integer
+downloadGetCurrentSize download =
+    withDownload download $ \ptr ->
+        liftM toInteger $ {#call download_get_current_size#} ptr
+
+downloadGetDestinationUri :: Download -> IO String
+downloadGetDestinationUri download =
+     withDownload download $ \ptr ->
+        {#call download_get_destination_uri#} ptr >>= peekCString
+
+downloadGetElapsedTime :: Download -> IO Double
+downloadGetElapsedTime download = 
+    withDownload download $ \ptr ->
+        liftM realToFrac $ {#call download_get_elapsed_time#} ptr
+
+downloadGetNetworkRequest :: Download -> IO NetworkRequest
+downloadGetNetworkRequest download =
+    withDownload download $ \ptr ->
+        makeNewObject mkNetworkRequest $ {#call download_get_network_request#} ptr
+
+downloadGetNetworkResponse :: Download -> IO NetworkResponse
+downloadGetNetworkResponse download =
+    withDownload download $ \ptr ->
+        makeNewObject mkNetworkResponse $ {#call download_get_network_response#} ptr
+
+downloadGetProgress :: Download -> IO Double
+downloadGetProgress download =
+    withDownload download $ \ptr ->
+        liftM realToFrac $ {#call download_get_progress#} ptr
+
 {- TODO
-void                webkit_download_cancel              (WebKitDownload *download);
-guint64             webkit_download_get_current_size    (WebKitDownload *download);
-const gchar *       webkit_download_get_destination_uri (WebKitDownload *download);
-gdouble             webkit_download_get_elapsed_time    (WebKitDownload *download);
-WebKitNetworkRequest * webkit_download_get_network_request
-                                                        (WebKitDownload *download);
-WebKitNetworkResponse * webkit_download_get_network_response
-                                                        (WebKitDownload *download);
-gdouble             webkit_download_get_progress        (WebKitDownload *download);
 WebKitDownloadStatus  webkit_download_get_status        (WebKitDownload *download);
-const gchar *       webkit_download_get_suggested_filename
-                                                        (WebKitDownload *download);
-guint64             webkit_download_get_total_size      (WebKitDownload *download);
-const gchar *       webkit_download_get_uri             (WebKitDownload *download);
-WebKitDownload *    webkit_download_new                 (WebKitNetworkRequest *request);
-void                webkit_download_set_destination_uri (WebKitDownload *download,
-                                                         const gchar *destination_uri);
-void                webkit_download_start               (WebKitDownload *download);
 -}
+
+downloadGetSuggestedFileName :: Download -> IO String
+downloadGetSuggestedFileName download =
+    withDownload download $ \ptr ->
+        {#call download_get_suggested_filename#} ptr >>= peekCString
+
+downloadGetTotalSize :: Download -> IO Integer
+downloadGetTotalSize download =
+    withDownload download $ \ptr ->
+        liftM toInteger $ {#call download_get_current_size#} ptr
+
+downloadGetUri :: Download -> IO String
+downloadGetUri download =
+    withDownload download $ \ptr ->
+        {#call download_get_uri#} ptr >>= peekCString
+
+downloadNew :: NetworkRequest -> IO Download
+downloadNew request =
+    withNetworkRequest request $ \ptr ->
+        makeNewObject mkDownload $ 
+            {#call download_new#} ptr 
+
+downloadSetDestinationUri :: Download -> String -> IO ()
+downloadSetDestinationUri download uri =
+    withDownload download $ \pDownload ->
+        withCString uri $ \pUri ->
+            {#call download_set_destination_uri#} pDownload pUri
+
+downloadStart :: Download -> IO ()
+downloadStart download =
+    withDownload download $ \ptr ->
+        {#call download_start#} ptr
