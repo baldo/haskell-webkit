@@ -10,13 +10,12 @@ module Graphics.UI.Gtk.WebKit.Download
     , downloadGetCurrentSize
     , downloadSetDestinationUri
     , downloadGetElapsedTime
-    , downloadGetCurrentSize
     , downloadGetUri
     , downloadGetTotalSize
     , downloadGetSuggestedFileName
     , downloadGetNetworkResponse
     , downloadGetNetworkRequest
-    --, downloadGetStatus
+    , downloadGetStatus
 
     ) where
 
@@ -46,6 +45,11 @@ import Graphics.UI.Gtk
     , mkNetworkResponse
 
     )
+
+{#import Graphics.UI.Gtk.WebKit.General.Enums#}
+    ( DownloadStatus
+    )
+
 
 downloadCancel :: Download -> IO ()
 downloadCancel download =
@@ -82,9 +86,10 @@ downloadGetProgress download =
     withDownload download $ \ptr ->
         liftM realToFrac $ {#call download_get_progress#} ptr
 
-{- TODO
-WebKitDownloadStatus  webkit_download_get_status        (WebKitDownload *download);
--}
+downloadGetStatus :: Download -> IO DownloadStatus 
+downloadGetStatus download =
+    withDownload download $ \ptr ->
+        liftM (toEnum . fromIntegral) $ {#call download_get_status#} ptr
 
 downloadGetSuggestedFileName :: Download -> IO String
 downloadGetSuggestedFileName download =

@@ -84,7 +84,7 @@ Graphics/UI/Gtk/WebKit/WebDataSource.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebResource.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
-Graphics/UI/Gtk/WebKit/Download.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
+Graphics/UI/Gtk/WebKit/Download.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
 
 Graphics/UI/Gtk/WebKit/SecurityOrigin.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
