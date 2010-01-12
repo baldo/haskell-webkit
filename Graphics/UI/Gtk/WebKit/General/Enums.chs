@@ -9,47 +9,66 @@ module Graphics.UI.Gtk.WebKit.General.Enums
     , PolicyError (..)
     , PluginError (..)
     , LoadStatus (..)
-    , NavigationReason (..)
+    , WebNavigationReason (..)
     , NavigationResponse (..)
     , WebViewTargetInfo (..)
     , EditingBehavior (..)
-    , WebNavigationReason (..) 
     , HitTestResultContext (..)
     -- , CacheModel (..) -- new in webkit 1.1.18
     ) where
 
 #include <webkit/webkit.h>
 
-{#enum DownloadStatus {underscoreToCase} deriving (Eq, Show)#}
+-- Error.h --------------------------------------------------------------------
+{#enum NetworkError {underscoreToCase} 
+    with prefix = "WebKit_" deriving (Eq, Show)#}
 
-{#enum DownloadError {underscoreToCase} deriving (Eq, Show)#}
+{#enum PolicyError {underscoreToCase} 
+    with prefix = "WebKit_" deriving (Eq, Show)#}
 
-{#enum NetworkError {underscoreToCase} deriving (Eq, Show)#}
+{#enum PluginError {underscoreToCase} 
+    with prefix = "WebKit_" deriving (Eq, Show)#}
 
-{#enum PolicyError {underscoreToCase} deriving (Eq, Show)#}
+-- WebFrame.h -----------------------------------------------------------------
 
-{#enum PluginError {underscoreToCase} deriving (Eq, Show)#}
+{#enum LoadStatus {underscoreToCase} 
+    with prefix = "WebKit_Load_" deriving (Eq, Show)#}
 
-{#enum LoadStatus {underscoreToCase} deriving (Eq, Show)#}
+-- WebView.h ------------------------------------------------------------------
 
-{#enum WebNavigationReason as NavigationReason {underscoreToCase}
-    with prefix = "WebKit_Web" deriving (Eq, Show)#}
+{#enum NavigationResponse {underscoreToCase} 
+    with prefix = "WebKit_Navigation_Response_" deriving (Eq, Show)#}
 
-{#enum NavigationResponse {underscoreToCase} deriving (Eq, Show)#}
+{#enum WebViewTargetInfo {underscoreToCase} 
+    with prefix = "WebKit_Web_View_" deriving (Eq, Show)#}
 
-{#enum WebViewTargetInfo {underscoreToCase} deriving (Eq, Show)#}
+-- WebSettings.h --------------------------------------------------------------
 
 {#enum EditingBehavior {underscoreToCase}
      with prefix = "WebKit_" deriving (Eq,Show)#}
 
+-- CacheModel.h ---------------------------------------------------------------
+
 {- new in webkit 1.1.18
 {#enum CacheModel {underscoreToCase}
-    with prefix = "WebKit_Cache_Model_" deriving (Eq,Show)#}
+    with prefix = "WebKit_" deriving (Eq,Show)#}
 -}
 
+-- WebNavigation.h --------------------------------------------------------------
+
 {#enum WebNavigationReason {underscoreToCase}
-    with prefix = "WebKit_Web_Navigation_Reason_" deriving (Eq,Show) #}
+    with prefix = "WebKit_Web_" deriving (Eq,Show) #}
+
+-- HitTestResult,h --------------------------------------------------------------
 
 {#enum HitTestResultContext {underscoreToCase}
-    with prefix = "WebKit_Hit_Test_Result_Context" deriving (Eq,Show) #}
+    with prefix = "WebKit_" deriving (Eq,Show) #}
+
+-- Download.h -------------------------------------------------------------------
+
+{#enum DownloadStatus {underscoreToCase}
+    with prefix = "WebKit_" deriving (Eq,Show) #}
+
+{#enum DownloadError {underscoreToCase}
+    with prefix = "WebKit_" deriving (Eq,Show) #}
 
