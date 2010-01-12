@@ -14,6 +14,7 @@ module Graphics.UI.Gtk.WebKit
     , module Graphics.UI.Gtk.WebKit.WebDataSource
     , module Graphics.UI.Gtk.WebKit.WebResource
     , module Graphics.UI.Gtk.WebKit.Download
+    , module Graphics.UI.Gtk.WebKit.WebWindowFeatures
     -- , module Graphics.UI.Gtk.WebKit.CacheModel -- new in webkit 1.1.18
     , module Graphics.UI.Gtk.WebKit.General.General
     , module Graphics.UI.Gtk.WebKit.General.Enums
@@ -34,6 +35,7 @@ import Graphics.UI.Gtk.WebKit.SecurityOrigin
 import Graphics.UI.Gtk.WebKit.WebDataSource
 import Graphics.UI.Gtk.WebKit.WebResource
 import Graphics.UI.Gtk.WebKit.Download
+import Graphics.UI.Gtk.WebKit.WebWindowFeatures
 -- import Graphics.UI.Gtk.WebKit.CacheModel -- new in webkit 1.1.18
 import Graphics.UI.Gtk.WebKit.General.General
 import Graphics.UI.Gtk.WebKit.General.Enums

@@ -88,6 +88,11 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , mkDownload
     , unDownload
 
+    , WebWindowFeatures
+    , withWebWindowFeatures
+    , mkWebWindowFeatures
+    , unWebWindowFeatures
+
     , unsafeCastGObject
     , toGObject
     ) where
@@ -310,3 +315,16 @@ instance GObjectClass Download where
 
 mkDownload = Download
 unDownload (Download o) = o
+
+-- WebWindowFeatures ----------------------------------------------------------
+
+{#pointer *WebWindowFeatures foreign newtype#}
+
+instance ObjectClass WebWindowFeatures
+instance GObjectClass WebWindowFeatures where
+  toGObject = mkGObject . castForeignPtr . unWebWindowFeatures
+  unsafeCastGObject = mkWebWindowFeatures . castForeignPtr . unGObject
+
+mkWebWindowFeatures = WebWindowFeatures
+unWebWindowFeatures (WebWindowFeatures o) = o
+
