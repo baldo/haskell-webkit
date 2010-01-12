@@ -95,7 +95,7 @@ Graphics/UI/Gtk/WebKit/WebWindowFeatures.hs: Graphics/UI/Gtk/WebKit/General/Type
 Network/Soup/Message.hs: Network/Soup/General/Types.hs
 
 doc: $(hs_files) $(generated)
-	@mkdir doc/
+	@mkdir -p doc/
 	@haddock -h -o doc/ Graphics/UI/Gtk/WebKit.hs
 
 clean:
