@@ -91,7 +91,8 @@ Graphics/UI/Gtk/WebKit/SecurityOrigin.hs: Graphics/UI/Gtk/WebKit/General/Types.h
 Network/Soup/Message.hs: Network/Soup/General/Types.hs
 
 doc: $(hs_files) $(generated)
-	@haddock -h -o doc/ Graphics/UI/Gtk/WebKit.hs 
+	@mkdir doc/
+	@haddock -h -o doc/ Graphics/UI/Gtk/WebKit.hs
 
 clean:
 	@rm -f Test spplayer *.o *.hi $(bin) $(from_chs)
