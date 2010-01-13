@@ -22,6 +22,36 @@ module Graphics.UI.Gtk.WebKit.WebWindowFeatures
     , webWindowFeaturesNew
     , webWindowFeaturesEqual
 
+    , webWindowFeaturesGetFullscreen
+    , webWindowFeaturesSetFullscreen
+
+    , webWindowFeaturesGetHeight
+    , webWindowFeaturesSetHeight
+
+    , webWindowFeaturesGetLocationbarVisible
+    , webWindowFeaturesSetLocationbarVisible
+
+    , webWindowFeaturesGetMenubarVisible
+    , webWindowFeaturesSetMenubarVisible
+
+    , webWindowFeaturesGetScrollbarVisible
+    , webWindowFeaturesSetScrollbarVisible
+
+    , webWindowFeaturesGetStatusbarVisible
+    , webWindowFeaturesSetStatusbarVisible
+
+    , webWindowFeaturesGetToolbarVisible
+    , webWindowFeaturesSetToolbarVisible
+
+    , webWindowFeaturesGetWidth
+    , webWindowFeaturesSetWidth
+
+    , webWindowFeaturesGetX
+    , webWindowFeaturesSetX
+
+    , webWindowFeaturesGetY
+    , webWindowFeaturesSetY
+
     ) where
 
 #include <webkit/webkitwebwindowfeatures.h>
@@ -29,7 +59,7 @@ module Graphics.UI.Gtk.WebKit.WebWindowFeatures
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
-import System.Glib.GType
+import System.Glib.Properties
 
 import Control.Monad
 
@@ -68,7 +98,7 @@ webWindowFeaturesNew =
 -- Properties -----------------------------------------------------------------
 
 
-{- TODO figure out what Construct means
+{- TODO figure out what Construct means, setter implemted
   "fullscreen"               gboolean              : Read / Write / Construct
   "height"                   gint                  : Read / Write / Construct
   "locationbar-visible"      gboolean              : Read / Write / Construct
@@ -80,3 +110,104 @@ webWindowFeaturesNew =
   "x"                        gint                  : Read / Write / Construct
   "y"                        gint                  : Read / Write / Construct
 -}
+
+webWindowFeaturesGetFullscreen :: WebWindowFeatures -> IO Bool
+webWindowFeaturesGetFullscreen = 
+  objectGetPropertyBool
+    "fullscreen"
+
+webWindowFeaturesSetFullscreen :: WebWindowFeatures -> Bool -> IO ()
+webWindowFeaturesSetFullscreen = 
+  objectSetPropertyBool
+    "fullscreen"
+
+webWindowFeaturesGetHeight :: WebWindowFeatures -> IO Int
+webWindowFeaturesGetHeight = 
+  objectGetPropertyInt
+    "height"
+
+webWindowFeaturesSetHeight :: WebWindowFeatures -> Int -> IO ()
+webWindowFeaturesSetHeight = 
+  objectSetPropertyInt
+    "height"
+
+webWindowFeaturesGetLocationbarVisible :: WebWindowFeatures -> IO Bool
+webWindowFeaturesGetLocationbarVisible = 
+  objectGetPropertyBool
+    "locationbar-visible"
+
+webWindowFeaturesSetLocationbarVisible :: WebWindowFeatures -> Bool -> IO ()
+webWindowFeaturesSetLocationbarVisible = 
+  objectSetPropertyBool
+    "locationbar-visible"
+
+webWindowFeaturesGetMenubarVisible :: WebWindowFeatures -> IO Bool
+webWindowFeaturesGetMenubarVisible = 
+  objectGetPropertyBool
+    "menubar-visible"
+
+webWindowFeaturesSetMenubarVisible :: WebWindowFeatures -> Bool -> IO ()
+webWindowFeaturesSetMenubarVisible = 
+  objectSetPropertyBool
+    "menubar-visible"
+
+webWindowFeaturesGetScrollbarVisible :: WebWindowFeatures -> IO Bool
+webWindowFeaturesGetScrollbarVisible = 
+  objectGetPropertyBool
+    "scrollbar-visible"
+
+webWindowFeaturesSetScrollbarVisible :: WebWindowFeatures -> Bool -> IO ()
+webWindowFeaturesSetScrollbarVisible = 
+  objectSetPropertyBool
+    "scrollbar-visible"
+
+webWindowFeaturesGetStatusbarVisible :: WebWindowFeatures -> IO Bool
+webWindowFeaturesGetStatusbarVisible = 
+  objectGetPropertyBool
+    "statusbar-visible"
+
+webWindowFeaturesSetStatusbarVisible :: WebWindowFeatures -> Bool -> IO ()
+webWindowFeaturesSetStatusbarVisible = 
+  objectSetPropertyBool
+    "statusbar-visible"
+
+webWindowFeaturesGetToolbarVisible :: WebWindowFeatures -> IO Bool
+webWindowFeaturesGetToolbarVisible = 
+  objectGetPropertyBool
+    "toolbar-visible"
+
+webWindowFeaturesSetToolbarVisible :: WebWindowFeatures -> Bool -> IO ()
+webWindowFeaturesSetToolbarVisible = 
+  objectSetPropertyBool
+    "toolbar-visible"
+
+webWindowFeaturesGetWidth :: WebWindowFeatures -> IO Int
+webWindowFeaturesGetWidth = 
+  objectGetPropertyInt
+    "width"
+
+webWindowFeaturesSetWidth :: WebWindowFeatures -> Int -> IO ()
+webWindowFeaturesSetWidth = 
+  objectSetPropertyInt
+    "width"
+
+webWindowFeaturesGetX :: WebWindowFeatures -> IO Int
+webWindowFeaturesGetX = 
+  objectGetPropertyInt
+    "x"
+
+webWindowFeaturesSetX :: WebWindowFeatures -> Int -> IO ()
+webWindowFeaturesSetX = 
+  objectSetPropertyInt
+    "x"
+
+webWindowFeaturesGetY :: WebWindowFeatures -> IO Int
+webWindowFeaturesGetY = 
+  objectGetPropertyInt
+    "y"
+
+webWindowFeaturesSetY :: WebWindowFeatures -> Int -> IO ()
+webWindowFeaturesSetY = 
+  objectSetPropertyInt
+    "y"
+
