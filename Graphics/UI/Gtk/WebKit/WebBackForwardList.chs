@@ -13,6 +13,8 @@ import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
 
+import System.Glib.GList
+
 import Control.Monad
 
 import Graphics.UI.Gtk
@@ -55,9 +57,12 @@ webBackForwardListGetBackLength list =
         liftM fromIntegral $ {#call web_back_forward_list_get_back_length#} ptr
 
 
-{- TODO
-GList *             webkit_web_back_forward_list_get_back_list_with_limit (WebKitWebBackForwardList *web_back_forward_list,  gint limit);
--}
+webBackForwardListGetBackListWithLimit :: WebBackForwardList -> Int -> IO [WebHistoryItem]
+webBackForwardListGetBackListWithLimit list limit =
+    withWebBackForwardList list $ \ptr ->
+        {#call web_back_forward_list_get_back_list_with_limit#} ptr (fromIntegral limit)
+            >>= fromGList >>= mapM (makeNewObject mkWebHistoryItem . return) 
+
 
 webBackForwardListGetCurrentItem :: WebBackForwardList -> IO WebHistoryItem 
 webBackForwardListGetCurrentItem list =
@@ -78,11 +83,11 @@ webBackForwardListGetForwardLength list =
         liftM fromIntegral $ {#call web_back_forward_list_get_forward_length#} ptr
 
 
-{- TODO
-GList *             webkit_web_back_forward_list_get_forward_list_with_limit
-                                                        (WebKitWebBackForwardList *web_back_forward_list,
-                                                         gint limit);
--}
+webBackForwardListGetForwardListWithLimit :: WebBackForwardList -> Int -> IO [WebHistoryItem]
+webBackForwardListGetForwardListWithLimit list limit =
+    withWebBackForwardList list $ \ptr ->
+        {#call web_back_forward_list_get_forward_list_with_limit#} ptr (fromIntegral limit)
+            >>= fromGList >>= mapM (makeNewObject mkWebHistoryItem . return) 
 
 webBackForwardListGetLimit :: WebBackForwardList -> IO Int
 webBackForwardListGetLimit list = 

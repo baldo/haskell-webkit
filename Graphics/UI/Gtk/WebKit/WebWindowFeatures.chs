@@ -19,9 +19,12 @@ WebView changes.
 module Graphics.UI.Gtk.WebKit.WebWindowFeatures
     ( WebWindowFeatures
 
+    -- * Functions
+
     , webWindowFeaturesNew
     , webWindowFeaturesEqual
 
+    -- * Properties
     , webWindowFeaturesGetFullscreen
     , webWindowFeaturesSetFullscreen
 

@@ -31,7 +31,6 @@ import Graphics.UI.Gtk
     , mkWebDatabase
     )
 
--- TODO Make a list of WebDatabase from GList
 securityOriginGetAllWebDatabase :: SecurityOrigin -> IO [WebDatabase]
 securityOriginGetAllWebDatabase origin = 
     withSecurityOrigin origin $ \ptr -> 

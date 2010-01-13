@@ -33,10 +33,10 @@ module Graphics.UI.Gtk.WebKit.WebFrame
     --, webFrameGetHorizontalScrollbarPolicy
     --, webFrameGetVerticalScrollbarPolicy
 
-    --, webFrameGetDataSource
-    --, webFrameGetProvisionalDataSource
+    , webFrameGetDataSource
+    , webFrameGetProvisionalDataSource
 
-    --, webFrameGetSecurityOrigin
+    , webFrameGetSecurityOrigin
     ) where
 
 #include <webkit/webkitwebframe.h>
@@ -54,13 +54,19 @@ import Graphics.UI.Gtk
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebFrame
     , WebView
+    , NetworkRequest
+    , WebDataSource
+    , SecurityOrigin
 
     , mkWebFrame
     , unWebFrame
     , mkWebView
     , unWebView
+    , mkWebDataSource
+    , mkSecurityOrigin
 
     , withWebFrame
+    , withNetworkRequest
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -120,9 +126,11 @@ webFrameLoadAlternateString frame content base_url unreachable_url = do
                     {#call web_frame_load_alternate_string#}
                         ptr c_content c_base_url c_unreachable_url
 
-{- TODO
-void web_frame_load_request (WebKitWebFrame *frame, WebKitNetworkRequest *request);
--}
+webFrameLoadRequest :: WebFrame -> NetworkRequest -> IO ()
+webFrameLoadRequest frame request =
+    withWebFrame frame $ \pFrame ->
+        withNetworkRequest request $ \pRequest ->
+            {#call web_frame_load_request#} pFrame pRequest 
 
 webFrameStopLoading :: WebFrame -> IO ()
 webFrameStopLoading frame =
@@ -163,13 +171,19 @@ webkit_web_frame_get_horizontal_scrollbar_policy (WebKitWebFrame        *frame);
 
 WEBKIT_API GtkPolicyType
 webkit_web_frame_get_vertical_scrollbar_policy   (WebKitWebFrame        *frame);
-
-WEBKIT_API WebKitWebDataSource *
-webkit_web_frame_get_data_source             (WebKitWebFrame       *frame);
-
-WEBKIT_API WebKitWebDataSource *
-webkit_web_frame_get_provisional_data_source (WebKitWebFrame       *frame);
-
-WEBKIT_API WebKitSecurityOrigin*
-webkit_web_frame_get_security_origin         (WebKitWebFrame       *frame);
 -}
+
+webFrameGetDataSource :: WebFrame -> IO WebDataSource
+webFrameGetDataSource frame =
+    withWebFrame frame $ \ptr ->
+        makeNewObject mkWebDataSource $ {#call web_frame_get_data_source#} ptr
+
+webFrameGetProvisionalDataSource :: WebFrame -> IO WebDataSource
+webFrameGetProvisionalDataSource frame =
+     withWebFrame frame $ \ptr ->
+        makeNewObject mkWebDataSource $ {#call web_frame_get_provisional_data_source#} ptr
+
+webFrameGetSecurityOrigin :: WebFrame -> IO SecurityOrigin
+webFrameGetSecurityOrigin frame =
+    withWebFrame frame $ \ptr ->
+        makeNewObject mkSecurityOrigin $ {#call web_frame_get_security_origin#} ptr
