@@ -23,7 +23,6 @@ module Graphics.UI.Gtk.WebKit.Download
     , downloadGetNetworkResponse
     , downloadGetNetworkRequest
     , downloadGetStatus
-    , downloadGetTotalSize
     , downloadGetProgress
     ) where
 
