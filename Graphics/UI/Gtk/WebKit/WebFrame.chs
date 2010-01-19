@@ -73,6 +73,11 @@ import Graphics.UI.Gtk
     ( LoadStatus (..)
     )
 
+{- DEPRECATED
+webkit_web_frame_new
+webkit_web_view_open
+-}
+
 webFrameGetWebView :: WebFrame -> IO WebView
 webFrameGetWebView frame =
     withWebFrame frame $ \ptr ->

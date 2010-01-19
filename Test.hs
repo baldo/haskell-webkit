@@ -78,17 +78,8 @@ startBrowser = do
     onWebViewStatusbarTextChanged wvBrowser $
         \text -> putStrLn $ "SB: " ++ text
 
-    onWebViewTitleChanged wvBrowser $
-        \frame -> windowSetTitle wMain
-
     onWebViewCopyClipboard wvBrowser $
         putStrLn "Copy"
-
-    onWebViewLoadStarted wvBrowser $
-        \frame -> widgetSetSensitive tbStop True
-
-    onWebViewLoadFinished wvBrowser $
-        \frame -> widgetSetSensitive tbStop False
 
     -- Show and run GUI -------------------------------------------------------
 
@@ -104,7 +95,7 @@ loadAddress :: Entry -> WebView -> IO ()
 loadAddress eAddress wvBrowser = do
     uri <- entryGetText eAddress 
     wfBrowser <- webViewGetMainFrame wvBrowser
-    webViewOpen wvBrowser uri
+    webViewLoadUri wvBrowser uri
     -- webViewGetTitle wvBrowser >>= print
     -- webViewGetUri wvBrowser >>= print
     -- webViewGetProgress wvBrowser >>= print

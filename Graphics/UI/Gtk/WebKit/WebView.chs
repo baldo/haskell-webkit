@@ -38,7 +38,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGoForward
 
     , webViewStopLoading
-    , webViewOpen
+    -- , webViewOpen
     , webViewReload
     , webViewReloadBypassCache
 
@@ -174,14 +174,14 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewIconLoaded
     , afterWebViewIconLoaded
 
-    , onWebViewLoadCommitted
-    , afterWebViewLoadCommitted
+    -- , onWebViewLoadCommitted
+    -- , afterWebViewLoadCommitted
 
-    , onWebViewLoadFinished
-    , afterWebViewLoadFinished
+    -- , onWebViewLoadFinished
+    -- , afterWebViewLoadFinished
 
-    , onWebViewLoadStarted
-    , afterWebViewLoadStarted
+    -- , onWebViewLoadStarted
+    -- , afterWebViewLoadStarted
 
     , onWebViewPasteClipboard
     , afterWebViewPasteClipboard
@@ -195,8 +195,8 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewStatusbarTextChanged
     , afterWebViewStatusbarTextChanged
 
-    , onWebViewTitleChanged
-    , afterWebViewTitleChanged
+    -- , onWebViewTitleChanged
+    -- , afterWebViewTitleChanged
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -347,11 +347,13 @@ webViewStopLoading web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_stop_loading#} ptr
 
+{- DEPRECATED since 1.1.1
 webViewOpen :: WebView -> String -> IO ()
 webViewOpen web_view uri = do
     withCString uri $ \c_uri ->
         withWebView web_view $ \ptr ->
             {#call web_view_open#} ptr c_uri
+-}
 
 webViewReload :: WebView -> IO ()
 webViewReload web_view =
@@ -739,40 +741,52 @@ onWebViewIconLoaded =
 afterWebViewIconLoaded =
     connect_NONE__NONE "icon-loaded" True
 
+{- DEPRECATED
 onWebViewLoadCommitted, afterWebViewLoadCommitted ::
     WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
 onWebViewLoadCommitted =
     connect_OBJECT__NONE "load-committed" False
 afterWebViewLoadCommitted =
     connect_OBJECT__NONE "load-committed" True
+-}
 
 {- TODO
 "load-error" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gchar *uri, gpointer web_error, gpointer user_data) : Run Last
 -}
 
+{- DEPRECATED
 onWebViewLoadFinished, afterWebViewLoadFinished ::
     WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
 onWebViewLoadFinished =
     connect_OBJECT__NONE "load-finished" False
 afterWebViewLoadFinished =
     connect_OBJECT__NONE "load-finished" True
+-}
 
-{- TODO
+{- DEPRECATED ?TODO?
 "load-progress-changed" : void user_function (WebKitWebView *web_view, gint progress, gpointer user_data) : Run Last / Action
 -}
 
+{- DEPRECATED
 onWebViewLoadStarted, afterWebViewLoadStarted ::
     WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
 onWebViewLoadStarted =
     connect_OBJECT__NONE "load-started" False
 afterWebViewLoadStarted =
     connect_OBJECT__NONE "load-started" True
+-}
 
 {- TODO
 "mime-type-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, gchar *mimetype, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
 "navigation-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
+-}
+
+{- DEPRECATED
 "navigation-requested" : gint user_function (WebKitWebView *webkitwebview, GObject *arg1, GObject *arg2, gpointer user_data) : Run Last / Action
+-}
+
+{- TODO
 "new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
 
@@ -818,12 +832,14 @@ onWebViewStatusbarTextChanged =
 afterWebViewStatusbarTextChanged =
     connect_STRING__NONE "status-bar-text-changed" True
 
+{- DEPRECATED
 onWebViewTitleChanged, afterWebViewTitleChanged ::
     WebView -> (WebFrame -> String -> IO ()) -> IO (ConnectId WebView)
 onWebViewTitleChanged =
     connect_OBJECT_STRING__NONE "title-changed" False
 afterWebViewTitleChanged =
     connect_OBJECT_STRING__NONE "title-changed" True
+-}
 
 {- TODO
 "undo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
