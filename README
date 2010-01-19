@@ -13,6 +13,7 @@ Haskell WebKit depends on:
 3. gtk2hs >= 0.10.1
 4. ghc >= 6.10 (don't know if it works with 6.12)
 5. c2hs >= 0.16.0
+6. haddock >= 2.4.2 (required only to build documentation)
 
 To build Haskell WebKit simply type
     make
