@@ -2,8 +2,21 @@
 
 {# context lib="libwebkit" prefix="webkit_" #}
 
+{-| The central datatype of Haskell WebKit
+
+'WebView' is the central datatype of Haskell WebKit. It is an instance of
+'WidgetClass' implementing the scrolling interface which means you can embed in
+a 'ScrolledWindow'. It is responsible for managing the drawing of the content,
+forwarding of events. You can load any URI into the 'WebView' or any kind of
+data string. With 'WebSettings' you can control various aspects of the
+rendering and loading of the content. Each 'WebView' has exactly one 'WebFrame'
+as main frame. A 'WebFrame' can have n children.
+-}
+
 module Graphics.UI.Gtk.WebKit.WebView
     ( WebView
+
+    -- * Functions
 
     , webViewGetType
 
@@ -106,7 +119,7 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     --, webViewGetHitTestResult
 
-    -- Properties --------------------------------------------------------------
+    -- * Properties
 
     --, webViewGetCopyTargetList
 
@@ -147,7 +160,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     --, webViewGetZoomLevel
     --, webViewSetZoomLevel
 
-    -- Signals -----------------------------------------------------------------
+    -- * Signals
 
     , onWebViewCopyClipboard
     , afterWebViewCopyClipboard
@@ -271,19 +284,31 @@ webViewGoToBackForwardItem view item =
             liftM toBool $
                 {#call web_view_go_to_back_forward_item#} ptr iptr 
  
-webViewCanGoBack :: WebView -> IO Bool
+-- | Determines whether the given 'WebView' has a previous history item.
+webViewCanGoBack :: WebView -- ^ lookup history for this 'WebView'
+                 -> IO Bool -- ^ 'True' if able to move back, 'False' otherwise
 webViewCanGoBack web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_go_back#} ptr
 
-webViewCanGoBackOrForward :: WebView -> Int -> IO Bool
+-- | Determines whether the given 'WebView' has a history item a given number
+--   of steps away. Negative values represent steps backward while positive
+--   values represent steps forward.
+webViewCanGoBackOrForward :: WebView -- ^ lookup history for this 'WebView'
+                          -> Int     -- ^ the number of steps 
+                          -> IO Bool -- ^ 'True' if able to move back or forward
+                                     --   the given number of steps, 'False'
+                                     --   otherwise 
 webViewCanGoBackOrForward web_view steps = do
     withWebView web_view $ \ptr ->
         liftM toBool $
             {#call web_view_can_go_back_or_forward#}
                 ptr (fromIntegral steps)
 
-webViewCanGoForward :: WebView -> IO Bool
+-- | Determines whether the given 'WebView' has a next history item.
+webViewCanGoForward :: WebView -- ^ lookup history for this 'WebView'
+                    -> IO Bool -- ^ 'True' if able to move forward, 'False'
+                               --   otherwise
 webViewCanGoForward web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_go_forward#} ptr
@@ -412,22 +437,30 @@ webViewCanPasteClipboard web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_paste_clipboard#} ptr
 
-webViewCutClipboard :: WebView -> IO ()
+-- | Cuts the current selection inside the 'WebView' to the clipboard.
+webViewCutClipboard :: WebView  -- ^ the 'WebView' to cut from
+                    -> IO ()
 webViewCutClipboard web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_cut_clipboard#} ptr
 
-webViewCopyClipboard :: WebView -> IO ()
+-- | Copies the current selection inside the 'WebView' to the clipboard.
+webViewCopyClipboard :: WebView -- ^ the 'WebView' to copy from
+                     -> IO ()
 webViewCopyClipboard web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_copy_clipboard#} ptr
 
-webViewPasteClipboard :: WebView -> IO ()
+-- | Pastes the current contents of the clipboard to the 'WebView'.
+webViewPasteClipboard :: WebView -- ^ the 'WebView' to paste to
+                      -> IO ()
 webViewPasteClipboard web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_paste_clipboard#} ptr
 
-webViewDeleteSelection :: WebView -> IO ()
+-- | Deletes the current selection inside the 'WebView'.
+webViewDeleteSelection :: WebView -- ^ the 'WebView' to delete from
+                       -> IO ()
 webViewDeleteSelection web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_delete_selection#} ptr
@@ -473,7 +506,12 @@ WebKitWebInspector* webkit_web_view_get_inspector (WebKitWebView *web_view);
 WebKitWebWindowFeatures* webkit_web_view_get_window_features (WebKitWebView *web_view);
 -}
 
-webViewCanShowMimeType :: WebView -> String -> IO Bool
+-- | This functions returns whether or not a MIME type can be displayed using
+--   this view.
+webViewCanShowMimeType :: WebView -- ^ the 'WebView' to check
+                       -> String  -- ^ the MIME type
+                       -> IO Bool -- ^ 'Bool' indicating if MIME type can be
+                                  --   displayed
 webViewCanShowMimeType web_view mime_type = do
     withCString mime_type $ \c_mime_type ->
         withWebView web_view $ \ptr ->

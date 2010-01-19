@@ -16,6 +16,7 @@ emitted. To be safe listen to the notify::window-features signal of the
 WebView and reconnect the signals whenever the WebWindowFeatures of a 
 WebView changes.
 -}
+
 module Graphics.UI.Gtk.WebKit.WebWindowFeatures
     ( WebWindowFeatures
 
@@ -25,6 +26,7 @@ module Graphics.UI.Gtk.WebKit.WebWindowFeatures
     , webWindowFeaturesEqual
 
     -- * Properties
+
     , webWindowFeaturesGetFullscreen
     , webWindowFeaturesSetFullscreen
 
@@ -79,21 +81,23 @@ import Graphics.UI.Gtk
     , withWebWindowFeatures
     )
 
--- |Decides if a WebKitWebWindowFeatures instance equals another, 
---  as in has the same values.
-webWindowFeaturesEqual :: WebWindowFeatures -- ^ a 'WebWindowFeatures' instance
-                       -> WebWindowFeatures -- ^ another 'WebWindowFeatures' instance
-                       -> IO Bool           -- ^ True if the instances have 
-                                            --   the same values, False otherwise
+-- | Decides if a 'WebWindowFeatures' object equals another, as in has the same
+--   values.
+webWindowFeaturesEqual :: WebWindowFeatures -- ^ a 'WebWindowFeatures' object
+                       -> WebWindowFeatures -- ^ another 'WebWindowFeatures'
+                                            --   object
+                       -> IO Bool           -- ^ 'True' if both have the same
+                                            --   values, 'False' otherwise
 webWindowFeaturesEqual f1 f2 =
     withWebWindowFeatures f1 $ \pf1 ->
         withWebWindowFeatures f2 $ \pf2 ->
             liftM toBool $ 
                 {#call web_window_features_equal#} pf1 pf2
 
--- |Creates a new 'WebWindowFeatures' instance with default values. 
---  It must be manually attached to a 'WebView'.
-webWindowFeaturesNew :: IO WebWindowFeatures -- ^ a new 'WebWindowFeatures' instance
+-- | Creates a new 'WebWindowFeatures' object with default values. 
+--   It must be manually attached to a 'WebView'.
+webWindowFeaturesNew :: IO WebWindowFeatures -- ^ a new 'WebWindowFeatures'
+                                             --   object
 webWindowFeaturesNew =
     makeNewObject mkWebWindowFeatures $
         {#call web_window_features_new#} 

@@ -101,3 +101,4 @@ clean:
 	@rm -f Test spplayer *.o *.hi $(bin) $(from_chs)
 	@make -C Graphics/UI/Gtk clean
 	@make -C Network clean
+	@rm -rf doc/
