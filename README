@@ -24,6 +24,11 @@ The bindings are pretty much the same way to use as the C libraries. Also refer
 to the gtk2hs docs at http://haskell.org/gtk2hs/docs/current/ as Haskell WebKit
 won't be very usefull without it.
 
+To build the docs available with Haskell WebKit simply type
+    make docs
+
+The build docs can be found in doc/.
+
 Licensing
 =========
 Haskell WebKit is provided under the terms of LGPL. The complete license text is
