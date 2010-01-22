@@ -86,5 +86,5 @@ networkRequestGetMessage request =
 networkRequestSetMessage :: NetworkRequest -> Message -> IO ()
 networkRequestSetMessage request message = do
     mt <- messageGetType
-    objectSetPropertyGObject mt "auto-load-images" request message
+    objectSetPropertyGObject mt "message" request message
 
