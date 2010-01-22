@@ -78,7 +78,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewSetSettings
     , webViewGetSettings
 
-    --, webViewGetInspector
+    , webViewGetInspector
 
     --, webViewGetWindowFeatures
 
@@ -152,10 +152,8 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     --, webViewGetUri
 
-    -- TODO , webViewGetWebInspector
-
-    --, webViewGetWindowFeatures
-    -- TODO , webViewSetWindowFeatures
+    , webViewGetWindowFeatures
+    , webViewSetWindowFeatures
 
     --, webViewGetZoomLevel
     --, webViewSetZoomLevel
@@ -223,6 +221,7 @@ import Graphics.UI.Gtk.Signals
     , WebSettings
     , WebBackForwardList
     , WebHistoryItem
+    , WebInspector
 
     , withNetworkRequest
     , withWebFrame
@@ -237,10 +236,16 @@ import Graphics.UI.Gtk.Signals
     , mkWebHistoryItem
     , withWebView
     , withWebSettings
+    , mkWebInspector
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( LoadStatus (..)
+    )
+
+{#import Graphics.UI.Gtk.WebKit.WebWindowFeatures#}
+    ( WebWindowFeatures
+    , webWindowFeaturesGetType
     )
 
 webViewGetType :: IO GType
@@ -533,10 +538,14 @@ webViewSetSettings web_view settings =
 webViewGetSettings :: WebView -> IO WebSettings 
 webViewGetSettings web_view =
     withWebView web_view $ \ptr ->
-        makeNewObject  mkWebSettings $ {#call web_view_get_settings#} ptr
+        makeNewObject mkWebSettings $ {#call web_view_get_settings#} ptr
+
+webViewGetInspector :: WebView -> IO WebInspector
+webViewGetInspector web_view =
+    withWebView web_view $ \ptr ->
+        makeNewObject mkWebInspector $ {#call web_view_get_inspector#} ptr
 
 {- TODO
-WebKitWebInspector* webkit_web_view_get_inspector (WebKitWebView *web_view);
 WebKitWebWindowFeatures* webkit_web_view_get_window_features (WebKitWebView *web_view);
 -}
 
@@ -685,13 +694,15 @@ webViewGetIconUri =
 "uri" gchar* : Read
 -}
 
-{- TODO
-webViewGetWebInspector :: WebView -> IO WebInspector
-"web-inspector" WebKitWebInspector* : Read
-
 webViewSetWindowFeatures :: WebView -> WebWindowFeatures -> IO ()
-"window-features" WebKitWebWindowFeatures* : Read / Write
--}
+webViewSetWindowFeatures web_view web_window_features = do
+    wwft <- webWindowFeaturesGetType
+    objectSetPropertyGObject wwft "window-features" web_view web_window_features
+
+webViewGetWindowFeatures :: WebView -> IO WebWindowFeatures
+webViewGetWindowFeatures web_view = do
+    wwft <- webWindowFeaturesGetType
+    objectGetPropertyGObject wwft "window-features" web_view
 
 {- Not needed...?
 "zoom-level" gfloat : Read / Write

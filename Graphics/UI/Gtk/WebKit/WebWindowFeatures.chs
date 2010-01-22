@@ -22,6 +22,8 @@ module Graphics.UI.Gtk.WebKit.WebWindowFeatures
 
     -- * Functions
 
+    , webWindowFeaturesGetType
+
     , webWindowFeaturesNew
     , webWindowFeaturesEqual
 
@@ -64,6 +66,7 @@ module Graphics.UI.Gtk.WebKit.WebWindowFeatures
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 import System.Glib.Properties
 
 import Control.Monad
@@ -80,6 +83,10 @@ import Graphics.UI.Gtk
 
     , withWebWindowFeatures
     )
+
+webWindowFeaturesGetType :: IO GType
+webWindowFeaturesGetType =
+    {#call web_window_features_get_type#}
 
 -- | Decides if a 'WebWindowFeatures' object equals another, as in has the same
 --   values.
