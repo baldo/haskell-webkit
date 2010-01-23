@@ -71,7 +71,7 @@ Graphics/UI/Gtk/WebKit/WebHistoryItem.hs: Graphics/UI/Gtk/WebKit/General/Types.h
 
 Graphics/UI/Gtk/WebKit/WebBackForwardList.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
-Graphics/UI/Gtk/WebKit/WebView.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+Graphics/UI/Gtk/WebKit/WebView.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs Graphics/UI/Gtk/WebKit/WebWindowFeatures.hs
 
 Graphics/UI/Gtk/WebKit/WebNavigationAction.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
 

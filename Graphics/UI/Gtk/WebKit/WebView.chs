@@ -72,8 +72,8 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGetEditable
     , webViewSetEditable
 
-    --, webViewGetCopyTargetList
-    --, webViewGetPasteTargetList
+    , webViewGetCopyTargetList
+    , webViewGetPasteTargetList
 
     , webViewSetSettings
     , webViewGetSettings
@@ -213,6 +213,7 @@ import Graphics.UI.Gtk
     )
 
 import Graphics.UI.Gtk.Signals
+import Graphics.UI.Gtk.General.DNDTypes
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
@@ -524,10 +525,19 @@ webViewSetEditable web_view flag =
     withWebView web_view $ \ptr ->
         {#call web_view_set_editable#} ptr $ fromBool flag
 
-{- TODO
-GtkTargetList * webkit_web_view_get_copy_target_list (WebKitWebView *web_view);
-GtkTargetList * webkit_web_view_get_paste_target_list (WebKitWebView *web_view);
--}
+-- TODO: Understand this stuff and check wether this does work as it should...
+webViewGetCopyTargetList :: WebView -> IO TargetList
+webViewGetCopyTargetList web_view =
+    withWebView web_view $ \ptr ->
+        {#call web_view_get_copy_target_list#} ptr
+            >>= mkTargetList . castPtr -- TODO: is this okay?
+
+-- TODO: Understand this stuff and check wether this does work as it should...
+webViewGetPasteTargetList :: WebView -> IO TargetList
+webViewGetPasteTargetList web_view =
+    withWebView web_view $ \ptr ->
+        {#call web_view_get_paste_target_list#} ptr
+            >>= mkTargetList . castPtr -- TODO: is this okay?
 
 webViewSetSettings :: WebView -> WebSettings -> IO ()
 webViewSetSettings web_view settings = 
