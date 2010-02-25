@@ -10,9 +10,9 @@ Haskell WebKit depends on:
 
 1. libwebkit >= 1.1.15.4
 2. libsoup >= 2.28.2
-3. gtk2hs >= 0.10.1
-4. ghc >= 6.10 (don't know if it works with 6.12)
-5. c2hs >= 0.16.0
+3. gtk2hs >= 0.10.1 
+4. ghc >= 6.12 (don't know if it builds any longer with 6.10)
+5. c2hs >= 0.16.0 (with patches for 6.12) 
 6. haddock >= 2.4.2 (required only to build documentation)
 
 To build Haskell WebKit simply type
