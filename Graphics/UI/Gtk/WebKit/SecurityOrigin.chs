@@ -18,7 +18,7 @@ import System.Glib.GType
 
 import Control.Monad
 
-import Graphics.UI.Gtk
+import Graphics.UI.Gtk.Abstract.Object
     ( makeNewObject
     )
 
