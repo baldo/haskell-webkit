@@ -16,9 +16,10 @@ import System.Glib.FFI
 import Graphics.UI.Gtk.Types
     ( ObjectClass
     , GObjectClass (..)
+    , GObject (..)
 
-    , mkGObject
     , unGObject
+    , objectUnref
     )
 
 -- Message --------------------------------------------------------------------
@@ -27,9 +28,9 @@ import Graphics.UI.Gtk.Types
 
 instance ObjectClass Message
 instance GObjectClass Message where
-  toGObject = mkGObject . castForeignPtr . unMessage
-  unsafeCastGObject = mkMessage . castForeignPtr . unGObject
+  toGObject (Message o) = GObject (castForeignPtr o)
+  unsafeCastGObject = Message . castForeignPtr . unGObject
 
-mkMessage = Message
+mkMessage = (Message, objectUnref) 
 unMessage (Message o) = o
 

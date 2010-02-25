@@ -105,9 +105,10 @@ import Graphics.UI.Gtk.Types
     ( WidgetClass
     , ObjectClass
     , GObjectClass (..)
+    , GObject (..)
 
-    , mkGObject
     , unGObject
+    , objectUnref
     )
 
 -- NetworkRequest -------------------------------------------------------------
@@ -116,10 +117,10 @@ import Graphics.UI.Gtk.Types
 
 instance ObjectClass NetworkRequest
 instance GObjectClass NetworkRequest where
-  toGObject = mkGObject . castForeignPtr . unNetworkRequest
-  unsafeCastGObject = mkNetworkRequest . castForeignPtr . unGObject
+  toGObject (NetworkRequest o) =  GObject (castForeignPtr o)
+  unsafeCastGObject = NetworkRequest . castForeignPtr . unGObject
 
-mkNetworkRequest = NetworkRequest
+mkNetworkRequest = (NetworkRequest, objectUnref)
 unNetworkRequest (NetworkRequest o) = o
 
 -- NetworkResponse ------------------------------------------------------------
@@ -128,10 +129,10 @@ unNetworkRequest (NetworkRequest o) = o
 
 instance ObjectClass NetworkResponse
 instance GObjectClass NetworkResponse where
-  toGObject = mkGObject . castForeignPtr . unNetworkResponse
-  unsafeCastGObject = mkNetworkResponse . castForeignPtr . unGObject
+  toGObject (NetworkResponse o) = GObject (castForeignPtr o)
+  unsafeCastGObject = NetworkResponse . castForeignPtr . unGObject
 
-mkNetworkResponse = NetworkResponse
+mkNetworkResponse = (NetworkResponse, objectUnref)
 unNetworkResponse (NetworkResponse o) = o
 
 -- WebFrame --------------------------------------------------------------------
@@ -141,10 +142,10 @@ unNetworkResponse (NetworkResponse o) = o
 instance WidgetClass WebFrame 
 instance ObjectClass WebFrame 
 instance GObjectClass WebFrame where
-  toGObject = mkGObject . castForeignPtr . unWebFrame
-  unsafeCastGObject = mkWebFrame . castForeignPtr . unGObject
+  toGObject (WebFrame o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebFrame . castForeignPtr . unGObject
 
-mkWebFrame = WebFrame
+mkWebFrame = (WebFrame, objectUnref)
 unWebFrame (WebFrame o) = o
 
 -- WebView --------------------------------------------------------------------
@@ -154,10 +155,10 @@ unWebFrame (WebFrame o) = o
 instance WidgetClass WebView 
 instance ObjectClass WebView 
 instance GObjectClass WebView where
-  toGObject = mkGObject . castForeignPtr . unWebView
-  unsafeCastGObject = mkWebView . castForeignPtr . unGObject
+  toGObject (WebView o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebView . castForeignPtr . unGObject
 
-mkWebView = WebView
+mkWebView = (WebView, objectUnref)
 unWebView (WebView o) = o
 
 -- WebSettings ----------------------------------------------------------------
@@ -166,10 +167,10 @@ unWebView (WebView o) = o
 
 instance ObjectClass WebSettings
 instance GObjectClass WebSettings where
-  toGObject = mkGObject . castForeignPtr . unWebSettings
-  unsafeCastGObject = mkWebSettings . castForeignPtr . unGObject
+  toGObject (WebSettings o)= GObject (castForeignPtr o)
+  unsafeCastGObject = WebSettings . castForeignPtr . unGObject
 
-mkWebSettings = WebSettings
+mkWebSettings = (WebSettings, objectUnref)
 unWebSettings (WebSettings o) = o
 
 -- WebHistoryItem -------------------------------------------------------------
@@ -178,10 +179,10 @@ unWebSettings (WebSettings o) = o
 
 instance ObjectClass WebHistoryItem
 instance GObjectClass WebHistoryItem where
-  toGObject = mkGObject . castForeignPtr . unWebHistoryItem
-  unsafeCastGObject = mkWebHistoryItem . castForeignPtr . unGObject
+  toGObject (WebHistoryItem o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebHistoryItem . castForeignPtr . unGObject
 
-mkWebHistoryItem = WebHistoryItem
+mkWebHistoryItem = (WebHistoryItem, objectUnref)
 unWebHistoryItem (WebHistoryItem o) = o
 
 -- WebBackForwardList ---------------------------------------------------------
@@ -190,10 +191,10 @@ unWebHistoryItem (WebHistoryItem o) = o
 
 instance ObjectClass WebBackForwardList
 instance GObjectClass WebBackForwardList where
-  toGObject = mkGObject . castForeignPtr . unWebBackForwardList
-  unsafeCastGObject = mkWebBackForwardList . castForeignPtr . unGObject
+  toGObject (WebBackForwardList o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebBackForwardList . castForeignPtr . unGObject
 
-mkWebBackForwardList = WebBackForwardList
+mkWebBackForwardList = (WebBackForwardList, objectUnref)
 unWebBackForwardList (WebBackForwardList o) = o
 
 -- WebNavigationAction --------------------------------------------------------
@@ -202,10 +203,10 @@ unWebBackForwardList (WebBackForwardList o) = o
 
 instance ObjectClass WebNavigationAction
 instance GObjectClass WebNavigationAction where
-  toGObject = mkGObject . castForeignPtr . unWebNavigationAction
-  unsafeCastGObject = mkWebNavigationAction . castForeignPtr . unGObject
+  toGObject (WebNavigationAction o) = GObject (castForeignPtr o) 
+  unsafeCastGObject = WebNavigationAction . castForeignPtr . unGObject
 
-mkWebNavigationAction = WebNavigationAction
+mkWebNavigationAction = (WebNavigationAction, objectUnref) 
 unWebNavigationAction (WebNavigationAction o) = o
  
 -- WebPolicyDecision ----------------------------------------------------------
@@ -214,10 +215,10 @@ unWebNavigationAction (WebNavigationAction o) = o
 
 instance ObjectClass WebPolicyDecision
 instance GObjectClass WebPolicyDecision where
-  toGObject = mkGObject . castForeignPtr . unWebPolicyDecision
-  unsafeCastGObject = mkWebPolicyDecision . castForeignPtr . unGObject
+  toGObject (WebPolicyDecision o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebPolicyDecision . castForeignPtr . unGObject
 
-mkWebPolicyDecision = WebPolicyDecision
+mkWebPolicyDecision = (WebPolicyDecision, objectUnref)
 unWebPolicyDecision (WebPolicyDecision o) = o
 
 -- HitTestResult ----------------------------------------------------------
@@ -226,10 +227,10 @@ unWebPolicyDecision (WebPolicyDecision o) = o
 
 instance ObjectClass HitTestResult
 instance GObjectClass HitTestResult where
-  toGObject = mkGObject . castForeignPtr . unHitTestResult
-  unsafeCastGObject = mkHitTestResult . castForeignPtr . unGObject
+  toGObject (HitTestResult o) = GObject (castForeignPtr o)
+  unsafeCastGObject = HitTestResult . castForeignPtr . unGObject
 
-mkHitTestResult = HitTestResult
+mkHitTestResult = (HitTestResult, objectUnref)
 unHitTestResult (HitTestResult o) = o
 
 -- WebInspector ----------------------------------------------------------
@@ -238,10 +239,10 @@ unHitTestResult (HitTestResult o) = o
 
 instance ObjectClass WebInspector
 instance GObjectClass WebInspector where
-  toGObject = mkGObject . castForeignPtr . unWebInspector
-  unsafeCastGObject = mkWebInspector . castForeignPtr . unGObject
+  toGObject (WebInspector o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebInspector . castForeignPtr . unGObject
 
-mkWebInspector = WebInspector
+mkWebInspector = (WebInspector, objectUnref)
 unWebInspector (WebInspector o) = o
 
 -- WebDatabase ----------------------------------------------------------
@@ -250,10 +251,10 @@ unWebInspector (WebInspector o) = o
 
 instance ObjectClass WebDatabase
 instance GObjectClass WebDatabase where
-  toGObject = mkGObject . castForeignPtr . unWebDatabase
-  unsafeCastGObject = mkWebDatabase . castForeignPtr . unGObject
+  toGObject (WebDatabase o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebDatabase . castForeignPtr . unGObject
 
-mkWebDatabase = WebDatabase
+mkWebDatabase = (WebDatabase, objectUnref)
 unWebDatabase (WebDatabase o) = o
 
 -- SecurityOrigin ----------------------------------------------------------
@@ -262,10 +263,10 @@ unWebDatabase (WebDatabase o) = o
 
 instance ObjectClass SecurityOrigin
 instance GObjectClass SecurityOrigin where
-  toGObject = mkGObject . castForeignPtr . unSecurityOrigin
-  unsafeCastGObject = mkSecurityOrigin . castForeignPtr . unGObject
+  toGObject (SecurityOrigin o) = GObject (castForeignPtr o)
+  unsafeCastGObject = SecurityOrigin . castForeignPtr . unGObject
 
-mkSecurityOrigin = SecurityOrigin
+mkSecurityOrigin = (SecurityOrigin, objectUnref) 
 unSecurityOrigin (SecurityOrigin o) = o
 
 -- SoupAuthDialog ----------------------------------------------------------
@@ -274,10 +275,10 @@ unSecurityOrigin (SecurityOrigin o) = o
 
 instance ObjectClass SoupAuthDialog
 instance GObjectClass SoupAuthDialog where
-  toGObject = mkGObject . castForeignPtr . unSoupAuthDialog
-  unsafeCastGObject = mkSoupAuthDialog . castForeignPtr . unGObject
+  toGObject (SoupAuthDialog o) = GObject (castForeignPtr o)
+  unsafeCastGObject = SoupAuthDialog . castForeignPtr . unGObject
 
-mkSoupAuthDialog = SoupAuthDialog
+mkSoupAuthDialog = (SoupAuthDialog, objectUnref)
 unSoupAuthDialog (SoupAuthDialog o) = o
 
 -- WebDataSource ----------------------------------------------------------
@@ -286,10 +287,10 @@ unSoupAuthDialog (SoupAuthDialog o) = o
 
 instance ObjectClass WebDataSource
 instance GObjectClass WebDataSource where
-  toGObject = mkGObject . castForeignPtr . unWebDataSource
-  unsafeCastGObject = mkWebDataSource . castForeignPtr . unGObject
+  toGObject (WebDataSource o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebDataSource . castForeignPtr . unGObject
 
-mkWebDataSource = WebDataSource
+mkWebDataSource = (WebDataSource, objectUnref)
 unWebDataSource (WebDataSource o) = o
 
 -- WebResource ----------------------------------------------------------
@@ -298,10 +299,10 @@ unWebDataSource (WebDataSource o) = o
 
 instance ObjectClass WebResource
 instance GObjectClass WebResource where
-  toGObject = mkGObject . castForeignPtr . unWebResource
-  unsafeCastGObject = mkWebResource . castForeignPtr . unGObject
+  toGObject (WebResource o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebResource . castForeignPtr . unGObject
 
-mkWebResource = WebResource
+mkWebResource = (WebResource, objectUnref)
 unWebResource (WebResource o) = o
 
 -- Download ----------------------------------------------------------
@@ -310,10 +311,10 @@ unWebResource (WebResource o) = o
 
 instance ObjectClass Download
 instance GObjectClass Download where
-  toGObject = mkGObject . castForeignPtr . unDownload
-  unsafeCastGObject = mkDownload . castForeignPtr . unGObject
+  toGObject (Download o) = GObject (castForeignPtr o)
+  unsafeCastGObject = Download . castForeignPtr . unGObject
 
-mkDownload = Download
+mkDownload = (Download, objectUnref)
 unDownload (Download o) = o
 
 -- WebWindowFeatures ----------------------------------------------------------
@@ -322,9 +323,9 @@ unDownload (Download o) = o
 
 instance ObjectClass WebWindowFeatures
 instance GObjectClass WebWindowFeatures where
-  toGObject = mkGObject . castForeignPtr . unWebWindowFeatures
-  unsafeCastGObject = mkWebWindowFeatures . castForeignPtr . unGObject
+  toGObject (WebWindowFeatures o) = GObject (castForeignPtr o)
+  unsafeCastGObject = WebWindowFeatures . castForeignPtr . unGObject
 
-mkWebWindowFeatures = WebWindowFeatures
+mkWebWindowFeatures = (WebWindowFeatures, objectUnref)
 unWebWindowFeatures (WebWindowFeatures o) = o
 
