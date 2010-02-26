@@ -38,7 +38,6 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGoForward
 
     , webViewStopLoading
-    -- , webViewOpen
     , webViewReload
     , webViewReloadBypassCache
 
@@ -80,8 +79,6 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , webViewGetInspector
 
-    --, webViewGetWindowFeatures
-
     , webViewCanShowMimeType
 
     , webViewGetTransparent
@@ -103,19 +100,19 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewSetCustomEncoding
     , webViewGetCustomEncoding
 
-    --, webViewMoveCursor
+    , webViewMoveCursor
 
     , webViewGetLoadStatus
     , webViewGetProgress
 
-    --, webViewUndo
-    --, webViewCanUndo
+    , webViewUndo
+    , webViewCanUndo
 
-    --, webViewRedo
-    --, webViewCanRedo
+    , webViewRedo
+    , webViewCanRedo
 
-    --, webViewSetViewSourceMode
-    --, webViewGetViewSourceMode
+    , webViewSetViewSourceMode
+    , webViewGetViewSourceMode
 
     --, webViewGetHitTestResult
 
@@ -214,6 +211,15 @@ import Graphics.UI.Gtk.Abstract.Object
 
 import Graphics.UI.Gtk.Signals
 import Graphics.UI.Gtk.General.DNDTypes
+import Graphics.UI.Gtk.General.Enums 
+    ( MovementStep
+    )
+import Graphics.UI.Gtk.Gdk.Events 
+    ( Event (..)
+    , EventButton 
+    , marshalEvent
+    ) 
+
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
@@ -223,6 +229,7 @@ import Graphics.UI.Gtk.General.DNDTypes
     , WebBackForwardList
     , WebHistoryItem
     , WebInspector
+    , HitTestResult
 
     , withNetworkRequest
     , withWebFrame
@@ -238,6 +245,7 @@ import Graphics.UI.Gtk.General.DNDTypes
     , withWebView
     , withWebSettings
     , mkWebInspector
+    , mkHitTestResult
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -555,10 +563,6 @@ webViewGetInspector web_view =
     withWebView web_view $ \ptr ->
         makeNewObject mkWebInspector $ {#call web_view_get_inspector#} ptr
 
-{- TODO
-WebKitWebWindowFeatures* webkit_web_view_get_window_features (WebKitWebView *web_view);
--}
-
 -- | This functions returns whether or not a MIME type can be displayed using
 --   this view.
 webViewCanShowMimeType :: WebView -- ^ the 'WebView' to check
@@ -653,9 +657,11 @@ webViewGetCustomEncoding web_view =
         {#call web_view_get_custom_encoding#} ptr
             >>= maybePeek peekCString
 
-{- TODO
-void webkit_web_view_move_cursor (WebKitWebView * webView, GtkMovementStep step, gint count);
--}
+webViewMoveCursor :: WebView -> MovementStep -> Int -> IO ()
+webViewMoveCursor web_view movement_step count =
+    withWebView web_view $ \wvptr ->
+        {#call web_view_move_cursor#} wvptr 
+            ((fromIntegral . fromEnum) movement_step) (fromIntegral count)
 
 webViewGetLoadStatus :: WebView -> IO LoadStatus
 webViewGetLoadStatus web_view =
@@ -669,14 +675,49 @@ webViewGetProgress web_view =
         liftM realToFrac $
             {#call web_view_get_progress#} ptr
 
+webViewUndo :: WebView -> IO ()
+webViewUndo web_view =
+    withWebView web_view $ \ptr ->
+        {#call web_view_undo#} ptr 
+
+webViewCanUndo :: WebView -> IO Bool
+webViewCanUndo web_view =
+    withWebView web_view $ \ptr ->
+        liftM toBool $ 
+            {#call web_view_can_undo#} ptr
+
+webViewRedo :: WebView -> IO ()
+webViewRedo web_view =
+    withWebView web_view $ \ptr ->
+        {#call web_view_redo#} ptr 
+
+webViewCanRedo :: WebView -> IO Bool
+webViewCanRedo web_view =
+    withWebView web_view $ \ptr ->
+        liftM toBool $ 
+            {#call web_view_can_redo#} ptr
+
+webViewSetViewSourceMode :: WebView -> Bool -> IO ()
+webViewSetViewSourceMode web_view source_mode =
+    withWebView web_view $ \ptr ->
+        {#call web_view_set_view_source_mode#} ptr 
+            (fromBool source_mode) 
+
+webViewGetViewSourceMode :: WebView -> IO Bool
+webViewGetViewSourceMode web_view =
+    withWebView web_view $ \ptr ->
+        liftM toBool $ 
+            {#call web_view_get_view_source_mode#} ptr
+
 {- TODO
-void webkit_web_view_undo (WebKitWebView *webView);
-gboolean webkit_web_view_can_undo (WebKitWebView *webView);
-void webkit_web_view_redo (WebKitWebView *webView);
-gboolean webkit_web_view_can_redo (WebKitWebView *webView);
-void webkit_web_view_set_view_source_mode (WebKitWebView *web_view, gboolean view_source_mode);
-gboolean webkit_web_view_get_view_source_mode (WebKitWebView *web_view);
 WebKitHitTestResult* webkit_web_view_get_hit_test_result (WebKitWebView *webView, GdkEventButton *event);
+
+webViewGetHitTestResult :: WebView -> EventButton -> IO HitTestResult 
+webViewGetHitTestResult web_view event_button =
+    withWebView web_view $ \wptr ->
+        makeNewObject mkHitTestResult $ do
+            {#call web_view_get_hit_test_result#} wptr ??? 
+
 -}
 
 -- Properties ------------------------------------------------------------------
