@@ -160,6 +160,9 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewCopyClipboard
     , afterWebViewCopyClipboard
 
+    , onWebViewConsoleMessage
+    ,afterWebViewConsoleMessage 
+
     , onWebViewCutClipboard
     , afterWebViewCutClipboard
 
@@ -168,6 +171,9 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewIconLoaded
     , afterWebViewIconLoaded
+
+    , onWebViewCloseWebView
+    , afterWebViewCloseWebView
 
     -- , onWebViewLoadCommitted
     -- , afterWebViewLoadCommitted
@@ -192,11 +198,16 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     -- , onWebViewTitleChanged
     -- , afterWebViewTitleChanged
+    
+    , onWebViewResourceRequestStarting 
+    , afterWebViewResourceRequestStarting 
+
     ) where
  
 #include <webkit/webkitwebview.h>
 
 import Foreign.C
+import Foreign.Ptr
 import GHC.Ptr
 import System.Glib.FFI
 
@@ -218,7 +229,10 @@ import Graphics.UI.Gtk.Gdk.Events
     ( Event (..)
     , EventButton 
     , marshalEvent
-    ) 
+    )
+
+import System.Glib.Signals
+import System.Glib.GObject
 
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
@@ -230,6 +244,8 @@ import Graphics.UI.Gtk.Gdk.Events
     , WebHistoryItem
     , WebInspector
     , HitTestResult
+    , WebResource 
+    , NetworkResponse
 
     , withNetworkRequest
     , withWebFrame
@@ -246,6 +262,9 @@ import Graphics.UI.Gtk.Gdk.Events
     , withWebSettings
     , mkWebInspector
     , mkHitTestResult
+    , mkNetworkResponse
+    , mkNetworkRequest
+    , mkWebResource
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -761,10 +780,26 @@ webViewGetWindowFeatures web_view = do
 
 -- Signals ---------------------------------------------------------------------
 
-{- TODO
-"close-web-view" : gboolean user_function (WebKitWebView *web_view, gpointer user_data) : Run Last
-"console-message" : gboolean user_function (WebKitWebView *web_view, gchar *message, gint line, gchar *source_id, gpointer user_data) : Run Last / Action
--}
+onWebViewCloseWebView, afterWebViewCloseWebView :: 
+    WebView -> (WebView -> IO Bool) -> IO (ConnectId WebView)
+onWebViewCloseWebView web_view f = 
+    on web_view (Signal (connectGeneric "close-web-view")) $
+        \ webViewPtr -> do 
+            x1 <- makeNewObject mkWebView $ return webViewPtr 
+            f x1
+afterWebViewCloseWebView web_view f = 
+    on web_view (Signal (connectGeneric "close-web-view")) $
+        \ webViewPtr -> do 
+            x1 <- makeNewObject mkWebView $ return webViewPtr 
+            f x1
+
+-- TODO wrap Ptr WebView to WebView for user function
+onWebViewConsoleMessage,afterWebViewConsoleMessage :: 
+    WebView -> (WebView -> String -> Int -> String -> IO Bool) -> IO (ConnectId WebView)
+onWebViewConsoleMessage web_view = 
+    on web_view (Signal (connectGeneric "console-message")) 
+afterWebViewConsoleMessage web_view = 
+    after web_view (Signal (connectGeneric "console-message")) 
 
 onWebViewCopyClipboard, afterWebViewCopyClipboard ::
     WebView -> IO () -> IO (ConnectId WebView)
@@ -864,6 +899,38 @@ afterWebViewPasteClipboard =
 "print-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer user_data) : Run Last
 "redo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
 "resource-request-starting" : void user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, WebKitWebResource *web_resource, WebKitNetworkRequest *request, WebKitNetworkResponse *response, gpointer user_data) : Run Last / Action
+-}
+
+onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
+   WebView
+   -> (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ()) 
+   -> IO (ConnectId WebView)
+onWebViewResourceRequestStarting wV f = 
+    on wV 
+        (Signal (connectGeneric "resource-request-starting")) 
+            (webViewResourceRequestStartingWrapper f) 
+afterWebViewResourceRequestStarting wV f = 
+    after wV 
+        (Signal (connectGeneric "resource-request-starting")) 
+            (webViewResourceRequestStartingWrapper f) 
+
+webViewResourceRequestStartingWrapper :: 
+   (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ()) 
+   -> Ptr WebView -> Ptr WebFrame -> Ptr WebResource -> Ptr NetworkRequest -> Ptr NetworkResponse
+   -> IO ()
+webViewResourceRequestStartingWrapper  
+    f web_view web_frame web_resource network_request network_response = do
+    x1 <- makeNewObject mkWebView $ return web_view
+    x2 <- makeNewObject mkWebFrame $ return web_frame
+    x3 <- makeNewObject mkWebResource $ return web_resource
+    x4 <- makeNewObject mkNetworkRequest $ return network_request
+    if nullPtr /= network_response then do
+        x5 <- makeNewObject mkNetworkResponse  $ return network_response
+        f x1 x2 x3 x4 (Just x5)
+      else
+        f x1 x2 x3 x4 Nothing
+
+{-
 "script-alert" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gpointer user_data) : Run Last / Action
 "script-confirm" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gboolean confirmed, gpointer user_data) : Run Last / Action
 "script-prompt" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gchar *default, gpointer text, gpointer user_data) : Run Last / Action
@@ -871,10 +938,10 @@ afterWebViewPasteClipboard =
 
 onWebViewSelectAll, afterWebViewSelectAll ::
     WebView -> IO () -> IO (ConnectId WebView)
-onWebViewSelectAll =
-    connect_NONE__NONE "select-all" False
-afterWebViewSelectAll =
-    connect_NONE__NONE "select-all" True
+onWebViewSelectAll web_view f = 
+    on web_view (Signal (connectGeneric "select-all")) (\_ -> f)
+afterWebViewSelectAll web_view f =
+    after web_view (Signal (connectGeneric "select-all")) (\_ -> f)
 
 onWebViewSelectionChanged, afterWebViewSelectionChanged ::
     WebView -> IO () -> IO (ConnectId WebView)
@@ -889,10 +956,10 @@ afterWebViewSelectionChanged =
 
 onWebViewStatusbarTextChanged, afterWebViewStatusbarTextChanged ::
     WebView -> (String -> IO ()) -> IO (ConnectId WebView)
-onWebViewStatusbarTextChanged =
-    connect_STRING__NONE "status-bar-text-changed" False
-afterWebViewStatusbarTextChanged =
-    connect_STRING__NONE "status-bar-text-changed" True
+onWebViewStatusbarTextChanged web_view f =
+    on web_view (Signal (connectGeneric "status-bar-text-changed")) (\_ -> f)
+afterWebViewStatusbarTextChanged web_view f =
+     after web_view (Signal (connectGeneric "status-bar-text-changed")) (\_ -> f)
 
 {- DEPRECATED
 onWebViewTitleChanged, afterWebViewTitleChanged ::
