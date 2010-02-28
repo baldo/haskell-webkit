@@ -205,6 +205,8 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewSetCrollAdjustments
     , afterWebViewSetCrollAdjustments 
 
+    , onWebViewScriptPrompt
+    , afterWebViewScriptPrompt 
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -939,9 +941,28 @@ webViewResourceRequestStartingWrapper
         f x1 x2 x3 x4 Nothing
 
 {-
-"script-confirm" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gboolean confirmed, gpointer user_data) : Run Last / Action
 "script-prompt" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gchar *default, gpointer text, gpointer user_data) : Run Last / Action
 -}
+onWebViewScriptPrompt, afterWebViewScriptPrompt :: 
+    WebView -> (WebView -> WebFrame -> String -> String -> String -> IO Bool) 
+    -> IO (ConnectId WebView)
+onWebViewScriptPrompt web_view f = 
+    on web_view (Signal (connectGeneric "script-prompt")) 
+        (webViewScriptPromptWrapper f)
+afterWebViewScriptPrompt web_view f = 
+    after web_view (Signal (connectGeneric "script-prompt")) 
+        (webViewScriptPromptWrapper f)
+
+webViewScriptPromptWrapper :: 
+    (WebView -> WebFrame -> String -> String -> String -> IO Bool) 
+    -> Ptr WebView -> Ptr WebFrame -> CString -> CString -> CString -> IO Bool     
+webViewScriptPromptWrapper f webViewPtr webFramePtr message def text = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeWebFrame $ return webFramePtr
+    x3 <- peekCString message
+    x4 <- peekCString def
+    x5 <- peekCString text
+    f x1 x2 x3 x4 x5
 
 onWebViewScriptAlert, afterWebViewScriptAlert :: 
     WebView -> (WebView -> WebFrame -> String -> IO Bool) 
@@ -955,11 +976,12 @@ afterWebViewScriptAlert web_view f =
 
 webViewScriptAlertWrapper :: 
     (WebView -> WebFrame -> String -> IO Bool) 
-    -> Ptr WebView -> Ptr WebFrame -> String -> IO Bool
+    -> Ptr WebView -> Ptr WebFrame -> CString -> IO Bool
 webViewScriptAlertWrapper f webViewPtr webFramePtr message = do
     x1 <- makeWebView $ return webViewPtr    
     x2 <- makeWebFrame $ return webFramePtr
-    f x1 x2 message
+    x3 <- peekCString message
+    f x1 x2 x3
 
 onWebViewScriptConfirm, afterWebViewScriptConfirm :: 
     WebView -> (WebView -> WebFrame -> String -> Bool -> IO Bool)
@@ -973,11 +995,12 @@ afterWebViewScriptConfirm web_view f =
 
 webViewScriptConfirmWrapper ::
     (WebView -> WebFrame -> String -> Bool -> IO Bool)
-    -> Ptr WebView -> Ptr WebFrame -> String -> Bool -> IO Bool
+    -> Ptr WebView -> Ptr WebFrame -> CString -> Bool -> IO Bool
 webViewScriptConfirmWrapper f webViewPtr webFramePtr message confirm = do
     x1 <- makeWebView $ return webViewPtr
     x2 <- makeWebFrame $ return webFramePtr 
-    f x1 x2 message confirm
+    x3 <- peekCString message
+    f x1 x2 x3 confirm
 
 onWebViewSelectAll, afterWebViewSelectAll ::
     WebView -> IO () -> IO (ConnectId WebView)
