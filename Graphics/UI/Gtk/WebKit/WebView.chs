@@ -1121,6 +1121,18 @@ afterWebViewTitleChanged =
 "window-object-cleared" : void user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer context, gpointer arg3, gpointer user_data) : Run Last / Action
 -}
 
+onWebViewReady,afterWebViewReady :: 
+    WebView -> (WebView -> IO ())
+    -> IO (ConnectId WebView)
+onWebViewReady web_view f =
+    on web_view (Signal (connectGeneric "web-view-ready")) $ \ wv -> do 
+        x <-  makeWebView $ return wv 
+        f x 
+afterWebViewReady web_view f =
+    after web_view (Signal (connectGeneric "web-view-ready")) $ \ wv -> do 
+        x <-  makeWebView $ return wv 
+        f x 
+
 onWebViewUndo, afterWebViewUndo :: 
     WebView -> (WebView -> IO ()) -> IO (ConnectId WebView) 
 onWebViewUndo web_view f =
