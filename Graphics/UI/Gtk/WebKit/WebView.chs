@@ -925,6 +925,23 @@ afterWebViewPasteClipboard =
 "populate-popup" : void user_function (WebKitWebView *web_view, GtkMenu *menu, gpointer user_data) : Run Last / Action
 -}
 
+onWebViewPopulatePopup, afterWebViewPopulatePopup ::
+    WebView -> (WebView -> Menu -> IO ()) -> IO (ConnectId WebView)
+onWebViewPopulatePopup web_view f =
+    on web_view (Signal (connectGeneric "populater-popup")) 
+        (webViewPopulatePopupWrapper f)
+afterWebViewPopulatePopup web_view f =
+    after web_view (Signal (connectGeneric "populater-popup")) 
+        (webViewPopulatePopupWrapper f)
+
+webViewPopulatePopupWrapper :: 
+    (WebView -> Menu -> IO ()) 
+    -> Ptr WebView -> Ptr Menu -> IO ()
+webViewPopulatePopupWrapper f webViewPtr menuPtr = do
+    x1 <- makeWebView $ return webViewPtr 
+    x2 <- makeNewObject (Menu, objectUnref) $ return menuPtr
+    f x1 x2 
+
 onWebViewPrintRequested, afterWebViewPrintRequested ::
     WebView -> (WebView -> WebFrame -> IO Bool) -> IO (ConnectId WebView)
 onWebViewPrintRequested web_view f =
