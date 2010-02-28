@@ -216,10 +216,6 @@ import System.Glib.Properties
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 import Graphics.UI.Gtk.Signals
 import Graphics.UI.Gtk.General.DNDTypes
 import Graphics.UI.Gtk.General.Enums 
@@ -248,23 +244,26 @@ import System.Glib.GObject
     , NetworkResponse
 
     , withNetworkRequest
+    , makeNetworkRequest
     , withWebFrame
-    , mkWebFrame
+    , makeWebFrame
     , withWebView
-    , mkWebView
+    , makeWebView
     , withWebSettings
-    , mkWebSettings
+    , makeWebSettings
     , withWebBackForwardList 
-    , mkWebBackForwardList
+    , makeWebBackForwardList
     , withWebHistoryItem
-    , mkWebHistoryItem
+    , makeWebHistoryItem
     , withWebView
+    , makeWebView
     , withWebSettings
-    , mkWebInspector
-    , mkHitTestResult
-    , mkNetworkResponse
-    , mkNetworkRequest
-    , mkWebResource
+    , makeWebSettings
+    , makeWebInspector
+    , makeHitTestResult
+    , makeNetworkResponse
+    , makeNetworkRequest
+    , makeWebResource
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -284,7 +283,7 @@ webViewNew :: IO WebView
 webViewNew = do
     ptr <- {#call web_view_new#}
     let ptr' = castPtr ptr
-    makeNewObject mkWebView (return ptr')
+    makeWebView (return ptr')
 
 webViewGetTitle :: WebView -> IO (Maybe String)
 webViewGetTitle web_view =
@@ -309,7 +308,7 @@ webViewGetBackForwardList :: WebView               -- ^ the 'WebView'
                           -> IO WebBackForwardList -- ^ the 'WebBackForwardList'
 webViewGetBackForwardList view =
     withWebView view $ \ptr ->
-        makeNewObject mkWebBackForwardList $
+        makeWebBackForwardList $
             {#call web_view_get_back_forward_list#} ptr
 
 webViewGoToBackForwardItem :: WebView -> WebHistoryItem -> IO Bool
@@ -469,12 +468,12 @@ webViewUnmarkTextMatches web_view =
 webViewGetMainFrame :: WebView -> IO WebFrame
 webViewGetMainFrame web_view =
     withWebView web_view $ \ptr ->
-        makeNewObject mkWebFrame $ {#call web_view_get_main_frame#} ptr
+        makeWebFrame $ {#call web_view_get_main_frame#} ptr
 
 webViewGetFocusedFrame :: WebView -> IO WebFrame
 webViewGetFocusedFrame web_view =
     withWebView web_view $ \ptr ->
-        makeNewObject mkWebFrame $ {#call web_view_get_focused_frame#} ptr
+        makeWebFrame $ {#call web_view_get_focused_frame#} ptr
 
 webViewExecuteScript :: WebView -> String -> IO ()
 webViewExecuteScript web_view script = do
@@ -575,12 +574,12 @@ webViewSetSettings web_view settings =
 webViewGetSettings :: WebView -> IO WebSettings 
 webViewGetSettings web_view =
     withWebView web_view $ \ptr ->
-        makeNewObject mkWebSettings $ {#call web_view_get_settings#} ptr
+        makeWebSettings $ {#call web_view_get_settings#} ptr
 
 webViewGetInspector :: WebView -> IO WebInspector
 webViewGetInspector web_view =
     withWebView web_view $ \ptr ->
-        makeNewObject mkWebInspector $ {#call web_view_get_inspector#} ptr
+        makeWebInspector $ {#call web_view_get_inspector#} ptr
 
 -- | This functions returns whether or not a MIME type can be displayed using
 --   this view.
@@ -734,7 +733,7 @@ WebKitHitTestResult* webkit_web_view_get_hit_test_result (WebKitWebView *webView
 webViewGetHitTestResult :: WebView -> EventButton -> IO HitTestResult 
 webViewGetHitTestResult web_view event_button =
     withWebView web_view $ \wptr ->
-        makeNewObject mkHitTestResult $ do
+        makeHitTestResult $ do
             {#call web_view_get_hit_test_result#} wptr ??? 
 
 -}
@@ -785,12 +784,12 @@ onWebViewCloseWebView, afterWebViewCloseWebView ::
 onWebViewCloseWebView web_view f = 
     on web_view (Signal (connectGeneric "close-web-view")) $
         \ webViewPtr -> do 
-            x1 <- makeNewObject mkWebView $ return webViewPtr 
+            x1 <- makeWebView $ return webViewPtr 
             f x1
 afterWebViewCloseWebView web_view f = 
     on web_view (Signal (connectGeneric "close-web-view")) $
         \ webViewPtr -> do 
-            x1 <- makeNewObject mkWebView $ return webViewPtr 
+            x1 <- makeWebView $ return webViewPtr 
             f x1
 
 -- TODO wrap Ptr WebView to WebView for user function
@@ -823,8 +822,8 @@ webViewCreateWebViewWrapper ::
     (WebView -> WebFrame -> IO WebView) 
     -> Ptr WebView -> Ptr WebFrame -> IO WebView
 webViewCreateWebViewWrapper f webViewPtr webFramePtr = do
-            x1 <- makeNewObject mkWebView $ return webViewPtr
-            x2 <- makeNewObject mkWebFrame $ return webFramePtr
+            x1 <- makeWebView $ return webViewPtr
+            x2 <- makeWebFrame $ return webFramePtr
             f x1 x2 
 
 onWebViewCutClipboard, afterWebViewCutClipboard ::
@@ -935,12 +934,12 @@ webViewResourceRequestStartingWrapper ::
    -> IO ()
 webViewResourceRequestStartingWrapper  
     f web_view web_frame web_resource network_request network_response = do
-    x1 <- makeNewObject mkWebView $ return web_view
-    x2 <- makeNewObject mkWebFrame $ return web_frame
-    x3 <- makeNewObject mkWebResource $ return web_resource
-    x4 <- makeNewObject mkNetworkRequest $ return network_request
+    x1 <- makeWebView $ return web_view
+    x2 <- makeWebFrame $ return web_frame
+    x3 <- makeWebResource $ return web_resource
+    x4 <- makeNetworkRequest $ return network_request
     if nullPtr /= network_response then do
-        x5 <- makeNewObject mkNetworkResponse  $ return network_response
+        x5 <- makeNetworkResponse  $ return network_response
         f x1 x2 x3 x4 (Just x5)
       else
         f x1 x2 x3 x4 Nothing
