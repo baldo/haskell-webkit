@@ -161,7 +161,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , afterWebViewCopyClipboard
 
     , onWebViewConsoleMessage
-    ,afterWebViewConsoleMessage 
+    , afterWebViewConsoleMessage 
 
     , onWebViewCutClipboard
     , afterWebViewCutClipboard
@@ -175,15 +175,6 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewCloseWebView
     , afterWebViewCloseWebView
 
-    -- , onWebViewLoadCommitted
-    -- , afterWebViewLoadCommitted
-
-    -- , onWebViewLoadFinished
-    -- , afterWebViewLoadFinished
-
-    -- , onWebViewLoadStarted
-    -- , afterWebViewLoadStarted
-
     , onWebViewPasteClipboard
     , afterWebViewPasteClipboard
 
@@ -196,11 +187,20 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewStatusbarTextChanged
     , afterWebViewStatusbarTextChanged
 
-    -- , onWebViewTitleChanged
-    -- , afterWebViewTitleChanged
-    
     , onWebViewResourceRequestStarting 
     , afterWebViewResourceRequestStarting 
+
+    , onWebViewCreateWebView
+    , afterWebViewCreateWebView
+
+    , onWebViewScriptAlert
+    , afterWebViewScriptAlert
+
+    , onWebViewScriptConfirm
+    , afterWebViewScriptConfirm
+
+    , onWebViewDownloadRequested
+    , afterWebViewDownloadRequested
 
     ) where
  
