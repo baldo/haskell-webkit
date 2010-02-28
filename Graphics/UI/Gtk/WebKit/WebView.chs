@@ -283,6 +283,12 @@ import Graphics.UI.Gtk.Gdk.Events
     , webWindowFeaturesGetType
     )
 
+{#import Network.Soup.General.Types#}
+    ( SoupSession
+
+    , makeSoupSession
+    )
+
 webViewGetType :: IO GType
 webViewGetType =
     {#call web_view_get_type#}
@@ -657,9 +663,9 @@ webViewSetFullContentZoom web_view full_content_zoom =
         {#call web_view_set_full_content_zoom#} ptr $
             fromBool full_content_zoom
 
-{- TODO
-SoupSession* webkit_get_default_session (void);
--}
+getDefaultSession :: IO SoupSession
+getDefaultSession =
+    makeSoupSession {#call get_default_session#}
 
 webViewGetEncoding :: WebView -> IO (Maybe String)
 webViewGetEncoding web_view =
@@ -940,9 +946,6 @@ webViewResourceRequestStartingWrapper
       else
         f x1 x2 x3 x4 Nothing
 
-{-
-"script-prompt" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gchar *default, gpointer text, gpointer user_data) : Run Last / Action
--}
 onWebViewScriptPrompt, afterWebViewScriptPrompt :: 
     WebView -> (WebView -> WebFrame -> String -> String -> String -> IO Bool) 
     -> IO (ConnectId WebView)
