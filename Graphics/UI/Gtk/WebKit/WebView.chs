@@ -808,9 +808,24 @@ onWebViewCopyClipboard =
 afterWebViewCopyClipboard =
     connect_NONE__NONE "copy-clipboard" True
 
-{- TODO"create-plugin-widget" : GtkWidget* user_function (WebKitWebView *web_view, gchar *mime_type, gchar *uri, GHashTable *param, gpointer user_data) : Run Last / Action
-"create-web-view" : WebKitWebView* user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer user_data) : Run Last / Action
--}
+{- TODO "create-plugin-widget" : GtkWidget* user_function (WebKitWebView *web_view, gchar *mime_type, gchar *uri, GHashTable *param, gpointer user_data) : Run Last / Action -}
+
+onWebViewCreateWebView, afterWebViewCreateWebView::
+    WebView -> (WebView -> WebFrame -> IO WebView) -> IO (ConnectId WebView)
+onWebViewCreateWebView web_view f = 
+    on web_view (Signal (connectGeneric "create-web-view")) 
+        (webViewCreateWebViewWrapper f) 
+afterWebViewCreateWebView web_view f = 
+    after web_view (Signal (connectGeneric "create-web-view"))
+        (webViewCreateWebViewWrapper f)
+
+webViewCreateWebViewWrapper :: 
+    (WebView -> WebFrame -> IO WebView) 
+    -> Ptr WebView -> Ptr WebFrame -> IO WebView
+webViewCreateWebViewWrapper f webViewPtr webFramePtr = do
+            x1 <- makeNewObject mkWebView $ return webViewPtr
+            x2 <- makeNewObject mkWebFrame $ return webFramePtr
+            f x1 x2 
 
 onWebViewCutClipboard, afterWebViewCutClipboard ::
     WebView -> IO () -> IO (ConnectId WebView)
