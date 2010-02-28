@@ -859,9 +859,6 @@ onWebViewCutClipboard =
 afterWebViewCutClipboard =
     connect_NONE__NONE "cut-clipboard" True
 
-{- TODO
-"database-quota-exceeded" : void user_function (WebKitWebView *web_view, GObject *frame, GObject *database, gpointer user_data) : Run Last / Action
--}
 onWebViewDatabaseQuotaExceeded, afterWebViewDatabaseQuotaExceeded ::
     WebView 
     -> (WebView -> WebFrame -> WebDatabase -> IO ())
@@ -923,15 +920,9 @@ afterWebViewLoadCommitted =
 
 {- TODO
 "load-error" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gchar *uri, gpointer web_error, gpointer user_data) : Run Last
--}
-
-{- TODO
 "mime-type-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, gchar *mimetype, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
 "navigation-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
--}
-
-{- TODO
 "new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
 
@@ -1126,8 +1117,17 @@ afterWebViewTitleChanged =
 -}
 
 {- TODO
-"undo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
 "web-view-ready" : gboolean user_function (WebKitWebView *web_view, gpointer user_data) : Run Last
 "window-object-cleared" : void user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer context, gpointer arg3, gpointer user_data) : Run Last / Action
 -}
 
+onWebViewUndo, afterWebViewUndo :: 
+    WebView -> (WebView -> IO ()) -> IO (ConnectId WebView) 
+onWebViewUndo web_view f =
+    on web_view (Signal (connectGeneric "undo")) $ \ wv -> do 
+        x <-  makeWebView $ return wv 
+        f x 
+afterWebViewUndo web_view f =
+    after web_view (Signal (connectGeneric "undo")) $ \ wv -> do 
+        x <-  makeWebView $ return wv 
+        f x 
