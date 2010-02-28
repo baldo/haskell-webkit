@@ -809,10 +809,21 @@ afterWebViewCloseWebView web_view f =
 -- TODO wrap Ptr WebView to WebView for user function
 onWebViewConsoleMessage,afterWebViewConsoleMessage :: 
     WebView -> (WebView -> String -> Int -> String -> IO Bool) -> IO (ConnectId WebView)
-onWebViewConsoleMessage web_view = 
+onWebViewConsoleMessage web_view f = 
     on web_view (Signal (connectGeneric "console-message")) 
-afterWebViewConsoleMessage web_view = 
+        (webViewConsoleMessageWrapper f)
+afterWebViewConsoleMessage web_view f = 
     after web_view (Signal (connectGeneric "console-message")) 
+        (webViewConsoleMessageWrapper f)
+
+webViewConsoleMessageWrapper ::
+    (WebView -> String -> Int -> String -> IO Bool)
+    -> Ptr WebView -> CString -> CInt -> CString -> IO Bool
+webViewConsoleMessageWrapper f webViewPtr message line source_id = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- peekCString message
+    x4 <- peekCString source_id
+    f x1 x2 (fromIntegral line) x4 
 
 onWebViewCopyClipboard, afterWebViewCopyClipboard ::
     WebView -> IO () -> IO (ConnectId WebView)
