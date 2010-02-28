@@ -242,6 +242,7 @@ import System.Glib.GObject
     , HitTestResult
     , WebResource 
     , NetworkResponse
+    , Download
 
     , withNetworkRequest
     , makeNetworkRequest
@@ -264,6 +265,7 @@ import System.Glib.GObject
     , makeNetworkResponse
     , makeNetworkRequest
     , makeWebResource
+    , makeDownload
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -835,8 +837,23 @@ afterWebViewCutClipboard =
 
 {- TODO
 "database-quota-exceeded" : void user_function (WebKitWebView *web_view, GObject *frame, GObject *database, gpointer user_data) : Run Last / Action
-"download-requested" : gboolean user_function (WebKitWebView *web_view, GObject *download, gpointer user_data) : Run Last
 -}
+
+onWebViewDownloadRequested, afterWebViewDownloadRequested :: 
+    WebView -> (WebView -> Download -> IO Bool) -> IO (ConnectId WebView)
+onWebViewDownloadRequested web_view f =
+    on web_view (Signal (connectGeneric "download-requested")) 
+        (webViewDownloadRequestedWrapper f)
+afterWebViewDownloadRequested web_view f =
+    after web_view (Signal (connectGeneric "download-requested")) 
+        (webViewDownloadRequestedWrapper f)
+  
+webViewDownloadRequestedWrapper ::
+     (WebView -> Download -> IO Bool) -> Ptr WebView -> Ptr Download -> IO Bool
+webViewDownloadRequestedWrapper f webViewPtr downloadPtr = do
+    x1 <- makeWebView $ return webViewPtr 
+    x2 <- makeDownload $ return downloadPtr 
+    f x1 x2 
 
 onWebViewHoveringOverLink, afterWebViewHoveringOverLink ::
     WebView -> (String -> String -> IO ()) -> IO (ConnectId WebView)
