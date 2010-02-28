@@ -923,9 +923,24 @@ afterWebViewPasteClipboard =
 
 {- TODO
 "populate-popup" : void user_function (WebKitWebView *web_view, GtkMenu *menu, gpointer user_data) : Run Last / Action
-"print-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer user_data) : Run Last
-"redo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
 -}
+
+onWebViewPrintRequested, afterWebViewPrintRequested ::
+    WebView -> (WebView -> WebFrame -> IO Bool) -> IO (ConnectId WebView)
+onWebViewPrintRequested web_view f =
+    on web_view (Signal (connectGeneric "print-requested"))
+    (onWebViewPrintRequestedWrapper f)
+afterWebViewPrintRequested web_view f =
+    after web_view (Signal (connectGeneric "print-requested"))
+    (onWebViewPrintRequestedWrapper f)
+
+onWebViewPrintRequestedWrapper ::
+    (WebView -> WebFrame -> IO Bool)
+    -> Ptr WebView -> Ptr WebFrame -> IO Bool
+onWebViewPrintRequestedWrapper f webViewPtr webFramePtr = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeWebFrame $ return webFramePtr
+    f x1 x2
 
 onWebViewRedo, afterWebViewRedo :: 
     WebView -> (WebView -> IO ()) -> IO (ConnectId WebView) 
