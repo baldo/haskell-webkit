@@ -202,6 +202,9 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewDownloadRequested
     , afterWebViewDownloadRequested
 
+    , onWebViewSetCrollAdjustments
+    , afterWebViewSetCrollAdjustments 
+
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -209,26 +212,29 @@ module Graphics.UI.Gtk.WebKit.WebView
 import Foreign.C
 import Foreign.Ptr
 import GHC.Ptr
-import System.Glib.FFI
-
-import System.Glib.GType
-import System.Glib.Properties
-
 import Control.Monad
 
+import System.Glib.Signals
+import System.Glib.GObject
+import System.Glib.FFI
+import System.Glib.GType
+import System.Glib.Properties
+import System.Glib.Types 
+    ( objectUnref )
+
+import Graphics.UI.Gtk.Types
 import Graphics.UI.Gtk.Signals
 import Graphics.UI.Gtk.General.DNDTypes
 import Graphics.UI.Gtk.General.Enums 
-    ( MovementStep
-    )
+    ( MovementStep )
+import Graphics.UI.Gtk.Abstract.Object  
+    ( makeNewObject )
+import Graphics.UI.Gtk.Misc.Adjustment 
 import Graphics.UI.Gtk.Gdk.Events 
     ( Event (..)
     , EventButton 
     , marshalEvent
     )
-
-import System.Glib.Signals
-import System.Glib.GObject
 
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
@@ -267,11 +273,9 @@ import System.Glib.GObject
     , makeWebResource
     , makeDownload
     )
-
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( LoadStatus (..)
     )
-
 {#import Graphics.UI.Gtk.WebKit.WebWindowFeatures#}
     ( WebWindowFeatures
     , webWindowFeaturesGetType
@@ -989,9 +993,24 @@ onWebViewSelectionChanged =
 afterWebViewSelectionChanged =
     connect_NONE__NONE "selection-changed" True
 
-{- TODO
-"set-scroll-adjustments" : void user_function (WebKitWebView *webkitwebview, GtkAdjustment *arg1, GtkAdjustment *arg2, gpointer user_data) : Run Last / Action
--}
+onWebViewSetCrollAdjustments,afterWebViewSetCrollAdjustments ::
+    WebView -> (WebView -> Adjustment -> Adjustment -> IO ()) 
+    -> IO (ConnectId WebView)
+onWebViewSetCrollAdjustments web_view f =
+    on web_view (Signal (connectGeneric "set-scroll-adjustments"))
+        (webViewSetCrollAdjustmentsWrapper f)
+afterWebViewSetCrollAdjustments web_view f =
+    after web_view (Signal (connectGeneric "set-scroll-adjustments"))
+        (webViewSetCrollAdjustmentsWrapper f)
+
+webViewSetCrollAdjustmentsWrapper ::
+    (WebView -> Adjustment -> Adjustment -> IO ()) 
+    -> Ptr WebView -> Ptr Adjustment -> Ptr Adjustment -> IO ()
+webViewSetCrollAdjustmentsWrapper f webViewPtr gtkAdj1Ptr gtkAdj2Ptr = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeNewObject (Adjustment, objectUnref)  $ return gtkAdj1Ptr
+    x3 <- makeNewObject (Adjustment, objectUnref)  $ return gtkAdj2Ptr
+    f x1 x2 x3 
 
 onWebViewStatusbarTextChanged, afterWebViewStatusbarTextChanged ::
     WebView -> (String -> IO ()) -> IO (ConnectId WebView)
