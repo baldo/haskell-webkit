@@ -251,6 +251,7 @@ import Graphics.UI.Gtk.Gdk.Events
     , WebResource 
     , NetworkResponse
     , Download
+    , WebDatabase
 
     , withNetworkRequest
     , makeNetworkRequest
@@ -274,6 +275,7 @@ import Graphics.UI.Gtk.Gdk.Events
     , makeNetworkRequest
     , makeWebResource
     , makeDownload
+    , makeWebDatabase
     )
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( LoadStatus (..)
@@ -860,6 +862,25 @@ afterWebViewCutClipboard =
 {- TODO
 "database-quota-exceeded" : void user_function (WebKitWebView *web_view, GObject *frame, GObject *database, gpointer user_data) : Run Last / Action
 -}
+onWebViewDatabaseQuotaExceeded, afterWebViewDatabaseQuotaExceeded ::
+    WebView 
+    -> (WebView -> WebFrame -> WebDatabase -> IO ())
+    -> IO (ConnectId WebView)
+onWebViewDatabaseQuotaExceeded web_view f =
+    on web_view (Signal (connectGeneric "database-quota-exceeded"))
+        (webViewDatabaseQuotaExceededWrapper f)
+afterWebViewDatabaseQuotaExceeded web_view f =
+    after web_view (Signal (connectGeneric "database-quota-exceeded"))
+        (webViewDatabaseQuotaExceededWrapper f)
+
+webViewDatabaseQuotaExceededWrapper :: 
+    (WebView -> WebFrame -> WebDatabase -> IO ())
+    -> Ptr WebView -> Ptr WebFrame -> Ptr WebDatabase -> IO ()
+webViewDatabaseQuotaExceededWrapper f webViewPtr webFramePtr databasePtr = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeWebFrame $ return webFramePtr 
+    x3 <- makeWebDatabase $ return databasePtr
+    f x1 x2 x3 
 
 onWebViewDownloadRequested, afterWebViewDownloadRequested :: 
     WebView -> (WebView -> Download -> IO Bool) -> IO (ConnectId WebView)
@@ -920,10 +941,6 @@ onWebViewPasteClipboard =
     connect_NONE__NONE "paste-clipboard" False
 afterWebViewPasteClipboard =
     connect_NONE__NONE "paste-clipboard" True
-
-{- TODO
-"populate-popup" : void user_function (WebKitWebView *web_view, GtkMenu *menu, gpointer user_data) : Run Last / Action
--}
 
 onWebViewPopulatePopup, afterWebViewPopulatePopup ::
     WebView -> (WebView -> Menu -> IO ()) -> IO (ConnectId WebView)
