@@ -957,6 +957,24 @@ webViewScriptAlertWrapper f webViewPtr webFramePtr message = do
     x2 <- makeWebFrame $ return webFramePtr
     f x1 x2 message
 
+onWebViewScriptConfirm, afterWebViewScriptConfirm :: 
+    WebView -> (WebView -> WebFrame -> String -> Bool -> IO Bool)
+    -> IO (ConnectId WebView)
+onWebViewScriptConfirm web_view f =
+    on web_view (Signal (connectGeneric "script-confirm"))
+        (webViewScriptConfirmWrapper f)
+afterWebViewScriptConfirm web_view f =
+    after web_view (Signal (connectGeneric "script-confirm"))
+        (webViewScriptConfirmWrapper f)
+
+webViewScriptConfirmWrapper ::
+    (WebView -> WebFrame -> String -> Bool -> IO Bool)
+    -> Ptr WebView -> Ptr WebFrame -> String -> Bool -> IO Bool
+webViewScriptConfirmWrapper f webViewPtr webFramePtr message confirm = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeWebFrame $ return webFramePtr 
+    f x1 x2 message confirm
+
 onWebViewSelectAll, afterWebViewSelectAll ::
     WebView -> IO () -> IO (ConnectId WebView)
 onWebViewSelectAll web_view f = 
