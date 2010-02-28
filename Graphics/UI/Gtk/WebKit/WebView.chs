@@ -806,7 +806,6 @@ afterWebViewCloseWebView web_view f =
             x1 <- makeWebView $ return webViewPtr 
             f x1
 
--- TODO wrap Ptr WebView to WebView for user function
 onWebViewConsoleMessage,afterWebViewConsoleMessage :: 
     WebView -> (WebView -> String -> Int -> String -> IO Bool) -> IO (ConnectId WebView)
 onWebViewConsoleMessage web_view f = 
@@ -927,6 +926,18 @@ afterWebViewPasteClipboard =
 "print-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer user_data) : Run Last
 "redo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
 -}
+
+onWebViewRedo, afterWebViewRedo :: 
+    WebView -> (WebView -> IO ()) -> IO (ConnectId WebView) 
+onWebViewRedo web_view f =
+    on web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
+        x <-  makeWebView $ return wv 
+        f x 
+afterWebViewRedo web_view f =
+    after web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
+        x <-  makeWebView $ return wv 
+        f x 
+       
 
 onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
    WebView
