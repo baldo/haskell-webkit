@@ -882,36 +882,10 @@ afterWebViewLoadCommitted =
 "load-error" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gchar *uri, gpointer web_error, gpointer user_data) : Run Last
 -}
 
-{- DEPRECATED
-onWebViewLoadFinished, afterWebViewLoadFinished ::
-    WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
-onWebViewLoadFinished =
-    connect_OBJECT__NONE "load-finished" False
-afterWebViewLoadFinished =
-    connect_OBJECT__NONE "load-finished" True
--}
-
-{- DEPRECATED ?TODO?
-"load-progress-changed" : void user_function (WebKitWebView *web_view, gint progress, gpointer user_data) : Run Last / Action
--}
-
-{- DEPRECATED
-onWebViewLoadStarted, afterWebViewLoadStarted ::
-    WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
-onWebViewLoadStarted =
-    connect_OBJECT__NONE "load-started" False
-afterWebViewLoadStarted =
-    connect_OBJECT__NONE "load-started" True
--}
-
 {- TODO
 "mime-type-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, gchar *mimetype, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
 "navigation-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
--}
-
-{- DEPRECATED
-"navigation-requested" : gint user_function (WebKitWebView *webkitwebview, GObject *arg1, GObject *arg2, gpointer user_data) : Run Last / Action
 -}
 
 {- TODO
@@ -929,7 +903,6 @@ afterWebViewPasteClipboard =
 "populate-popup" : void user_function (WebKitWebView *web_view, GtkMenu *menu, gpointer user_data) : Run Last / Action
 "print-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer user_data) : Run Last
 "redo" : void user_function (WebKitWebView *web_view, gpointer user_data) : Run Last / Action
-"resource-request-starting" : void user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, WebKitWebResource *web_resource, WebKitNetworkRequest *request, WebKitNetworkResponse *response, gpointer user_data) : Run Last / Action
 -}
 
 onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
@@ -962,10 +935,27 @@ webViewResourceRequestStartingWrapper
         f x1 x2 x3 x4 Nothing
 
 {-
-"script-alert" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gpointer user_data) : Run Last / Action
 "script-confirm" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gboolean confirmed, gpointer user_data) : Run Last / Action
 "script-prompt" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gchar *message, gchar *default, gpointer text, gpointer user_data) : Run Last / Action
 -}
+
+onWebViewScriptAlert, afterWebViewScriptAlert :: 
+    WebView -> (WebView -> WebFrame -> String -> IO Bool) 
+    -> IO (ConnectId WebView)
+onWebViewScriptAlert web_view f =
+    on web_view (Signal (connectGeneric "script-alert"))
+        (webViewScriptAlertWrapper f)
+afterWebViewScriptAlert web_view f =
+    after web_view (Signal (connectGeneric "script-alert"))
+        (webViewScriptAlertWrapper f)
+
+webViewScriptAlertWrapper :: 
+    (WebView -> WebFrame -> String -> IO Bool) 
+    -> Ptr WebView -> Ptr WebFrame -> String -> IO Bool
+webViewScriptAlertWrapper f webViewPtr webFramePtr message = do
+    x1 <- makeWebView $ return webViewPtr    
+    x2 <- makeWebFrame $ return webFramePtr
+    f x1 x2 message
 
 onWebViewSelectAll, afterWebViewSelectAll ::
     WebView -> IO () -> IO (ConnectId WebView)
