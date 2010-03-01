@@ -17,6 +17,25 @@ module Graphics.UI.Gtk.WebKit.WebInspector
 
     -- , webInspectorSetTimeLineProfilingEnabled -- new in webkit 1.1.17
     -- , webInspectorGetTimeLineProfilingEnabled -- new in webkit 1.1.17
+
+    -- Signals ----------------------------------------------------------------
+    , onWebInspectorShowWindow
+    , afterWebInspectorShowWindow 
+
+    , onWebInspectorFinished
+    , afterWebInspectorFinished 
+
+    , onWebInspectorDetachWindow
+    , afterWebInspectorDetachWindow 
+
+    , onWebInspectorCloseWindow
+    , afterWebInspectorCloseWindow 
+
+    , onWebInspectorAttachWindow
+    , afterWebInspectorAttachWindow 
+
+    , onWebInspectorInspectWebView
+    , afterWebInspectorInspectWebView 
     ) where
 
 #include <webkit/webkitwebinspector.h>
@@ -24,6 +43,7 @@ module Graphics.UI.Gtk.WebKit.WebInspector
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.Signals
 import System.Glib.Properties
 
 import Control.Monad
@@ -38,7 +58,8 @@ import Graphics.UI.Gtk.Abstract.Object
 
     , mkWebInspector
     , withWebInspector
-    , mkWebView
+    , makeWebInspector
+    , makeWebView
     )
 
 webInspectorGetInspectedUri :: WebInspector -> IO String
@@ -49,7 +70,7 @@ webInspectorGetInspectedUri inspector =
 webInspectorGetWebView :: WebInspector -> IO WebView
 webInspectorGetWebView inspector = 
     withWebInspector inspector $ \ptr ->
-        makeNewObject mkWebView $ 
+        makeWebView $ 
             {#call web_inspector_get_web_view#} ptr 
 
 {- new in webkit 1.1.17
@@ -69,6 +90,7 @@ webInspectorClose inspector =
         {#call  web_inspector_close#} ptr
 -} 
 
+-- Properties -----------------------------------------------------------------
 
 webInspectorSetJavascriptProfilingEnabled :: WebInspector -> Bool -> IO ()
 webInspectorSetJavascriptProfilingEnabled =
@@ -93,11 +115,73 @@ webInspectorGetTimeLineProfilingEnabled =
         "timeline-profiling-enabled" 
 -}
 
-{- TODO Signals 
-  "attach-window"                                  : Run Last
-  "close-window"                                   : Run Last
-  "detach-window"                                  : Run Last
-  "finished"                                       : Run Last
-  "inspect-web-view"                               : Run Last
-  "show-window"                                    : Run Last
--}
+-- Signals --------------------------------------------------------------------
+
+onWebInspectorAttachWindow, afterWebInspectorAttachWindow ::
+    WebInspector -> (WebInspector -> IO ()) -> IO (ConnectId WebInspector)
+onWebInspectorAttachWindow web_inspector f =
+    on web_inspector (Signal (connectGeneric "attach-window"))
+        (webInspectorSignalWrapper f) 
+afterWebInspectorAttachWindow web_inspector f =
+    after web_inspector (Signal (connectGeneric "attach-window"))
+        (webInspectorSignalWrapper f)
+
+onWebInspectorCloseWindow, afterWebInspectorCloseWindow ::
+    WebInspector -> (WebInspector -> IO ()) -> IO (ConnectId WebInspector)
+onWebInspectorCloseWindow web_inspector f =
+    on web_inspector (Signal (connectGeneric "close-window"))
+        (webInspectorSignalWrapper f) 
+afterWebInspectorCloseWindow web_inspector f =
+    after web_inspector (Signal (connectGeneric "close-window"))
+        (webInspectorSignalWrapper f)
+
+onWebInspectorDetachWindow, afterWebInspectorDetachWindow ::
+    WebInspector -> (WebInspector -> IO ()) -> IO (ConnectId WebInspector)
+onWebInspectorDetachWindow web_inspector f =
+    on web_inspector (Signal (connectGeneric "detach-window"))
+        (webInspectorSignalWrapper f) 
+afterWebInspectorDetachWindow web_inspector f =
+    after web_inspector (Signal (connectGeneric "detach-window"))
+        (webInspectorSignalWrapper f)
+
+onWebInspectorFinished, afterWebInspectorFinished ::
+    WebInspector -> (WebInspector -> IO ()) -> IO (ConnectId WebInspector)
+onWebInspectorFinished web_inspector f =
+    on web_inspector (Signal (connectGeneric "finished"))
+        (webInspectorSignalWrapper f) 
+afterWebInspectorFinished web_inspector f =
+    after web_inspector (Signal (connectGeneric "finished"))
+        (webInspectorSignalWrapper f)
+
+onWebInspectorShowWindow, afterWebInspectorShowWindow ::
+    WebInspector -> (WebInspector -> IO ()) -> IO (ConnectId WebInspector)
+onWebInspectorShowWindow web_inspector f =
+    on web_inspector (Signal (connectGeneric "show-window"))
+        (webInspectorSignalWrapper f) 
+afterWebInspectorShowWindow web_inspector f =
+    after web_inspector (Signal (connectGeneric "show-window"))
+        (webInspectorSignalWrapper f)
+
+webInspectorSignalWrapper :: 
+    (WebInspector -> IO ()) 
+    -> Ptr WebInspector -> IO ()
+webInspectorSignalWrapper f webInspectorPtr = do
+    x1 <- makeWebInspector $ return webInspectorPtr 
+    f x1 
+
+onWebInspectorInspectWebView, afterWebInspectorInspectWebView ::
+    WebInspector -> (WebInspector -> WebView -> IO ()) -> IO (ConnectId WebInspector)
+onWebInspectorInspectWebView web_inspector f =
+    on web_inspector (Signal (connectGeneric "inspect-web-view"))
+        (webInspectorWebViewSignalWrapper f) 
+afterWebInspectorInspectWebView web_inspector f =
+    after web_inspector (Signal (connectGeneric "inspect-web-view"))
+        (webInspectorWebViewSignalWrapper f)
+
+webInspectorWebViewSignalWrapper :: 
+    (WebInspector -> WebView -> IO ()) 
+    -> Ptr WebInspector -> Ptr WebView -> IO ()
+webInspectorWebViewSignalWrapper f webInspectorPtr webViewPtr = do
+    x1 <- makeWebInspector $ return webInspectorPtr 
+    x2 <- makeWebView $ return webViewPtr
+    f x1 x2
