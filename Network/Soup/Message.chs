@@ -7,6 +7,8 @@ module Network.Soup.Message
 
     , messageGetType
 
+    , messageNew
+
     -- Properties --------------------------------------------------------------
 
     -- Signals -----------------------------------------------------------------
@@ -34,16 +36,25 @@ import Graphics.UI.Gtk.Signals
     ( Message 
 
     , withMessage
-    , mkMessage
+    , makeMessage
     )
 
+{#import Network.Soup.General.Enums#}
+    ( HttpVersion (..)
+    )
 messageGetType :: IO GType
 messageGetType =
     {#call message_get_type#}
 
+messageNew :: String -> String -> IO Message
+messageNew method uri =
+    withCString method $ \c_method ->
+        withCString uri $ \c_uri -> do
+            ptr <- {#call message_new#} c_method c_uri
+            let ptr' = castPtr ptr
+            makeMessage (return ptr')
+
 {- TODO
-GType soup_message_get_type (void);
-SoupMessage *soup_message_new (const char *method, CONST CHAr *uri_string);
 SoupMessage *soup_message_new_from_uri (const char *method, SoupURI *uri);
 void soup_message_set_request (SoupMessage *msg, const char *content_type, SoupMemoryUse req_use, const char *req_body, gsize req_length);
 void soup_message_set_response (SoupMessage *msg, const char *content_type, SoupMemoryUse resp_use, const char *resp_body, gsize resp_length);

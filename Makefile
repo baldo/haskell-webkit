@@ -22,6 +22,7 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/General/Types.hs \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
 	Network/Soup/Message.hs \
+	Network/Soup/General/Enums.hs \
 	Network/Soup/General/Types.hs
 
 hs_files = \
@@ -47,6 +48,7 @@ hs_files = \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
 	Network/Soup.hs \
 	Network/Soup/Message.hs \
+	Network/Soup/General/Enums.hs \
 	Network/Soup/General/Types.hs
 
 %.hs: %.chs
@@ -91,7 +93,7 @@ Graphics/UI/Gtk/WebKit/SecurityOrigin.hs: Graphics/UI/Gtk/WebKit/General/Types.h
 
 Graphics/UI/Gtk/WebKit/WebWindowFeatures.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
-Network/Soup/Message.hs: Network/Soup/General/Types.hs
+Network/Soup/Message.hs: Network/Soup/General/Types.hs Network/Soup/General/Enums.hs
 
 doc: $(hs_files)
 	@mkdir -p doc/
