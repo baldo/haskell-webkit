@@ -133,6 +133,8 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , webViewGetIconUri
 
+    -- , webViewGetImContext -- TODO
+
     --, webViewGetLoadStatus
 
     --, webViewGetPasteTargetList
@@ -768,6 +770,10 @@ webViewGetIconUri :: WebView -> IO String
 webViewGetIconUri =
     objectGetPropertyString
         "icon-uri"
+
+{- TODO / new in 1.1.20
+"im-context" GtkIMContext* : Read
+-}
 
 {- Not needed...?
 "load-status" WebKitLoadStatus : Read
