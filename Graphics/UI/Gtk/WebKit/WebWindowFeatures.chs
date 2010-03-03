@@ -111,20 +111,6 @@ webWindowFeaturesNew =
 
 -- Properties -----------------------------------------------------------------
 
-
-{- TODO figure out what Construct means, setter implemted
-  "fullscreen"               gboolean              : Read / Write / Construct
-  "height"                   gint                  : Read / Write / Construct
-  "locationbar-visible"      gboolean              : Read / Write / Construct
-  "menubar-visible"          gboolean              : Read / Write / Construct
-  "scrollbar-visible"        gboolean              : Read / Write / Construct
-  "statusbar-visible"        gboolean              : Read / Write / Construct
-  "toolbar-visible"          gboolean              : Read / Write / Construct
-  "width"                    gint                  : Read / Write / Construct
-  "x"                        gint                  : Read / Write / Construct
-  "y"                        gint                  : Read / Write / Construct
--}
-
 webWindowFeaturesGetFullscreen :: WebWindowFeatures -> IO Bool
 webWindowFeaturesGetFullscreen = 
   objectGetPropertyBool

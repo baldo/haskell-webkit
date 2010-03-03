@@ -93,7 +93,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewGetFullContentZoom
     , webViewSetFullContentZoom
 
-    --, getDefaultSession
+    , getDefaultSession
 
     , webViewGetEncoding
 
@@ -114,48 +114,16 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewSetViewSourceMode
     , webViewGetViewSourceMode
 
-    --, webViewGetHitTestResult
+    --, webViewGetHitTestResult -- TODO
 
     -- * Properties
-
-    --, webViewGetCopyTargetList
-
-    --, webViewGetCustomEncoding
-    --, webViewSetCustomEncoding
-
-    --, webViewGetEditable
-    --, webViewSetEditable
-
-    --, webViewGetEncoding
-
-    --, webViewGetFullContentZoom
-    --, webViewSetFullContentZoom
 
     , webViewGetIconUri
 
     -- , webViewGetImContext -- TODO
 
-    --, webViewGetLoadStatus
-
-    --, webViewGetPasteTargetList
-
-    --, webViewGetProgress
-
-    --, webViewGetSettings
-    --, webViewSetSettings
-
-    --, webViewGetTitle
-
-    --, webViewGetTransparent
-    --, webViewSetTransparent
-
-    --, webViewGetUri
-
     , webViewGetWindowFeatures
     , webViewSetWindowFeatures
-
-    --, webViewGetZoomLevel
-    --, webViewSetZoomLevel
 
     -- * Signals
 
@@ -758,14 +726,6 @@ webViewGetHitTestResult web_view event_button =
 
 -- Properties ------------------------------------------------------------------
 
-{- Not needed...?
-"copy-target-list" GtkTargetList* : Read
-"custom-encoding" gchar* : Read / Write
-"editable" gboolean : Read / Write
-"encoding" gchar* : Read
-"full-content-zoom" gboolean : Read / Write
--}
-
 webViewGetIconUri :: WebView -> IO String
 webViewGetIconUri =
     objectGetPropertyString
@@ -773,16 +733,6 @@ webViewGetIconUri =
 
 {- TODO / new in 1.1.20
 "im-context" GtkIMContext* : Read
--}
-
-{- Not needed...?
-"load-status" WebKitLoadStatus : Read
-"paste-target-list" GtkTargetList* : Read
-"progress" gdouble : Read
-"settings" WebKitWebSettings* : Read / Write
-"title" gchar* : Read
-"transparent" gboolean : Read / Write
-"uri" gchar* : Read
 -}
 
 webViewSetWindowFeatures :: WebView -> WebWindowFeatures -> IO ()
@@ -794,10 +744,6 @@ webViewGetWindowFeatures :: WebView -> IO WebWindowFeatures
 webViewGetWindowFeatures web_view = do
     wwft <- webWindowFeaturesGetType
     objectGetPropertyGObject wwft "window-features" web_view
-
-{- Not needed...?
-"zoom-level" gfloat : Read / Write
--}
 
 -- Signals ---------------------------------------------------------------------
 

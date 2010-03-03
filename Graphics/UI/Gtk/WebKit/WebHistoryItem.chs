@@ -5,7 +5,7 @@
 module Graphics.UI.Gtk.WebKit.WebHistoryItem
     ( WebHistoryItem
 
-    --, webHistoryItemCopy
+    --, webHistoryItemCopy -- TODO
     , webHistoryItemSetAlternateTitle
     , webHistoryItemNewWithData
     , webHistoryItemNew
@@ -38,7 +38,7 @@ import Graphics.UI.Gtk.Abstract.Object
 
 -- Property get/set functions are aready provided by WebKit :)
 
--- New in WebKit 1.1.18
+-- New in WebKit 1.1.18 -- TODO
 --webHistoryItemCopy :: WebHistoryItem -> IO WebHistoryItem 
 --webHistoryItemCopy historyItem =
 --    withHistoryItem historyItem $ \ptr ->

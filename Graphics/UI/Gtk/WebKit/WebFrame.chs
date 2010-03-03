@@ -16,22 +16,22 @@ module Graphics.UI.Gtk.WebKit.WebFrame
     , webFrameLoadUri
     , webFrameLoadString
     , webFrameLoadAlternateString
-    --, webFrameLoadRequest
+    , webFrameLoadRequest
 
     , webFrameStopLoading
     , webFrameReload
 
     , webFrameFindFrame
 
-    --, webFrameGetGlobalContext
+    --, webFrameGetGlobalContext -- TODO
 
-    --, webFramePrintFull
+    --, webFramePrintFull -- TODO
     , webFramePrint
 
     , webFrameGetLoadStatus
 
-    --, webFrameGetHorizontalScrollbarPolicy
-    --, webFrameGetVerticalScrollbarPolicy
+    --, webFrameGetHorizontalScrollbarPolicy -- TODO
+    --, webFrameGetVerticalScrollbarPolicy -- TODO
 
     , webFrameGetDataSource
     , webFrameGetProvisionalDataSource

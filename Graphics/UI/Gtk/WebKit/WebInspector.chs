@@ -5,9 +5,9 @@
 module Graphics.UI.Gtk.WebKit.WebInspector
     ( WebInspector
 
-    -- , webInspectorClose -- new in webkit 1.1.17
-    -- , webInspectorShow  -- new in webkit 1.1.17
-    -- , webInspectorInspectCoordinates -- new in webkit 1.1.17
+    -- , webInspectorClose -- new in webkit 1.1.17 -- TODO
+    -- , webInspectorShow  -- new in webkit 1.1.17 -- TODO
+    -- , webInspectorInspectCoordinates -- new in webkit 1.1.17 -- TODO
     , webInspectorGetWebView
     , webInspectorGetInspectedUri
 
@@ -15,8 +15,8 @@ module Graphics.UI.Gtk.WebKit.WebInspector
     , webInspectorSetJavascriptProfilingEnabled 
     , webInspectorGetJavascriptProfilingEnabled 
 
-    -- , webInspectorSetTimeLineProfilingEnabled -- new in webkit 1.1.17
-    -- , webInspectorGetTimeLineProfilingEnabled -- new in webkit 1.1.17
+    -- , webInspectorSetTimeLineProfilingEnabled -- new in webkit 1.1.17 -- TODO
+    -- , webInspectorGetTimeLineProfilingEnabled -- new in webkit 1.1.17 -- TODO
 
     -- Signals ----------------------------------------------------------------
     , onWebInspectorShowWindow
@@ -73,7 +73,7 @@ webInspectorGetWebView inspector =
         makeWebView $ 
             {#call web_inspector_get_web_view#} ptr 
 
-{- new in webkit 1.1.17
+{- new in webkit 1.1.17 -- TODO
 webInspectorInspectCoordinates :: WebInspector -> Double -> Double -> IO ()
 webInspectorInspectCoordinates inspector x y =
     withWebInspector inspector $ \ptr ->

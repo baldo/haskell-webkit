@@ -10,7 +10,7 @@ module Graphics.UI.Gtk.WebKit.WebResource
     , webResourceGetType
     , webResourceGetFrameName
     , webResourceGetEncoding
-    --, webResourceGetData
+    --, webResourceGetData -- TODO
 
     ) where
 
