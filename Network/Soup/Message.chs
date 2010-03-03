@@ -8,6 +8,33 @@ module Network.Soup.Message
     , messageGetType
 
     , messageNew
+    -- , messageNewFromUri -- TODO
+
+    -- , messageSetRequest -- TODO
+    -- , messageSetResponse -- TODO
+
+    , messageSetHttpVersion
+    , messageGetHttpVersion
+
+    -- , messageIsKeepalive -- TODO
+
+    -- , messageGetUri -- TODO
+    -- , messageSetUri -- TODO
+
+    -- , messageGetAddress -- TODO
+
+    -- , messageSetFlags -- TODO
+    -- , messageGetFlags -- TODO
+
+    -- , messageAddHeaderHandler -- TODO
+    -- , messageAddStatusCodeHandler -- TODO
+
+    -- , messageSetStatus -- TODO
+    -- , messageSetStatusFull -- TODO
+
+    -- , messageSetChunkAllocator -- TODO
+
+    -- , messageDisableFeature -- TODO
 
     -- Properties --------------------------------------------------------------
 
@@ -58,8 +85,21 @@ messageNew method uri =
 SoupMessage *soup_message_new_from_uri (const char *method, SoupURI *uri);
 void soup_message_set_request (SoupMessage *msg, const char *content_type, SoupMemoryUse req_use, const char *req_body, gsize req_length);
 void soup_message_set_response (SoupMessage *msg, const char *content_type, SoupMemoryUse resp_use, const char *resp_body, gsize resp_length);
-void soup_message_set_http_version (SoupMessage *msg, SoupHTTPVersion version);
-SoupHTTPVersion soup_message_get_http_version (SoupMessage *msg);
+-}
+
+messageSetHttpVersion :: Message -> HttpVersion -> IO ()
+messageSetHttpVersion message version =
+    withMessage message $ \ptr ->
+        {#call message_set_http_version#} ptr
+            ((fromIntegral . fromEnum) version)
+
+messageGetHttpVersion :: Message -> IO HttpVersion
+messageGetHttpVersion message =
+    withMessage message $ \ptr ->
+        liftM (toEnum . fromIntegral) $
+            {#call message_get_http_version#} ptr
+
+{- TODO
 gboolean soup_message_is_keepalive (SoupMessage *msg);
 SoupURI *soup_message_get_uri (SoupMessage *msg);
 void soup_message_set_uri (SoupMessage *msg, SoupURI *uri);
