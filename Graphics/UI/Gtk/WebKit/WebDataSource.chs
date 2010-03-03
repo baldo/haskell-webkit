@@ -14,7 +14,7 @@ module Graphics.UI.Gtk.WebKit.WebDataSource
     , webDataSourceGetMainResource
     , webDataSourceGetInitialRequest
     , webDataSourceGetEncoding
-    -- , webDataSourceGetData
+    , webDataSourceGetData
     ) where
 
 #include <webkit/webkitwebdatasource.h>
@@ -49,12 +49,11 @@ import Graphics.UI.Gtk.Abstract.Object
     , mkWebFrame
     )
 
-{- TODO figure out wtf GString comes from
-webDataSourceGetData :: WebDataSource -> IO GString
+webDataSourceGetData :: WebDataSource -> IO String
 webDataSourceGetData source = 
     withWebDataSource source $ \ptr ->
-        {#call web_data_source_get_data#} ptr 
--}
+        {#call web_data_source_get_data#} ptr >>=
+            {#get GString->str#} >>= peekCString
 
 webDataSourceGetEncoding :: WebDataSource -> IO String
 webDataSourceGetEncoding source =

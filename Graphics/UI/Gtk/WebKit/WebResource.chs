@@ -10,7 +10,7 @@ module Graphics.UI.Gtk.WebKit.WebResource
     , webResourceGetType
     , webResourceGetFrameName
     , webResourceGetEncoding
-    --, webResourceGetData -- TODO
+    , webResourceGetData
 
     ) where
 
@@ -34,10 +34,11 @@ import Graphics.UI.Gtk.Abstract.Object
     , mkWebResource
     )
 
-
-{- TODO figure out wth GString comes from
-GString *           webkit_web_resource_get_data        (WebKitWebResource *web_resource);
--}
+webResourceGetData :: WebResource -> IO String
+webResourceGetData resource = 
+    withWebResource resource $ \ptr ->
+        {#call web_resource_get_data#} ptr >>=
+            {#get GString->str#} >>= peekCString
 
 webResourceGetEncoding :: WebResource -> IO String
 webResourceGetEncoding resource =
