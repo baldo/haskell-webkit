@@ -23,7 +23,7 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 
     , webFrameFindFrame
 
-    --, webFrameGetGlobalContext -- TODO
+    , webFrameGetGlobalContext 
 
     --, webFramePrintFull -- TODO
     , webFramePrint
@@ -71,6 +71,11 @@ import Graphics.UI.Gtk.Abstract.Object
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( LoadStatus (..)
+    )
+
+{#import Language.JavaScript.JavaScriptCore.General.Types#} 
+    ( GlobalContextRef (..)
+    , makeGlobalContextRef
     )
 
 {- DEPRECATED
@@ -155,9 +160,18 @@ webFrameFindFrame frame name = do
                 {#call web_frame_find_frame#} ptr c_name
 
 {- TODO
-JSGlobalContextRef web_frame_get_global_context (WebKitWebFrame *frame);
 GtkPrintOperationResult web_frame_print_full (WebKitWebFrame *frame, GtkPrintOperation *operation, GtkPrintOperationAction action, GError **error);
 -}
+
+webFrameGetGlobalContext :: WebFrame -> IO GlobalContextRef
+webFrameGetGlobalContext frame =
+    withWebFrame frame $ \ptr ->
+       makeGlobalContextRef $
+            webkit_web_frame_get_global_context ptr 
+
+-- need this self written import because c2hs has convertion problems 
+foreign import ccall safe "webkitwebframe.h webkit_web_frame_get_global_context"
+    webkit_web_frame_get_global_context :: ((Ptr (WebFrame)) -> (IO (Ptr (GlobalContextRef))))
 
 webFramePrint :: WebFrame -> IO ()
 webFramePrint frame =
