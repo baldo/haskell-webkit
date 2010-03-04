@@ -23,7 +23,10 @@ from_chs = \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \
 	Network/Soup/Message.hs \
 	Network/Soup/General/Enums.hs \
-	Network/Soup/General/Types.hs
+	Network/Soup/General/Types.hs \
+	Language/JavaScript/JavaScriptCore/Base.hs \
+	Language/JavaScript/JavaScriptCore/General/Types.hs
+
 
 hs_files = \
 	Graphics/UI/Gtk/WebKit.hs \
@@ -49,7 +52,10 @@ hs_files = \
 	Network/Soup.hs \
 	Network/Soup/Message.hs \
 	Network/Soup/General/Enums.hs \
-	Network/Soup/General/Types.hs
+	Network/Soup/General/Types.hs \
+	Language/JavaScript/JavaScriptCore.hs \
+	Language/JavaScript/JavaScriptCore/Base.hs \
+	Language/JavaScript/JavaScriptCore/General/Types.hs
 
 %.hs: %.chs
 	c2hs `pkg-config --cflags webkit-1.0 | sed 's/-[^ ]*/-C &/g'` -o $@ $<
@@ -63,7 +69,7 @@ Graphics/UI/Gtk/WebKit/NetworkRequest.hs: Graphics/UI/Gtk/WebKit/General/Types.h
 
 Graphics/UI/Gtk/WebKit/NetworkResponse.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Network/Soup/General/Types.hs
 
-Graphics/UI/Gtk/WebKit/WebFrame.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs
+Graphics/UI/Gtk/WebKit/WebFrame.hs: Graphics/UI/Gtk/WebKit/General/Types.hs Graphics/UI/Gtk/WebKit/General/Enums.hs Language/JavaScript/JavaScriptCore/General/Types.hs
 
 Graphics/UI/Gtk/WebKit/WebHistoryItem.hs: Graphics/UI/Gtk/WebKit/General/Types.hs
 
@@ -103,4 +109,5 @@ clean:
 	@rm -f Test spplayer *.o *.hi $(bin) $(from_chs)
 	@make -C Graphics/UI/Gtk clean
 	@make -C Network clean
+	@make -C Language/JavaScript clean
 	@rm -rf doc/
