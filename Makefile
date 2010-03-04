@@ -55,8 +55,7 @@ hs_files = \
 	Network/Soup.hs \
 	Network/Soup/General/Enums.hs \
 	Network/Soup/General/Types.hs \
-	Network/Soup/Message.hs \
-   	Graphics/UI/Gtk/WebKit/WebBackForwardList.hs
+	Network/Soup/Message.hs
 
 %.hs: %.chs
 	c2hs `pkg-config --cflags webkit-1.0 | sed 's/-[^ ]*/-C &/g'` -o $@ $<
