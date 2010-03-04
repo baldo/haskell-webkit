@@ -66,7 +66,7 @@ Test: Test.hs $(hs_files)
 	@ghc --make Test.hs `pkg-config --libs webkit-1.0`
 
 Graphics/UI/Gtk/WebKit/CacheModel.hs: \
-	Graphics/UI/Gtk/WebKit/General/Types.hs
+	Graphics/UI/Gtk/WebKit/General/Enums.hs
 
 Graphics/UI/Gtk/WebKit/Download.hs: \
 	Graphics/UI/Gtk/WebKit/General/Enums.hs \

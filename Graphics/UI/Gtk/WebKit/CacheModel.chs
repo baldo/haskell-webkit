@@ -24,14 +24,16 @@ import Graphics.UI.Gtk.Abstract.Object
     ( makeNewObject
     )
 
-{#import Graphics.UI.Gtk.WebKit.General.Types#}
-    ( CacheModel 
+{#import Graphics.UI.Gtk.WebKit.General.Enums#}
+    ( CacheModel (..)
     )
 
 getCacheModel :: IO CacheModel
 getCacheModel =
-    {#call get_cache_model#}
+    liftM (toEnum . fromIntegral) $
+        {#call get_cache_model#}
 
 setCacheModel :: CacheModel -> IO ()
 setCacheModel cacheModel =
-    {#call set_cache_model#} cacheModel
+    {#call set_cache_model#} $ (fromIntegral . fromEnum) cacheModel
+
