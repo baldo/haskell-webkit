@@ -38,5 +38,5 @@ import Graphics.UI.Gtk.WebKit.Download
 import Graphics.UI.Gtk.WebKit.WebWindowFeatures
 import Graphics.UI.Gtk.WebKit.CacheModel
 import Graphics.UI.Gtk.WebKit.General.General
-import Graphics.UI.Gtk.WebKit.General.Enums
+import Graphics.UI.Gtk.WebKit.General.Enums hiding (CacheModel)
 
