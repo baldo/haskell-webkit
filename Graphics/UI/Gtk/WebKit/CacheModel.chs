@@ -2,6 +2,9 @@
 
 {# context lib="libwebkit" prefix="webkit_" #}
 
+{-| TODO: Module description goes here...
+-}
+
 module Graphics.UI.Gtk.WebKit.CacheModel
     ( CacheModel
     
@@ -9,7 +12,7 @@ module Graphics.UI.Gtk.WebKit.CacheModel
     , setCacheModel
     ) where
 
-#include <webkit/webkitcachemodel.h>
+#include <webkit/webkitwebview.h>
 
 import Foreign.C
 import GHC.Ptr
