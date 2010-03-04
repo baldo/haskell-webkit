@@ -16,15 +16,15 @@ module Network.Soup.Message
     , messageSetHttpVersion
     , messageGetHttpVersion
 
-    -- , messageIsKeepalive -- TODO
+    , messageIsKeepalive
 
     -- , messageGetUri -- TODO
     -- , messageSetUri -- TODO
 
     -- , messageGetAddress -- TODO
 
-    -- , messageSetFlags -- TODO
-    -- , messageGetFlags -- TODO
+    , messageSetFlags
+    , messageGetFlags
 
     -- , messageAddHeaderHandler -- TODO
     -- , messageAddStatusCodeHandler -- TODO
@@ -68,6 +68,7 @@ import Graphics.UI.Gtk.Signals
 
 {#import Network.Soup.General.Enums#}
     ( HttpVersion (..)
+    , MessageFlags (..)
     )
 messageGetType :: IO GType
 messageGetType =
@@ -99,13 +100,31 @@ messageGetHttpVersion message =
         liftM (toEnum . fromIntegral) $
             {#call message_get_http_version#} ptr
 
+messageIsKeepalive :: Message -> IO Bool
+messageIsKeepalive message =
+    withMessage message $ \ptr ->
+        liftM toBool $ 
+            {#call message_is_keepalive#} ptr
+
 {- TODO
-gboolean soup_message_is_keepalive (SoupMessage *msg);
 SoupURI *soup_message_get_uri (SoupMessage *msg);
 void soup_message_set_uri (SoupMessage *msg, SoupURI *uri);
 SoupAddress *soup_message_get_address (SoupMessage *msg);
-void soup_message_set_flags (SoupMessage *msg, SoupMessageFlags flags);
-SoupMessageFlags soup_message_get_flags (SoupMessage *msg);
+-}
+
+messageSetFlags :: Message -> MessageFlags -> IO ()
+messageSetFlags message flags =
+    withMessage message $ \ptr ->
+        {#call message_set_flags#} ptr
+            ((fromIntegral . fromEnum) flags)
+
+messageGetFlags :: Message -> IO MessageFlags
+messageGetFlags message =
+    withMessage message $ \ptr ->
+        liftM (toEnum . fromIntegral) $
+            {#call message_get_flags#} ptr
+
+{- TODO
 guint soup_message_add_header_handler (SoupMessage *msg, const char *signal, const char *header, GCallback callback, gpointer user_data);
 guint soup_message_add_status_code_handler ( SoupMessage *msg, const char *signal, guint status_code, GCallback callback, gpointer user_data);
 void soup_message_set_status (SoupMessage *msg, guint status_code);
