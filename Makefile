@@ -136,7 +136,7 @@ Network/Soup/Message.hs: \
 
 doc: $(hs_files)
 	@mkdir -p doc/
-	@haddock -h -o doc/ $(hs_files)
+	@haddock -h -t "Haskell WebKit" -o doc/ $(hs_files)
 
 clean:
 	@rm -f Test spplayer *.o *.hi $(bin) $(from_chs)
