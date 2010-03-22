@@ -3,10 +3,12 @@
 
 # vim swap-files
 *.swp
+*.swo
 
 # ghc+gcc noise
 *.hi
 *.o
+*.i
 
 # c2hs noise
 *.h
