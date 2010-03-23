@@ -59,9 +59,9 @@ import Graphics.UI.Gtk.Abstract.Object
     )
 
 -- | Returns the name of the 'WebDatabase' as seen by the user.
-webDatabaseGetDisplayName :: WebDatabase -- ^ the database
-                          -> IO String   -- ^ the name of the database as seen
-                                         --   by the user.
+webDatabaseGetDisplayName
+    :: WebDatabase -- ^ the database
+    -> IO String   -- ^ the name of the database as seen by the user.
 webDatabaseGetDisplayName database =
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_display_name#} ptr >>= peekCString
@@ -70,40 +70,43 @@ webDatabaseGetDisplayName database =
      web author. The Web Database standard allows web authors to specify an
      expected size of the database to optimize the user experience.
 -}
-webDatabaseGetExpectedSize :: WebDatabase -- ^ the database
-                           -> IO Integer  -- ^ the expected size of the database
-                                          --   in bytes 
+webDatabaseGetExpectedSize
+    :: WebDatabase -- ^ the database
+    -> IO Integer  -- ^ the expected size of the database in bytes 
 webDatabaseGetExpectedSize database =
     withWebDatabase database $ \ptr ->
         liftM toInteger $
             {#call webkit_web_database_get_expected_size#} ptr
 
 -- | Returns the absolute filename to the 'WebDatabase' file on disk.
-webDatabaseGetFilename :: WebDatabase -- ^ the database
-                       -> IO String   -- ^ the absolute filename of the database
+webDatabaseGetFilename
+    :: WebDatabase -- ^ the database
+    -> IO String   -- ^ the absolute filename of the database
 webDatabaseGetFilename database =
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_filename#} ptr >>= peekCString
 
 -- | Returns the canonical name of the 'WebDatabase'.
-webDatabaseGetName :: WebDatabase -- ^ the database
-                   -> IO String   -- ^ the name of the database
+webDatabaseGetName
+    :: WebDatabase -- ^ the database
+    -> IO String   -- ^ the name of the database
 webDatabaseGetName database =
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_name#} ptr >>= peekCString
 
 -- | Returns the 'SecurityOrigin' of the 'WebDatabase'.
-webDatabaseGetSecurityOrigin :: WebDatabase       -- ^ the database
-                             -> IO SecurityOrigin -- ^ the security origin of
-                                                  --   the database 
+webDatabaseGetSecurityOrigin
+    :: WebDatabase       -- ^ the database
+    -> IO SecurityOrigin -- ^ the security origin of the database 
 webDatabaseGetSecurityOrigin database =
     withWebDatabase database $ \ptr ->
         makeNewObject mkSecurityOrigin $
             {#call webkit_web_database_get_security_origin#} ptr
 
 -- | Returns the actual size of the 'WebDatabase' space on disk in bytes.
-webDatabaseGetSize :: WebDatabase -- ^ the database
-                   -> IO Integer  -- ^ the actual size of the database in bytes
+webDatabaseGetSize
+    :: WebDatabase -- ^ the database
+    -> IO Integer  -- ^ the actual size of the database in bytes
 webDatabaseGetSize database =
     withWebDatabase database $ \ptr ->
         liftM toInteger $ {#call webkit_web_database_get_size#} ptr
@@ -111,8 +114,9 @@ webDatabaseGetSize database =
 {- | Removes the 'WebDatabase' from its 'SecurityOrigin' and destroys all data
      stored in the database.
 -}
-webDatabaseRemove :: WebDatabase -- ^ the database to remove
-                  -> IO ()
+webDatabaseRemove
+    :: WebDatabase -- ^ the database to remove
+    -> IO ()
 webDatabaseRemove database =
     withWebDatabase database $ \ptr ->
        {#call webkit_web_database_remove#} ptr

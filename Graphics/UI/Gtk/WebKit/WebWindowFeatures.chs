@@ -88,23 +88,25 @@ webWindowFeaturesGetType :: IO GType
 webWindowFeaturesGetType =
     {#call web_window_features_get_type#}
 
--- | Decides if a 'WebWindowFeatures' object equals another, as in has the same
---   values.
-webWindowFeaturesEqual :: WebWindowFeatures -- ^ a 'WebWindowFeatures' object
-                       -> WebWindowFeatures -- ^ another 'WebWindowFeatures'
-                                            --   object
-                       -> IO Bool           -- ^ 'True' if both have the same
-                                            --   values, 'False' otherwise
+{- | Decides if a 'WebWindowFeatures' object equals another, as in has the same
+     values.
+-}
+webWindowFeaturesEqual
+    :: WebWindowFeatures -- ^ a 'WebWindowFeatures' object
+    -> WebWindowFeatures -- ^ another 'WebWindowFeatures' object
+    -> IO Bool           -- ^ 'True' if both have the same values, 'False'
+                         --   otherwise
 webWindowFeaturesEqual f1 f2 =
     withWebWindowFeatures f1 $ \pf1 ->
         withWebWindowFeatures f2 $ \pf2 ->
             liftM toBool $ 
                 {#call web_window_features_equal#} pf1 pf2
 
--- | Creates a new 'WebWindowFeatures' object with default values. 
---   It must be manually attached to a 'WebView'.
-webWindowFeaturesNew :: IO WebWindowFeatures -- ^ a new 'WebWindowFeatures'
-                                             --   object
+{- | Creates a new 'WebWindowFeatures' object with default values. 
+     It must be manually attached to a 'WebView'.
+-}
+webWindowFeaturesNew
+    :: IO WebWindowFeatures -- ^ a new 'WebWindowFeatures' object
 webWindowFeaturesNew =
     makeNewObject mkWebWindowFeatures $
         {#call web_window_features_new#} 

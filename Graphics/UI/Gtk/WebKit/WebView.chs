@@ -208,7 +208,6 @@ import Graphics.UI.Gtk.Gdk.Events
     , marshalEvent
     )
 
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
     , WebFrame
@@ -290,8 +289,9 @@ webViewSetMaintainsBackForwardList web_view flag =
             ptr $ fromBool flag
 
 -- | Returns the 'WebBackForwardList' for the given 'WebView'.
-webViewGetBackForwardList :: WebView               -- ^ the 'WebView'
-                          -> IO WebBackForwardList -- ^ the 'WebBackForwardList'
+webViewGetBackForwardList
+    :: WebView               -- ^ the 'WebView'
+    -> IO WebBackForwardList -- ^ the 'WebBackForwardList'
 webViewGetBackForwardList view =
     withWebView view $ \ptr ->
         makeWebBackForwardList $
@@ -305,8 +305,9 @@ webViewGoToBackForwardItem view item =
                 {#call web_view_go_to_back_forward_item#} ptr iptr 
  
 -- | Determines whether the given 'WebView' has a previous history item.
-webViewCanGoBack :: WebView -- ^ lookup history for this 'WebView'
-                 -> IO Bool -- ^ 'True' if able to move back, 'False' otherwise
+webViewCanGoBack
+    :: WebView -- ^ lookup history for this 'WebView'
+    -> IO Bool -- ^ 'True' if able to move back, 'False' otherwise
 webViewCanGoBack web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_go_back#} ptr
@@ -315,11 +316,11 @@ webViewCanGoBack web_view = do
      of steps away. Negative values represent steps backward while positive
      values represent steps forward.
 -}
-webViewCanGoBackOrForward :: WebView -- ^ lookup history for this 'WebView'
-                          -> Int     -- ^ the number of steps 
-                          -> IO Bool -- ^ 'True' if able to move back or forward
-                                     --   the given number of steps, 'False'
-                                     --   otherwise 
+webViewCanGoBackOrForward
+    :: WebView -- ^ lookup history for this 'WebView'
+    -> Int     -- ^ the number of steps 
+    -> IO Bool -- ^ 'True' if able to move back or forward the given number of
+               --   steps, 'False' otherwise 
 webViewCanGoBackOrForward web_view steps = do
     withWebView web_view $ \ptr ->
         liftM toBool $
@@ -327,16 +328,17 @@ webViewCanGoBackOrForward web_view steps = do
                 ptr (fromIntegral steps)
 
 -- | Determines whether the given 'WebView' has a next history item.
-webViewCanGoForward :: WebView -- ^ lookup history for this 'WebView'
-                    -> IO Bool -- ^ 'True' if able to move forward, 'False'
-                               --   otherwise
+webViewCanGoForward
+    :: WebView -- ^ lookup history for this 'WebView'
+    -> IO Bool -- ^ 'True' if able to move forward, 'False' otherwise
 webViewCanGoForward web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_can_go_forward#} ptr
 
 -- | Loads the previous history item.
-webViewGoBack :: WebView -- ^ the 'WebView' that should go back
-              -> IO ()
+webViewGoBack
+    :: WebView -- ^ the 'WebView' that should go back
+    -> IO ()
 webViewGoBack web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_go_back#} ptr
@@ -345,17 +347,18 @@ webViewGoBack web_view =
      item. Negative values represent steps backward while positive values
      represent steps forward.
 -}
-webViewGoBackOrForward :: WebView -- ^ the 'WebView' that should go back or
-                                  --   forward
-                       -> Int     -- ^ number of steps
-                       -> IO ()
+webViewGoBackOrForward
+    :: WebView -- ^ the 'WebView' that should go back or forward
+    -> Int     -- ^ number of steps
+    -> IO ()
 webViewGoBackOrForward web_view steps =
     withWebView web_view $ \ptr ->
         {#call web_view_go_back_or_forward#} ptr (fromIntegral steps)
 
 -- | Loads the next history item.
-webViewGoForward :: WebView -- ^ the 'WebView' that should go forward
-                 -> IO ()
+webViewGoForward
+    :: WebView -- ^ the 'WebView' that should go forward
+    -> IO ()
 webViewGoForward web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_go_forward#} ptr
@@ -384,9 +387,10 @@ webViewReloadBypassCache web_view =
         {#call web_view_reload_bypass_cache#} ptr
 
 -- | Requests loading of the specified URI string.
-webViewLoadUri :: WebView -- ^ load in this 'WebView'
-               -> String  -- ^ URI to load
-               -> IO ()
+webViewLoadUri
+    :: WebView -- ^ load in this 'WebView'
+    -> String  -- ^ URI to load
+    -> IO ()
 webViewLoadUri web_view uri = do
     withCString uri $ \c_uri ->
         withWebView web_view $ \ptr ->
@@ -416,9 +420,10 @@ webViewLoadHtmlString web_view content base_uri = do
      data source once any data has been received. Use 'webViewStopLoading'
      to stop the load.
 -}
-webViewLoadRequest :: WebView        -- ^ load in this 'WebView'
-                   -> NetworkRequest -- ^ 'NetworkRequest' to load
-                   -> IO ()
+webViewLoadRequest
+    :: WebView        -- ^ load in this 'WebView'
+    -> NetworkRequest -- ^ 'NetworkRequest' to load
+    -> IO ()
 webViewLoadRequest web_view request =
     withWebView web_view $ \wv_ptr ->
         withNetworkRequest request $ \r_ptr ->
@@ -483,29 +488,33 @@ webViewCanPasteClipboard web_view = do
         liftM toBool $ {#call web_view_can_paste_clipboard#} ptr
 
 -- | Cuts the current selection inside the 'WebView' to the clipboard.
-webViewCutClipboard :: WebView  -- ^ the 'WebView' to cut from
-                    -> IO ()
+webViewCutClipboard
+    :: WebView  -- ^ the 'WebView' to cut from
+    -> IO ()
 webViewCutClipboard web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_cut_clipboard#} ptr
 
 -- | Copies the current selection inside the 'WebView' to the clipboard.
-webViewCopyClipboard :: WebView -- ^ the 'WebView' to copy from
-                     -> IO ()
+webViewCopyClipboard
+    :: WebView -- ^ the 'WebView' to copy from
+    -> IO ()
 webViewCopyClipboard web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_copy_clipboard#} ptr
 
 -- | Pastes the current contents of the clipboard to the 'WebView'.
-webViewPasteClipboard :: WebView -- ^ the 'WebView' to paste to
-                      -> IO ()
+webViewPasteClipboard
+    :: WebView -- ^ the 'WebView' to paste to
+    -> IO ()
 webViewPasteClipboard web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_paste_clipboard#} ptr
 
 -- | Deletes the current selection inside the 'WebView'.
-webViewDeleteSelection :: WebView -- ^ the 'WebView' to delete from
-                       -> IO ()
+webViewDeleteSelection
+    :: WebView -- ^ the 'WebView' to delete from
+    -> IO ()
 webViewDeleteSelection web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_delete_selection#} ptr
@@ -522,12 +531,13 @@ webViewSelectAll web_view =
 
 {- | Returns whether the user is allowed to edit the document.
 
-Returns 'True' if 'WebView' allows the user to edit the HTML document, 'False'
-if it doesn\'t. You can change the document programmatically regardless of
-this setting.
+     Returns 'True' if 'WebView' allows the user to edit the HTML document,
+     'False' if it doesn't. You can change the document programmatically
+     regardless of this setting.
 -}
-webViewGetEditable :: WebView -- ^ the 'WebView'
-                   -> IO Bool -- ^ indicates the editable state
+webViewGetEditable
+    :: WebView -- ^ the 'WebView'
+    -> IO Bool -- ^ indicates the editable state
 webViewGetEditable web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $ {#call web_view_get_editable#} ptr
@@ -567,12 +577,13 @@ webViewGetInspector web_view =
     withWebView web_view $ \ptr ->
         makeWebInspector $ {#call web_view_get_inspector#} ptr
 
--- | This functions returns whether or not a MIME type can be displayed using
---   this view.
-webViewCanShowMimeType :: WebView -- ^ the 'WebView' to check
-                       -> String  -- ^ the MIME type
-                       -> IO Bool -- ^ 'Bool' indicating if MIME type can be
-                                  --   displayed
+{- | This functions returns whether or not a MIME type can be displayed using
+     this view.
+-}
+webViewCanShowMimeType
+    :: WebView -- ^ the 'WebView' to check
+    -> String  -- ^ the MIME type
+    -> IO Bool -- ^ 'Bool' indicating if MIME type can be displayed
 webViewCanShowMimeType web_view mime_type = do
     withCString mime_type $ \c_mime_type ->
         withWebView web_view $ \ptr ->
@@ -580,9 +591,10 @@ webViewCanShowMimeType web_view mime_type = do
                 {#call web_view_can_show_mime_type#} ptr c_mime_type
 
 -- | Returns whether the 'WebView' has a transparent background.
-webViewGetTransparent :: WebView -- ^ the 'WebView'
-                      -> IO Bool -- ^ 'False' when the 'WebView' draws a solid
-                                 --   background (the default), otherwise 'True'
+webViewGetTransparent
+    :: WebView -- ^ the 'WebView'
+    -> IO Bool -- ^ 'False' when the 'WebView' draws a solid background
+               -- ^ (the default), otherwise 'True'
 webViewGetTransparent web_view = do
     withWebView web_view $ \ptr ->
         liftM toBool $
@@ -600,8 +612,9 @@ webViewSetTransparent web_view flag =
      level changes the text size, or if 'True', scales all elements in the
      page.
 -}
-webViewGetZoomLevel :: WebView  -- ^ the 'WebView'
-                    -> IO Float -- ^ the zoom level
+webViewGetZoomLevel
+    :: WebView  -- ^ the 'WebView'
+    -> IO Float -- ^ the zoom level
 webViewGetZoomLevel web_view =
     withWebView web_view $ \ptr ->
         liftM realToFrac $
@@ -651,11 +664,12 @@ webViewSetCustomEncoding web_view encoding = do
         withWebView web_view $ \ptr ->
             {#call web_view_set_custom_encoding#} ptr c_encoding
 
--- | Returns the current encoding of the 'WebView', not the default-encoding
---   of 'WebSettings'.
-webViewGetCustomEncoding :: WebView           -- ^ the 'WebView'
-                         -> IO (Maybe String) -- ^ 'Just' encoding if set,
-                                              --   otherwise 'Nothin'
+{- | Returns the current encoding of the 'WebView', not the default-encoding
+     of 'WebSettings'.
+-}
+webViewGetCustomEncoding
+    :: WebView           -- ^ the 'WebView'
+    -> IO (Maybe String) -- ^ 'Just' encoding if set, otherwise 'Nothing'
 webViewGetCustomEncoding web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_get_custom_encoding#} ptr

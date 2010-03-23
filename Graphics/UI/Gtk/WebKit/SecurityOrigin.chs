@@ -56,30 +56,34 @@ import Graphics.UI.Gtk.Abstract.Object
     )
 
 -- | Returns a list of all 'WebDatabase's in the 'SecurityOrigin'.
-securityOriginGetAllWebDatabase :: SecurityOrigin   -- ^ the 'SecurityOrigin'
-                                -> IO [WebDatabase] -- ^ the 'WebDatabase's
+securityOriginGetAllWebDatabase
+    :: SecurityOrigin   -- ^ the 'SecurityOrigin'
+    -> IO [WebDatabase] -- ^ the 'WebDatabase's
 securityOriginGetAllWebDatabase origin = 
     withSecurityOrigin origin $ \ptr -> 
         {#call security_origin_get_all_web_databases#} ptr
             >>= fromGList >>= mapM (makeNewObject mkWebDatabase . return)
 
 -- | Returns the hostname for the 'SecurityOrigin'.
-securityOriginGetHost :: SecurityOrigin -- ^ the 'SecurityOrigin'
-                      -> IO String      -- ^ the hostname
+securityOriginGetHost
+    :: SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> IO String      -- ^ the hostname
 securityOriginGetHost origin =
     withSecurityOrigin origin $ \ptr ->
         {#call webkit_security_origin_get_host#} ptr >>= peekCString 
 
 -- | Returns the port for the 'SecurityOrigin'.
-securityOriginGetPort :: SecurityOrigin -- ^ the 'SecurityOrigin'
-                      -> IO Int         -- ^ the port
+securityOriginGetPort
+    :: SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> IO Int         -- ^ the port
 securityOriginGetPort origin =
     withSecurityOrigin origin $ \ptr ->
         liftM fromIntegral $ {#call security_origin_get_port#} ptr
 
 -- | Returns the protocol for the 'SecurityOrigin'.
-securityOriginGetProtocol :: SecurityOrigin -- ^ the 'SecurityOrigin'
-                          -> IO String      -- ^ the protocol
+securityOriginGetProtocol
+    :: SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> IO String      -- ^ the protocol
 securityOriginGetProtocol origin =
     withSecurityOrigin origin $ \ptr ->
         {#call webkit_security_origin_get_protocol#} ptr >>= peekCString 
@@ -91,17 +95,18 @@ securityOriginGetType =
 {- | Returns the quota for 'WebDatabase' storage of the 'SecurityOrigin' in
      bytes.
 -}
-securityOriginGetWebDatabaseQuote :: SecurityOrigin -- ^ the 'SecurityOrigin'
-                                  -> IO Integer     -- ^ the quota in bytes
+securityOriginGetWebDatabaseQuote
+    :: SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> IO Integer     -- ^ the quota in bytes
 securityOriginGetWebDatabaseQuote origin =
     withSecurityOrigin origin $ \ptr ->
         liftM toInteger $ {#call security_origin_get_web_database_quota#} ptr
 
 -- | Adjust the quota for 'WebDatabase' storage of the 'SecurityOrigin'
-securityOriginSetWebDatabaseQuota :: SecurityOrigin -- ^ the 'SecurityOrigin'
-                                  -> Integer        -- ^ a new 'WebDatabase'
-                                                    --   quota in bytes
-                                  -> IO ()
+securityOriginSetWebDatabaseQuota
+    :: SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> Integer        -- ^ a new 'WebDatabase' quota in bytes
+    -> IO ()
 securityOriginSetWebDatabaseQuota origin quota =
      withSecurityOrigin origin $ \ptr ->
         {#call security_origin_set_web_database_quota#} ptr (fromInteger quota)

@@ -238,6 +238,7 @@ instance GObjectClass WebNavigationAction where
 mkWebNavigationAction = (WebNavigationAction, objectUnref) 
 unWebNavigationAction (WebNavigationAction o) = o
 makeWebNavigationAction = makeNewObject mkWebNavigationAction    
+
 -- WebPolicyDecision ----------------------------------------------------------
 
 {#pointer *WebPolicyDecision foreign newtype#}
@@ -250,6 +251,7 @@ instance GObjectClass WebPolicyDecision where
 mkWebPolicyDecision = (WebPolicyDecision, objectUnref)
 unWebPolicyDecision (WebPolicyDecision o) = o
 makeWebPolicyDecision = makeNewObject mkWebPolicyDecision  
+
 -- HitTestResult ----------------------------------------------------------
 
 {#pointer *HitTestResult foreign newtype#}
@@ -275,6 +277,7 @@ instance GObjectClass WebInspector where
 mkWebInspector = (WebInspector, objectUnref)
 unWebInspector (WebInspector o) = o
 makeWebInspector = makeNewObject mkWebInspector 
+
 -- WebDatabase ----------------------------------------------------------
 
 {#pointer *WebDatabase foreign newtype#}
@@ -287,6 +290,7 @@ instance GObjectClass WebDatabase where
 mkWebDatabase = (WebDatabase, objectUnref)
 unWebDatabase (WebDatabase o) = o
 makeWebDatabase= makeNewObject mkWebDatabase
+
 -- SecurityOrigin ----------------------------------------------------------
 
 {#pointer *SecurityOrigin foreign newtype#}
@@ -299,6 +303,7 @@ instance GObjectClass SecurityOrigin where
 mkSecurityOrigin = (SecurityOrigin, objectUnref) 
 unSecurityOrigin (SecurityOrigin o) = o
 makeSecurityOrigin = makeNewObject mkSecurityOrigin 
+
 -- SoupAuthDialog ----------------------------------------------------------
 
 {#pointer *SoupAuthDialog foreign newtype#}
@@ -311,6 +316,7 @@ instance GObjectClass SoupAuthDialog where
 mkSoupAuthDialog = (SoupAuthDialog, objectUnref)
 unSoupAuthDialog (SoupAuthDialog o) = o
 makeSoupAuthDialog = makeNewObject mkSoupAuthDialog 
+
 -- WebDataSource ----------------------------------------------------------
 
 {#pointer *WebDataSource foreign newtype#}
@@ -323,6 +329,7 @@ instance GObjectClass WebDataSource where
 mkWebDataSource = (WebDataSource, objectUnref)
 unWebDataSource (WebDataSource o) = o
 makeWebDataSource = makeNewObject mkWebDataSource 
+
 -- WebResource ----------------------------------------------------------
 
 {#pointer *WebResource foreign newtype#}
@@ -335,6 +342,7 @@ instance GObjectClass WebResource where
 mkWebResource = (WebResource, objectUnref)
 unWebResource (WebResource o) = o
 makeWebResource = makeNewObject mkWebResource  
+
 -- Download ----------------------------------------------------------
 
 {#pointer *Download foreign newtype#}
@@ -347,6 +355,7 @@ instance GObjectClass Download where
 mkDownload = (Download, objectUnref)
 unDownload (Download o) = o
 makeDownload = makeNewObject mkDownload 
+
 -- WebWindowFeatures ----------------------------------------------------------
 
 {#pointer *WebWindowFeatures foreign newtype#}

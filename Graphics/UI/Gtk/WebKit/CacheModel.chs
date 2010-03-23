@@ -44,14 +44,16 @@ import Graphics.UI.Gtk.Abstract.Object
     )
 
 -- | Returns the current 'CacheModel'.
-getCacheModel :: IO CacheModel -- ^ the current 'CacheModel'
+getCacheModel
+    :: IO CacheModel -- ^ the current 'CacheModel'
 getCacheModel =
     liftM (toEnum . fromIntegral) $
         {#call get_cache_model#}
 
 -- | Sets the 'CacheModel' for WebKit.
-setCacheModel :: CacheModel -- ^ 'CacheModel' to use
-              -> IO ()
+setCacheModel
+    :: CacheModel -- ^ 'CacheModel' to use
+    -> IO ()
 setCacheModel cacheModel =
     {#call set_cache_model#} $ (fromIntegral . fromEnum) cacheModel
 

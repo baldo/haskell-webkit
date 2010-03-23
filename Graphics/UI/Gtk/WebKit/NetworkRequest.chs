@@ -67,11 +67,10 @@ networkRequestGetType =
     {#call network_request_get_type#}
 
 -- | Creates a new 'NetworkRequest' initialized with an URI.
-networkRequestNew :: String                    -- ^ an URI
-                  -> IO (Maybe NetworkRequest) -- ^ 'Just' a new
-                                               --   'NetworkRequest', or
-                                               --   'Nothing' if the URI is
-                                               --   invalid. 
+networkRequestNew
+    :: String                    -- ^ an URI
+    -> IO (Maybe NetworkRequest) -- ^ 'Just' a new 'NetworkRequest', or
+                                 --   'Nothing' if the URI is invalid. 
 networkRequestNew uri =
     withCString uri $ \c_uri -> do
         ptr <- {#call network_request_new#} c_uri
@@ -79,8 +78,9 @@ networkRequestNew uri =
         maybePeek ((makeNewObject mkNetworkRequest) . return) ptr'
 
 -- | Returns the URI belonging to the given 'NetworkRequest'
-networkRequestGetUri :: NetworkRequest -- ^ the 'NetworkRequest'
-                     -> IO String      -- ^ the URI
+networkRequestGetUri
+    :: NetworkRequest -- ^ the 'NetworkRequest'
+    -> IO String      -- ^ the URI
 networkRequestGetUri request =
     withNetworkRequest request $ \ptr ->
         {#call network_request_get_uri#} ptr
@@ -89,17 +89,19 @@ networkRequestGetUri request =
 {- | Sets the URI held and used by the given 'NetworkRequest'. When the request
      has an associated 'Message', its URI will also be set by this call.
 -}
-networkRequestSetUri :: NetworkRequest -- ^ the 'NetworkRequest'
-                     -> String         -- ^ the URI
-                     -> IO ()
+networkRequestSetUri
+    :: NetworkRequest -- ^ the 'NetworkRequest'
+    -> String         -- ^ the URI
+    -> IO ()
 networkRequestSetUri request uri = do
     withCString uri $ \c_uri ->
         withNetworkRequest request $ \ptr ->
             {#call network_request_set_uri#} ptr c_uri
 
 -- | Returns the to the 'NetworkRequest' associated 'Message'.
-networkRequestGetMessage :: NetworkRequest -- ^ the 'NetworkRequest'
-                         -> IO Message     -- ^ the 'Message'
+networkRequestGetMessage
+    :: NetworkRequest -- ^ the 'NetworkRequest'
+    -> IO Message     -- ^ the 'Message'
 networkRequestGetMessage request =
     withNetworkRequest request $ \ptr ->
         makeNewObject mkMessage $ {#call network_request_get_message#} ptr
@@ -107,9 +109,10 @@ networkRequestGetMessage request =
 -- Properties ------------------------------------------------------------------
 
 -- | Associate the given 'Message' to the given 'NetworkRequest'.
-networkRequestSetMessage :: NetworkRequest -- ^ the 'NetworkRequest'
-                         -> Message        -- ^ the 'Message'
-                         -> IO ()
+networkRequestSetMessage
+    :: NetworkRequest -- ^ the 'NetworkRequest'
+    -> Message        -- ^ the 'Message'
+    -> IO ()
 networkRequestSetMessage request message = do
     mt <- messageGetType
     objectSetPropertyGObject mt "message" request message
