@@ -5,7 +5,7 @@
 module Graphics.UI.Gtk.WebKit.WebHistoryItem
     ( WebHistoryItem
 
-    --, webHistoryItemCopy -- TODO
+    , webHistoryItemCopy
     , webHistoryItemSetAlternateTitle
     , webHistoryItemNewWithData
     , webHistoryItemNew
