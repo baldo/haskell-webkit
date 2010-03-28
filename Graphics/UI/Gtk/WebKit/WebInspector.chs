@@ -5,9 +5,9 @@
 module Graphics.UI.Gtk.WebKit.WebInspector
     ( WebInspector
 
-    -- , webInspectorClose -- new in webkit 1.1.17 -- TODO
-    -- , webInspectorShow  -- new in webkit 1.1.17 -- TODO
-    -- , webInspectorInspectCoordinates -- new in webkit 1.1.17 -- TODO
+    , webInspectorClose
+    , webInspectorShow
+    , webInspectorInspectCoordinates
     , webInspectorGetWebView
     , webInspectorGetInspectedUri
 
@@ -15,8 +15,8 @@ module Graphics.UI.Gtk.WebKit.WebInspector
     , webInspectorSetJavascriptProfilingEnabled 
     , webInspectorGetJavascriptProfilingEnabled 
 
-    -- , webInspectorSetTimeLineProfilingEnabled -- new in webkit 1.1.17 -- TODO
-    -- , webInspectorGetTimeLineProfilingEnabled -- new in webkit 1.1.17 -- TODO
+    , webInspectorSetTimeLineProfilingEnabled
+    , webInspectorGetTimeLineProfilingEnabled
 
     -- Signals ----------------------------------------------------------------
     , onWebInspectorShowWindow
@@ -73,11 +73,10 @@ webInspectorGetWebView inspector =
         makeWebView $ 
             {#call web_inspector_get_web_view#} ptr 
 
-{- new in webkit 1.1.17 -- TODO
 webInspectorInspectCoordinates :: WebInspector -> Double -> Double -> IO ()
 webInspectorInspectCoordinates inspector x y =
     withWebInspector inspector $ \ptr ->
-        {#call web_inspector_inspect_coordinates#} ptr (toRational x) (toRational y)
+        {#call web_inspector_inspect_coordinates#} ptr (realToFrac x) (realToFrac y)
 
 webInspectorShow :: WebInspector -> IO ()
 webInspectorShow inspector =
@@ -88,7 +87,6 @@ webInspectorClose :: WebInspector -> IO ()
 webInspectorClose inspector =
     withWebInspector inspector $ \ptr ->
         {#call  web_inspector_close#} ptr
--} 
 
 -- Properties -----------------------------------------------------------------
 
@@ -103,7 +101,6 @@ webInspectorGetJavascriptProfilingEnabled =
         "javascript-profiling-enabled" 
 
 
-{- new in webkit 1.1.17
 webInspectorSetTimeLineProfilingEnabled :: WebInspector -> Bool -> IO ()
 webInspectorSetTimeLineProfilingEnabled =
     objectSetPropertyBool 
@@ -113,7 +110,6 @@ webInspectorGetTimeLineProfilingEnabled :: WebInspector -> IO Bool
 webInspectorGetTimeLineProfilingEnabled =
     objectGetPropertyBool 
         "timeline-profiling-enabled" 
--}
 
 -- Signals --------------------------------------------------------------------
 
