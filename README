@@ -20,7 +20,9 @@ To build Haskell WebKit simply type
 
 Documentation
 =============
-For now we recommend to have look at http://webkitgtk.org/reference/index.html.
+Documentation is pretty much copy & paste from the WebKitGTK+ manual with a few
+adjustments. Since documenting is still work in progress we recommend to have
+a look at http://webkitgtk.org/reference/index.html for the missing parts.
 The bindings are pretty much the same way to use as the C libraries. Also refer
 to the gtk2hs docs at http://haskell.org/gtk2hs/docs/current/ as Haskell WebKit
 won't be very usefull without it.
