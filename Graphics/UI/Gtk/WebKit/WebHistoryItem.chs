@@ -30,20 +30,16 @@ import Graphics.UI.Gtk.Abstract.Object
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebHistoryItem
 
-    , mkWebHistoryItem
-    , unWebHistoryItem
-
+    , makeWebHistoryItem
     , withWebHistoryItem
     )
 
 -- Property get/set functions are aready provided by WebKit :)
 
--- New in WebKit 1.1.18 -- TODO
---webHistoryItemCopy :: WebHistoryItem -> IO WebHistoryItem 
---webHistoryItemCopy historyItem =
---    withHistoryItem historyItem $ \ptr ->
---        makeNewObject mkHistoryItem $ {#call web_history_item_copy#} 
-
+webHistoryItemCopy :: WebHistoryItem -> IO WebHistoryItem 
+webHistoryItemCopy historyItem =
+    withWebHistoryItem historyItem $ \ptr ->
+        makeWebHistoryItem $ {#call web_history_item_copy#} ptr
 
 webHistoryItemGetAlternateTitle :: WebHistoryItem -> IO String
 webHistoryItemGetAlternateTitle  historyItem = 
@@ -72,13 +68,13 @@ webHistoryItemGetUri historyItem =
 
 webHistoryItemNew :: IO WebHistoryItem 
 webHistoryItemNew = 
-    makeNewObject mkWebHistoryItem $ {#call web_history_item_new#}
+    makeWebHistoryItem $ {#call web_history_item_new#}
 
 webHistoryItemNewWithData :: String -> String -> IO WebHistoryItem
 webHistoryItemNewWithData uri title =
     withCString uri $ \uptr ->
         withCString title $ \tptr ->
-            makeNewObject mkWebHistoryItem 
+            makeWebHistoryItem 
                 $ {#call web_history_item_new_with_data#} uptr tptr
 
 webHistoryItemSetAlternateTitle :: WebHistoryItem -> String -> IO ()
