@@ -27,6 +27,10 @@ The bindings are pretty much the same way to use as the C libraries. Also refer
 to the gtk2hs docs at http://haskell.org/gtk2hs/docs/current/ as Haskell WebKit
 won't be very usefull without it.
 
+We have ported a few small parts of libsoup for now. Hopefully the bindings will
+grow and become more usefull. For the moment refer to libsoup's documentation at
+http://library.gnome.org/devel/libsoup/stable/.
+
 To build the docs available with Haskell WebKit simply type
     make docs
 
