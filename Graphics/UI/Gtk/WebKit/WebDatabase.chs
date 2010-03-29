@@ -14,7 +14,7 @@ user-friendly display name.
 
 WebKit uses SQLite to create and access the local SQL databases. The location of
 a 'WebDatabase' can be accessed wth 'webDatabaseGetFilename'. You can configure
-he location of all databases with webkit_set_database_directory_path. (???)
+the location of all databases with webkit_set_database_directory_path. (???)
 
 For each database the web site can define an estimated size which can be
 accessed with 'webDatabaseGetExpectedSize'. The current size of the database in
