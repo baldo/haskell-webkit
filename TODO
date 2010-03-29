@@ -16,9 +16,6 @@ Implement following functions (if neccessary):
     set_default_web_database_quota
     set_web_database_directory_path
     soup_auth_dialog_get_type
-    web_back_forward_list_get_type
-    web_database_get_type
-    web_data_source_get_type
     web_data_source_new_with_request
     web_frame_get_global_context
     web_frame_get_horizontal_scrollbar_policy
