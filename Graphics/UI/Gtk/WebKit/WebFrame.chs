@@ -299,6 +299,14 @@ webFramePrint frame =
     withWebFrame frame $ \ptr ->
         {#call web_frame_print#} ptr
 
+{- TODO GtkPrintOperationResult  webkit_web_frame_print_full    (WebKitWebFrame *frame,
+                                                         GtkPrintOperation *operation,
+                                                         GtkPrintOperationAction action,
+                                                         GError **error);
+	This needs implementation of the printing part of gtk in gtk2hs..
+-}
+
+
 -- | Determines the current status of the load.
 webFrameGetLoadStatus
     :: WebFrame      -- ^ a frame
