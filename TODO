@@ -43,5 +43,4 @@ Implement following functions (if neccessary):
     web_navigation_reason_get_type
     web_settings_get_type
     web_settings_get_user_agent
-    web_view_get_icon_uri
     web_view_target_info_get_type
