@@ -34,7 +34,7 @@ Implement following functions (if neccessary):
     web_frame_get_horizontal_scrollbar_policy
     web_frame_get_type
     web_frame_get_vertical_scrollbar_policy
-    web_frame_new
+    DEPRECATED: web_frame_new
     web_frame_print_full
     web_history_item_get_type
     web_inspector_close
