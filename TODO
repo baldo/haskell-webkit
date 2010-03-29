@@ -29,18 +29,13 @@ Implement following functions (if neccessary):
     web_back_forward_list_get_type
     web_database_get_type
     web_data_source_get_type
-    web_data_source_new_with_request
     web_frame_get_global_context
-    web_frame_get_horizontal_scrollbar_policy
     web_frame_get_type
-    web_frame_get_vertical_scrollbar_policy
     DEPRECATED: web_frame_new
-    web_frame_print_full
+    web_frame_print_full -- need more work in gtk2hs
     web_history_item_get_type
     web_inspector_close
     web_inspector_get_type
-    web_inspector_show
     web_navigation_reason_get_type
     web_settings_get_type
-    web_settings_get_user_agent
     web_view_target_info_get_type
