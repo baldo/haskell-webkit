@@ -1,34 +1,21 @@
 Implement following functions (if neccessary):
-    cache_model_get_type
     check_version
-    download_error_get_type
     download_get_total_size
     download_get_type
-    download_status_get_type
-    editing_behavior_get_type
     get_default_web_database_quota
     get_web_database_directory_path
-    hit_test_result_context_get_type
     hit_test_result_get_type
-    load_status_get_type
     major_version
     micro_version
     minor_version
-    navigation_response_get_type
-    network_error_get_type
     network_error_quark
-    plugin_error_get_type
     plugin_error_quark
-    policy_error_get_type
     policy_error_quark
     remove_all_web_databases
     security_origin_get_web_database_usage
     set_default_web_database_quota
     set_web_database_directory_path
     soup_auth_dialog_get_type
-    web_back_forward_list_get_type
-    web_database_get_type
-    web_data_source_get_type
     web_frame_get_global_context
     web_frame_get_type
     DEPRECATED: web_frame_new
@@ -36,6 +23,3 @@ Implement following functions (if neccessary):
     web_history_item_get_type
     web_inspector_close
     web_inspector_get_type
-    web_navigation_reason_get_type
-    web_settings_get_type
-    web_view_target_info_get_type

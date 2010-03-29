@@ -21,6 +21,7 @@ loading before using any of these functions. You can do this via
 module Graphics.UI.Gtk.WebKit.WebDataSource
     ( WebDataSource
 
+    , webDataSourceGetType
     , webDataSourceNew
     , webDataSourceNewWithRequest 
     , webDataSourceIsLoading
@@ -39,6 +40,7 @@ module Graphics.UI.Gtk.WebKit.WebDataSource
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 import System.Glib.GList 
     ( fromGList 
     )
@@ -54,7 +56,7 @@ import Graphics.UI.Gtk.Abstract.Object
     , NetworkRequest
     , WebResource
     , WebFrame 
-     
+
     , withWebDataSource
     , makeWebDataSource
     , mkWebDataSource
@@ -67,6 +69,11 @@ import Graphics.UI.Gtk.Abstract.Object
     
     , mkWebFrame
     )
+
+webDataSourceGetType
+    :: IO GType
+webDataSourceGetType =
+    {#call web_data_source_get_type#}
 
 {- | Returns the raw data that represents the the frame's content. The data
      will be incomplete until the data has finished loading. Returns

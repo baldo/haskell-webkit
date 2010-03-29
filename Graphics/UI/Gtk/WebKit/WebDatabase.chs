@@ -27,6 +27,7 @@ For more information refer to the Web Database specification proposal at
 module Graphics.UI.Gtk.WebKit.WebDatabase
     ( WebDatabase
     
+    , webDatabaseGetType
     , webDatabaseGetSize
     , webDatabaseRemove
     , webDatabaseGetSecurityOrigin
@@ -42,6 +43,7 @@ module Graphics.UI.Gtk.WebKit.WebDatabase
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 
 import Control.Monad
 
@@ -57,6 +59,11 @@ import Graphics.UI.Gtk.Abstract.Object
     , withWebDatabase
     , mkSecurityOrigin
     )
+
+webDatabaseGetType
+    :: IO GType
+webDatabaseGetType =
+    {#call web_database_get_type#}
 
 -- | Returns the name of the 'WebDatabase' as seen by the user.
 webDatabaseGetDisplayName

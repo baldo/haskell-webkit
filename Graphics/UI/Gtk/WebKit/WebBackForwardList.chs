@@ -8,6 +8,8 @@
 module Graphics.UI.Gtk.WebKit.WebBackForwardList
     ( WebBackForwardList
 
+    , webBackForwardListGetType
+
     , webBackForwardListAddItem
     , webBackForwardListContainsItem
 
@@ -38,6 +40,7 @@ module Graphics.UI.Gtk.WebKit.WebBackForwardList
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 
 import System.Glib.GList
 
@@ -58,6 +61,11 @@ import Graphics.UI.Gtk.Abstract.Object
     , withWebHistoryItem
     , withWebView
     )
+
+webBackForwardListGetType
+    :: IO GType
+webBackForwardListGetType =
+    {#call web_back_forward_list_get_type#}
 
 {- | Adds the item to the 'WebBackForwardList'.
 

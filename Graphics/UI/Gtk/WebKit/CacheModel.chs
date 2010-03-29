@@ -22,12 +22,13 @@ Default value is 'CacheModelWebBrowser'.
 
 module Graphics.UI.Gtk.WebKit.CacheModel
     ( CacheModel
-    
+
     , getCacheModel
     , setCacheModel
     ) where
 
 #include <webkit/webkitwebview.h>
+#include <webkit/webkitenumtypes.h>
 
 import Foreign.C
 import GHC.Ptr
