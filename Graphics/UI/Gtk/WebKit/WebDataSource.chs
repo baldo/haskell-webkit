@@ -22,6 +22,7 @@ module Graphics.UI.Gtk.WebKit.WebDataSource
     ( WebDataSource
 
     , webDataSourceNew
+    , webDataSourceNewWithRequest 
     , webDataSourceIsLoading
     , webDataSourceGetWebFrame
     , webDataSourceGetUnreachableUri
@@ -55,10 +56,12 @@ import Graphics.UI.Gtk.Abstract.Object
     , WebFrame 
      
     , withWebDataSource
+    , makeWebDataSource
     , mkWebDataSource
     , unWebDataSource
     
     , mkNetworkRequest
+    , withNetworkRequest
     
     , mkWebResource
     
@@ -183,4 +186,12 @@ webDataSourceNew
 webDataSourceNew =
     makeNewObject mkWebDataSource $
         {#call web_data_source_new#} 
+
+webDataSourceNewWithRequest 
+    :: NetworkRequest   -- ^ a network request
+    -> IO WebDataSource -- ^ web data source for supplied request
+webDataSourceNewWithRequest request =
+    withNetworkRequest request $ \ptr ->
+        makeWebDataSource $ 
+            {#call web_data_source_new_with_request#} ptr
 
