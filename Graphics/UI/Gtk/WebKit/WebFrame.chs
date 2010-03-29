@@ -41,8 +41,8 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 
     , webFrameGetLoadStatus
 
-    --, webFrameGetHorizontalScrollbarPolicy -- TODO
-    --, webFrameGetVerticalScrollbarPolicy -- TODO
+    , webFrameGetHorizontalScrollbarPolicy
+    , webFrameGetVerticalScrollbarPolicy 
 
     , webFrameGetDataSource
     , webFrameGetProvisionalDataSource
@@ -55,6 +55,9 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import Graphics.UI.Gtk.General.Enums 
+	( PolicyType (..)
+	)
 
 import Control.Monad
 
@@ -316,13 +319,23 @@ webFrameGetLoadStatus frame =
         liftM (toEnum . fromIntegral) $
             {#call web_frame_get_load_status#} ptr
 
-{- TODO
-WEBKIT_API GtkPolicyType
-webkit_web_frame_get_horizontal_scrollbar_policy (WebKitWebFrame        *frame);
+webFrameGetHorizontalScrollbarPolicy 
+	:: WebFrame 	-- ^ a frame
+ 	-> IO PolicyType -- ^ horizontal scrollbar policy
+webFrameGetHorizontalScrollbarPolicy frame =
+	withWebFrame frame $ \ptr ->
+		liftM (toEnum . fromIntegral) $
+			{#call web_frame_get_horizontal_scrollbar_policy#} ptr
 
-WEBKIT_API GtkPolicyType
-webkit_web_frame_get_vertical_scrollbar_policy   (WebKitWebFrame        *frame);
--}
+webFrameGetVerticalScrollbarPolicy 
+	:: WebFrame 	-- ^ a frame
+ 	-> IO PolicyType -- ^ vertical scrollbar policy
+webFrameGetVerticalScrollbarPolicy frame =
+	withWebFrame frame $ \ptr ->
+		liftM (toEnum . fromIntegral) $
+			{#call web_frame_get_vertical_scrollbar_policy#} ptr
+
+
 
 -- | Returns the committed data source.
 webFrameGetDataSource
