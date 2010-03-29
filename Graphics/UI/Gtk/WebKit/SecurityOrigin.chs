@@ -70,7 +70,7 @@ securityOriginGetHost
     -> IO String      -- ^ the hostname
 securityOriginGetHost origin =
     withSecurityOrigin origin $ \ptr ->
-        {#call webkit_security_origin_get_host#} ptr >>= peekCString 
+        {#call security_origin_get_host#} ptr >>= peekCString 
 
 -- | Returns the port for the 'SecurityOrigin'.
 securityOriginGetPort
@@ -86,7 +86,7 @@ securityOriginGetProtocol
     -> IO String      -- ^ the protocol
 securityOriginGetProtocol origin =
     withSecurityOrigin origin $ \ptr ->
-        {#call webkit_security_origin_get_protocol#} ptr >>= peekCString 
+        {#call security_origin_get_protocol#} ptr >>= peekCString 
 
 securityOriginGetType :: IO GType 
 securityOriginGetType = 
