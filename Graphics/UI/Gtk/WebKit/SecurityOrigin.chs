@@ -29,6 +29,8 @@ module Graphics.UI.Gtk.WebKit.SecurityOrigin
 
     , securityOriginGetWebDatabaseQuote
     , securityOriginSetWebDatabaseQuota
+
+    , securityOriginGetWebDatabaseUsage
     ) where
 
 #include <webkit/webkitsecurityorigin.h>
@@ -111,4 +113,8 @@ securityOriginSetWebDatabaseQuota origin quota =
      withSecurityOrigin origin $ \ptr ->
         {#call security_origin_set_web_database_quota#} ptr (fromInteger quota)
 
--- TODO: guint64 webkit_security_origin_get_web_database_usage (WebKitSecurityOrigin *securityOrigin);
+securityOriginGetWebDatabaseUsage :: SecurityOrigin -> IO Int
+securityOriginGetWebDatabaseUsage origin =
+    withSecurityOrigin origin $ \ptr ->
+        liftM fromIntegral $ 
+            {#call security_origin_get_web_database_usage#} ptr
