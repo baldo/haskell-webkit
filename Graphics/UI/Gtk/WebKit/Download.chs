@@ -162,7 +162,7 @@ downloadGetTotalSize
     -> IO Integer -- ^ expected total size
 downloadGetTotalSize download =
     withDownload download $ \ptr ->
-        liftM toInteger $ {#call download_get_current_size#} ptr
+        liftM toInteger $ {#call download_get_total_size#} ptr
 
 {- | Convenience method to retrieve the URI from the 'NetworkRequest'
      which is being downloaded.
