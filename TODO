@@ -1,8 +1,5 @@
 Implement following functions (if neccessary):
     check_version
-    download_get_total_size
-    download_get_type
-    get_default_web_database_quota
     get_web_database_directory_path
     hit_test_result_get_type
     major_version
@@ -13,11 +10,7 @@ Implement following functions (if neccessary):
     policy_error_quark
     remove_all_web_databases
     security_origin_get_web_database_usage
-    set_default_web_database_quota
     set_web_database_directory_path
     soup_auth_dialog_get_type
-    web_frame_get_global_context
-    web_frame_get_type
     DEPRECATED: web_frame_new
     web_frame_print_full -- need more work in gtk2hs
-    web_inspector_close
