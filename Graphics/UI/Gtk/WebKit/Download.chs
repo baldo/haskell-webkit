@@ -13,6 +13,7 @@ do it itself.
 module Graphics.UI.Gtk.WebKit.Download
     ( Download
 
+    , downloadGetType
     , downloadCancel
     , downloadStart
     , downloadGetCurrentSize
@@ -57,6 +58,10 @@ import Graphics.UI.Gtk.Abstract.Object
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( DownloadStatus
     )
+
+downloadGetType :: IO GType
+downloadGetType =
+    {#call download_get_type#}
 
 {- | Cancels the download. Calling this will not free the 'Download'
      object, so you still need to call g_object_unref() on it, if you are 
