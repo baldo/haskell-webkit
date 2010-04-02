@@ -1,16 +1,11 @@
 Implement following functions (if neccessary):
     check_version
-    get_web_database_directory_path
-    hit_test_result_get_type
     major_version
     micro_version
     minor_version
     network_error_quark
     plugin_error_quark
     policy_error_quark
-    remove_all_web_databases
-    security_origin_get_web_database_usage
-    set_web_database_directory_path
     soup_auth_dialog_get_type
     DEPRECATED: web_frame_new
     web_frame_print_full -- need more work in gtk2hs
