@@ -62,6 +62,7 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , makeHitTestResult
     , mkHitTestResult
     , unHitTestResult
+    , hitTestResultGetType
 
     , WebInspector
     , withWebInspector
@@ -118,6 +119,7 @@ module Graphics.UI.Gtk.WebKit.General.Types
 #include <webkit/webkit.h>
 
 import System.Glib.FFI
+import System.Glib.GType
 
 import Graphics.UI.Gtk.Abstract.Object
     ( makeNewObject
@@ -264,6 +266,10 @@ instance GObjectClass HitTestResult where
 mkHitTestResult = (HitTestResult, objectUnref)
 unHitTestResult (HitTestResult o) = o
 makeHitTestResult = makeNewObject mkHitTestResult  
+
+hitTestResultGetType :: IO GType
+hitTestResultGetType =
+    {#call hit_test_result_get_type#}
 
 -- WebInspector ----------------------------------------------------------
 
