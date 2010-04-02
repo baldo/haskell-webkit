@@ -30,6 +30,7 @@ module Graphics.UI.Gtk.WebKit.WebDatabase
     , webDatabaseGetType
     , webDatabaseGetSize
     , webDatabaseRemove
+    , webDatabaseRemoveAll 
     , webDatabaseGetSecurityOrigin
     , webDatabaseGetName
     , webDatabaseGetFilename
@@ -130,6 +131,10 @@ webDatabaseRemove
 webDatabaseRemove database =
     withWebDatabase database $ \ptr ->
        {#call webkit_web_database_remove#} ptr
+
+webDatabaseRemoveAll :: IO ()
+webDatabaseRemoveAll =
+    {#call remove_all_web_databases#}
 
 webDatabaseGetDefaultQuota :: IO Int
 webDatabaseGetDefaultQuota = 
