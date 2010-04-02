@@ -5,6 +5,7 @@
 module Graphics.UI.Gtk.WebKit.WebInspector
     ( WebInspector
 
+    , webInseptorGetType
     , webInspectorClose
     , webInspectorShow
     , webInspectorInspectCoordinates
