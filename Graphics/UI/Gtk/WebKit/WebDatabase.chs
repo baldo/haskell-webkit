@@ -37,7 +37,9 @@ module Graphics.UI.Gtk.WebKit.WebDatabase
     , webDatabaseGetDisplayName
     , webDatabaseGetDefaultQuota 
     , webDatabaseSetDefaultQuota 
- 
+    , webDatabaseGetDirectoryPath 
+    , webDatabaseSetDirectoryPath 
+
     ) where
 
 #include <webkit/webkitwebdatabase.h>
@@ -46,7 +48,6 @@ import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
-
 import Control.Monad
 
 import Graphics.UI.Gtk.Abstract.Object
@@ -138,3 +139,12 @@ webDatabaseGetDefaultQuota =
 webDatabaseSetDefaultQuota :: Int -> IO ()
 webDatabaseSetDefaultQuota quota =
     {#call set_default_web_database_quota#} (fromIntegral quota)
+
+webDatabaseGetDirectoryPath :: IO String
+webDatabaseGetDirectoryPath = 
+        {#call get_web_database_directory_path#} >>= peekCString
+
+webDatabaseSetDirectoryPath :: String -> IO ()
+webDatabaseSetDirectoryPath directory =
+    withCString directory $ \ dir ->
+        {#call set_web_database_directory_path#} dir
