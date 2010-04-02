@@ -87,6 +87,7 @@ module Graphics.UI.Gtk.WebKit.General.Types
     , makeSoupAuthDialog
     , mkSoupAuthDialog
     , unSoupAuthDialog
+    , soupAuthDialogGetType
 
     , WebDataSource
     , withWebDataSource
@@ -322,6 +323,10 @@ instance GObjectClass SoupAuthDialog where
 mkSoupAuthDialog = (SoupAuthDialog, objectUnref)
 unSoupAuthDialog (SoupAuthDialog o) = o
 makeSoupAuthDialog = makeNewObject mkSoupAuthDialog 
+
+soupAuthDialogGetType :: IO GType
+soupAuthDialogGetType =
+    {#call soup_auth_dialog_get_type#}
 
 -- WebDataSource ----------------------------------------------------------
 
