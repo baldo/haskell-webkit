@@ -35,6 +35,8 @@ module Graphics.UI.Gtk.WebKit.WebDatabase
     , webDatabaseGetFilename
     , webDatabaseGetExpectedSize
     , webDatabaseGetDisplayName
+    , webDatabaseGetDefaultQuota 
+    , webDatabaseSetDefaultQuota 
  
     ) where
 
@@ -128,3 +130,11 @@ webDatabaseRemove database =
     withWebDatabase database $ \ptr ->
        {#call webkit_web_database_remove#} ptr
 
+webDatabaseGetDefaultQuota :: IO Int
+webDatabaseGetDefaultQuota = 
+    liftM fromIntegral $
+        {#call get_default_web_database_quota#}
+
+webDatabaseSetDefaultQuota :: Int -> IO ()
+webDatabaseSetDefaultQuota quota =
+    {#call set_default_web_database_quota#} (fromIntegral quota)
