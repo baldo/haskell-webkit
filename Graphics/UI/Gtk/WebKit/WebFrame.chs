@@ -14,6 +14,8 @@ children and one child can be found by using 'webFrameFindFrame'.
 module Graphics.UI.Gtk.WebKit.WebFrame
     ( WebFrame
 
+    , webFrameGetType 
+
     , webFrameGetWebView
 
     , webFrameGetName
@@ -55,6 +57,7 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 import Graphics.UI.Gtk.General.Enums 
 	( PolicyType (..)
 	)
@@ -87,6 +90,10 @@ import Control.Monad
     ( GlobalContextRef (..)
     , makeGlobalContextRef
     )
+
+webFrameGetType :: IO GType 
+webFrameGetType =
+    {#call web_frame_get_type#}
 
 {- DEPRECATED
 webkit_web_frame_new
