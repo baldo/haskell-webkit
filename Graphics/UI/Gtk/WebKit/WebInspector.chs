@@ -43,6 +43,7 @@ module Graphics.UI.Gtk.WebKit.WebInspector
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 import System.Glib.Signals
 import System.Glib.Properties
 
@@ -61,6 +62,10 @@ import Graphics.UI.Gtk.Abstract.Object
     , makeWebInspector
     , makeWebView
     )
+
+webInseptorGetType :: IO GType
+webInseptorGetType = 
+    {#call web_inspector_get_type#}
 
 webInspectorGetInspectedUri :: WebInspector -> IO String
 webInspectorGetInspectedUri inspector =
