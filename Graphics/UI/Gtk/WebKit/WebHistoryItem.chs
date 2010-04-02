@@ -5,6 +5,7 @@
 module Graphics.UI.Gtk.WebKit.WebHistoryItem
     ( WebHistoryItem
 
+    , webHistoryItemGetType     
     , webHistoryItemCopy
     , webHistoryItemSetAlternateTitle
     , webHistoryItemNewWithData
@@ -20,6 +21,7 @@ module Graphics.UI.Gtk.WebKit.WebHistoryItem
 import Foreign.C
 import GHC.Ptr
 import System.Glib.FFI
+import System.Glib.GType
 
 import Control.Monad
 
@@ -33,6 +35,10 @@ import Graphics.UI.Gtk.Abstract.Object
     , makeWebHistoryItem
     , withWebHistoryItem
     )
+
+webHistoryItemGetType :: IO GType
+webHistoryItemGetType =
+    {#call web_history_item_get_type#}
 
 -- Property get/set functions are aready provided by WebKit :)
 
