@@ -10,6 +10,9 @@ Homepage:      http://github.com/baldo/haskell-webkit
 Category:      Graphics
 Tested-With:   GHC == 6.12.1
 
+Extra-Source-Files:
+    README
+
 Source-Repository head
     Type:     git
     Location: git://github.com/baldo/haskell-webkit
