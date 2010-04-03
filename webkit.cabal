@@ -6,8 +6,13 @@ License:       LGPL-2.1
 License-File:  LICENSE
 Build-Type:    Simple
 Cabal-Version: >=1.4
+Homepage:      http://github.com/baldo/haskell-webkit
 Category:      Graphics
 Tested-With:   GHC == 6.12.1
+
+Source-Repository head
+    Type:     git
+    Location: git://github.com/baldo/haskell-webkit
 
 Library
     Build-Depends:
