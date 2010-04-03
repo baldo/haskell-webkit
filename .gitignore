@@ -44,3 +44,4 @@ Network/Soup/Message.hs
 Network/Soup/General/Enums.hs
 Network/Soup/General/Types.hs
 doc/*
+dist/*

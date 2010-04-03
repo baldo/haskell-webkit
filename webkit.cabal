@@ -1,0 +1,56 @@
+Name:          webkit
+Version:       0.0
+Stability:     Alpha
+Synopsis:      Bindings for WebKitGTK+.
+License:       LGPL-2.1
+License-File:  LICENSE
+Build-Type:    Simple
+Cabal-Version: >=1.2
+Category:      Graphics
+
+Library
+    Build-Depends:
+        base >= 4,
+        glib >= 0.10.1,
+        gtk  >= 0.10.1
+
+    Build-Tools:
+        c2hs
+
+    Exposed-Modules:
+        Graphics.UI.Gtk.WebKit
+        Graphics.UI.Gtk.WebKit.General.Enums
+        Graphics.UI.Gtk.WebKit.General.General
+        Graphics.UI.Gtk.WebKit.General.Types
+        Network.Soup
+        Network.Soup.General.Enums
+        Network.Soup.General.Types
+        Network.Soup.Message
+        Language.JavaScript.JavaScriptCore
+        Language.JavaScript.JavaScriptCore.General.Types
+        Language.JavaScript.JavaScriptCore.Base
+        Graphics.UI.Gtk.WebKit.CacheModel
+        Graphics.UI.Gtk.WebKit.Download
+        Graphics.UI.Gtk.WebKit.NetworkRequest
+        Graphics.UI.Gtk.WebKit.NetworkResponse
+        Graphics.UI.Gtk.WebKit.SecurityOrigin
+        Graphics.UI.Gtk.WebKit.WebBackForwardList
+        Graphics.UI.Gtk.WebKit.WebDataSource
+        Graphics.UI.Gtk.WebKit.WebDatabase
+        Graphics.UI.Gtk.WebKit.WebFrame
+        Graphics.UI.Gtk.WebKit.WebHistoryItem
+        Graphics.UI.Gtk.WebKit.WebInspector
+        Graphics.UI.Gtk.WebKit.WebNavigationAction
+        Graphics.UI.Gtk.WebKit.WebPolicyDecision
+        Graphics.UI.Gtk.WebKit.WebResource
+        Graphics.UI.Gtk.WebKit.WebSettings
+        Graphics.UI.Gtk.WebKit.WebWindowFeatures
+        Graphics.UI.Gtk.WebKit.WebView
+
+    Pkgconfig-Depends:
+        webkit-1.0,
+        libsoup-2.4
+
+    Extensions:
+        ForeignFunctionInterface
+
