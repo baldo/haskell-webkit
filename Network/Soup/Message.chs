@@ -48,11 +48,8 @@ import Foreign.C
 import System.Glib.FFI
 
 import System.Glib.GType
-import System.Glib.Properties
 
 import Control.Monad
-
-import Graphics.UI.Gtk.Signals
 
 {#import Network.Soup.General.Types#}
     ( Message 

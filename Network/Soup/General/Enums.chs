@@ -1,4 +1,5 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
+{-# OPTIONS_GHC -fno-warn-overlapping-patterns #-}
 
 {# context lib="libsoup" prefix="Soup" #}
 
