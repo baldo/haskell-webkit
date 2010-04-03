@@ -9,6 +9,7 @@ module Graphics.UI.Gtk.WebKit.WebResource
     , webResourceGetUri
     , webResourceGetType
     , webResourceGetFrameName
+    , webResourceGetMimeType 
     , webResourceGetEncoding
     , webResourceGetData
 
@@ -20,8 +21,6 @@ import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
 
-import Control.Monad
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebResource
 
@@ -31,8 +30,8 @@ import Control.Monad
 
 webResourceGetData :: WebResource -> IO String
 webResourceGetData resource = 
-    withWebResource resource $ \ptr ->
-        {#call web_resource_get_data#} ptr >>=
+    withWebResource resource $ \rptr ->
+        {#call web_resource_get_data#} rptr >>=
             {#get GString->str#} >>= peekCString
 
 webResourceGetEncoding :: WebResource -> IO String

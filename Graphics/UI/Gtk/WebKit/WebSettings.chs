@@ -127,12 +127,8 @@ module Graphics.UI.Gtk.WebKit.WebSettings
 
 #include <webkit/webkitwebsettings.h>
 
-import Foreign.C
 import System.Glib.FFI
-
 import System.Glib.Properties
-
-import Control.Monad
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebSettings

@@ -16,6 +16,7 @@ module Graphics.UI.Gtk.WebKit.WebHistoryItem
 
     , webHistoryItemGetType     
     , webHistoryItemCopy
+    , webHistoryItemGetAlternateTitle
     , webHistoryItemSetAlternateTitle
     , webHistoryItemNewWithData
     , webHistoryItemNew
@@ -119,4 +120,4 @@ webHistoryItemSetAlternateTitle historyItem title =
     withCString title $ \cTitle ->
         withWebHistoryItem historyItem $ \ptr ->
             {#call web_history_item_set_alternate_title#} ptr cTitle
-    
+

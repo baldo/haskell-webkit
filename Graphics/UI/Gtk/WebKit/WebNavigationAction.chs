@@ -11,6 +11,7 @@ module Graphics.UI.Gtk.WebKit.WebNavigationAction
     , webNavigationActionGetType
     , webNavigationActionGetTargetFrame
     , webNavigationActionGetOriginalUri
+    , webNavigationActionGetReason 
     , webNavigationActionGetModifierState
     ) where
 

@@ -17,6 +17,6 @@ import Graphics.UI.Gtk
 initWebKit :: IO ()
 initWebKit = do
     {#call unsafe thread_init#} nullPtr
-    initGUI
+    _ <- initGUI
     return ()
 

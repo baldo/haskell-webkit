@@ -54,7 +54,6 @@ import Control.Monad
 
     , withWebDataSource
     , makeWebDataSource
-    , unWebDataSource
     
     , makeNetworkRequest
     , withNetworkRequest
@@ -80,8 +79,8 @@ webDataSourceGetData
     -> IO (Maybe String) -- ^ 'Just' the data or 'Nothing' if no data has been
                          --   loaded
 webDataSourceGetData source = 
-    withWebDataSource source $ \ptr ->
-        {#call web_data_source_get_data#} ptr >>=
+    withWebDataSource source $ \sptr ->
+        {#call web_data_source_get_data#} sptr >>=
             {#get GString->str#} >>= maybePeek peekCString
 
 {- | Returns the text encoding name as set in the 'WebView', or if not, the

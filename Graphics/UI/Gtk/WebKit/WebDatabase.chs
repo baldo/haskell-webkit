@@ -54,7 +54,6 @@ import Control.Monad
     ( WebDatabase
     , SecurityOrigin
 
-    , makeWebDatabase
     , withWebDatabase
     , makeSecurityOrigin
     )

@@ -17,9 +17,11 @@ module Graphics.UI.Gtk.WebKit.Download
     , downloadCancel
     , downloadStart
     , downloadGetCurrentSize
+    , downloadGetDestinationUri
     , downloadSetDestinationUri
     , downloadGetElapsedTime
     , downloadGetUri
+    , downloadNew
     , downloadGetTotalSize
     , downloadGetSuggestedFileName
     , downloadGetNetworkResponse
