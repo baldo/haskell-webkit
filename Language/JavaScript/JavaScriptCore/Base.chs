@@ -11,7 +11,6 @@ module Language.JavaScript.JavaScriptCore.Base
     ) where
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 
 import Control.Monad

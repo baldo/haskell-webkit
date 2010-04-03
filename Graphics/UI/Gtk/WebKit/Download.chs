@@ -31,15 +31,10 @@ module Graphics.UI.Gtk.WebKit.Download
 #include <webkit/webkitdownload.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 
 import Control.Monad
-
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( Download
@@ -47,16 +42,15 @@ import Graphics.UI.Gtk.Abstract.Object
     , NetworkRequest
 
     , withDownload
-    , mkDownload
+    , makeDownload
     
     , withNetworkRequest
-    , mkNetworkRequest
-    , mkNetworkResponse
-
+    , makeNetworkRequest
+    , makeNetworkResponse
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
-    ( DownloadStatus
+    ( DownloadStatus (..)
     )
 
 downloadGetType :: IO GType
@@ -113,7 +107,7 @@ downloadGetNetworkRequest
     -> IO NetworkRequest -- ^ the corresponding 'NetworkRequest'
 downloadGetNetworkRequest download =
     withDownload download $ \ptr ->
-        makeNewObject mkNetworkRequest $ {#call download_get_network_request#} ptr
+        makeNetworkRequest $ {#call download_get_network_request#} ptr
 
 -- | Retrieves the 'NetworkResponse' datatype that backs the download process.
 downloadGetNetworkResponse
@@ -121,7 +115,7 @@ downloadGetNetworkResponse
     -> IO NetworkResponse -- ^ the corresponding 'NetworkResponse'
 downloadGetNetworkResponse download =
     withDownload download $ \ptr ->
-        makeNewObject mkNetworkResponse $ {#call download_get_network_response#} ptr
+        makeNetworkResponse $ {#call download_get_network_response#} ptr
 
 
 {- | Determines the current progress of the download.
@@ -180,7 +174,7 @@ downloadNew
     -> IO Download    -- ^ the new 'Download'
 downloadNew request =
     withNetworkRequest request $ \ptr ->
-        makeNewObject mkDownload $ 
+        makeDownload $ 
             {#call download_new#} ptr 
 
 -- | Defines the URI that should be used to save the downloaded file to.

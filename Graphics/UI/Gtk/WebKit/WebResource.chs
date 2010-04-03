@@ -17,21 +17,16 @@ module Graphics.UI.Gtk.WebKit.WebResource
 #include <webkit/webkitwebresource.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebResource
 
     , withWebResource 
-    , mkWebResource
+    , makeWebResource
     )
 
 webResourceGetData :: WebResource -> IO String
@@ -71,5 +66,5 @@ webResourceGetNew dat size uri mimeType encoding frameName =
         withCString mimeType $ \pMimeType ->
           withCString encoding $ \pEncoding ->
             withCString frameName $ \pFrameName ->
-              makeNewObject mkWebResource $ 
+              makeWebResource $ 
                 {#call web_resource_new#} pData (fromIntegral size) pUri pMimeType pEncoding pFrameName

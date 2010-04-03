@@ -46,22 +46,17 @@ module Graphics.UI.Gtk.WebKit.WebDatabase
 #include <webkit/webkitwebdatabase.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 import Control.Monad
-
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebDatabase
     , SecurityOrigin
 
-    , mkWebDatabase
+    , makeWebDatabase
     , withWebDatabase
-    , mkSecurityOrigin
+    , makeSecurityOrigin
     )
 
 webDatabaseGetType
@@ -111,7 +106,7 @@ webDatabaseGetSecurityOrigin
     -> IO SecurityOrigin -- ^ the security origin of the database 
 webDatabaseGetSecurityOrigin database =
     withWebDatabase database $ \ptr ->
-        makeNewObject mkSecurityOrigin $
+        makeSecurityOrigin $
             {#call webkit_web_database_get_security_origin#} ptr
 
 -- | Returns the actual size of the 'WebDatabase' space on disk in bytes.

@@ -31,14 +31,8 @@ module Graphics.UI.Gtk.WebKit.CacheModel
 #include <webkit/webkitenumtypes.h>
 
 import Foreign.C
-import GHC.Ptr
-import System.Glib.FFI
 
 import Control.Monad
-
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( CacheModel (..)

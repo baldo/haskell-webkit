@@ -64,23 +64,16 @@ module Graphics.UI.Gtk.WebKit.WebWindowFeatures
 #include <webkit/webkitwebwindowfeatures.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 import System.Glib.Properties
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebWindowFeatures
 
-    , mkWebWindowFeatures
-    , unWebWindowFeatures
-
+    , makeWebWindowFeatures
     , withWebWindowFeatures
     )
 
@@ -108,7 +101,7 @@ webWindowFeaturesEqual f1 f2 =
 webWindowFeaturesNew
     :: IO WebWindowFeatures -- ^ a new 'WebWindowFeatures' object
 webWindowFeaturesNew =
-    makeNewObject mkWebWindowFeatures $
+    makeWebWindowFeatures $
         {#call web_window_features_new#} 
 
 -- Properties -----------------------------------------------------------------

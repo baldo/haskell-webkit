@@ -41,9 +41,7 @@ module Language.JavaScript.JavaScriptCore.General.Types
     , makeValueRef
     ) where
 
-
 import System.Glib.FFI
-import Foreign.ForeignPtr
 
 #include <JavaScriptCore/JavaScript.h>
 

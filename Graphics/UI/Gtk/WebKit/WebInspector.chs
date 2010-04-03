@@ -42,7 +42,6 @@ module Graphics.UI.Gtk.WebKit.WebInspector
 #include <webkit/webkitwebinspector.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 import System.Glib.Signals
@@ -50,17 +49,12 @@ import System.Glib.Properties
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebInspector
     , WebView
 
-    , mkWebInspector
-    , withWebInspector
     , makeWebInspector
+    , withWebInspector
     , makeWebView
     )
 

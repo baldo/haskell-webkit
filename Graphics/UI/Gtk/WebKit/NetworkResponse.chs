@@ -24,7 +24,6 @@ module Graphics.UI.Gtk.WebKit.NetworkResponse
 #include <webkit/webkitnetworkresponse.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 
 import System.Glib.GType
@@ -32,23 +31,19 @@ import System.Glib.Properties
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 import Graphics.UI.Gtk.Signals
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkResponse
 
     , withNetworkResponse
-    , mkNetworkResponse
+    , makeNetworkResponse
     )
 
 {#import Network.Soup.General.Types#}
     ( Message
     
-    , mkMessage
+    , makeMessage
     )
 
 networkResponseGetType :: IO GType
@@ -64,7 +59,7 @@ networkResponseNew uri =
     withCString uri $ \c_uri -> do
         ptr <- {#call network_response_new#} c_uri
         let ptr' = castPtr ptr
-        maybePeek ((makeNewObject mkNetworkResponse) . return) ptr'
+        maybePeek (makeNetworkResponse . return) ptr'
 
 -- | Returns the URI belonging to the given 'NetworkResponse'
 networkResponseGetUri
@@ -94,5 +89,5 @@ networkResponseGetMessage
     -> IO Message      -- ^ the 'Message'
 networkResponseGetMessage response =
     withNetworkResponse response $ \ptr ->
-        makeNewObject mkMessage $ {#call network_response_get_message#} ptr
+        makeMessage $ {#call network_response_get_message#} ptr
 

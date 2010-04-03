@@ -182,8 +182,6 @@ module Graphics.UI.Gtk.WebKit.WebView
 #include <webkit/webkitwebview.h>
 
 import Foreign.C
-import Foreign.Ptr
-import GHC.Ptr
 import Control.Monad
 
 import System.Glib.Signals
@@ -246,9 +244,11 @@ import Graphics.UI.Gtk.Gdk.Events
     , makeDownload
     , makeWebDatabase
     )
+
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( LoadStatus (..)
     )
+
 {#import Graphics.UI.Gtk.WebKit.WebWindowFeatures#}
     ( WebWindowFeatures
     , webWindowFeaturesGetType

@@ -38,7 +38,6 @@ module Graphics.UI.Gtk.WebKit.WebBackForwardList
 #include <webkit/webkitwebbackforwardlist.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 
@@ -46,18 +45,14 @@ import System.Glib.GList
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebBackForwardList
     , WebHistoryItem
     , WebView
 
-    , mkWebBackForwardList
+    , makeWebBackForwardList
     , withWebBackForwardList
-    , mkWebHistoryItem
+    , makeWebHistoryItem
     , withWebHistoryItem
     , withWebView
     )
@@ -98,7 +93,7 @@ webBackForwardListGetBackItem
     -> IO WebHistoryItem  -- ^ the 'WebHistoryItem' preceding the current item
 webBackForwardListGetBackItem list =
    withWebBackForwardList list $ \ptr ->
-        makeNewObject mkWebHistoryItem $ {#call web_back_forward_list_get_back_item#} ptr 
+        makeWebHistoryItem $ {#call web_back_forward_list_get_back_item#} ptr 
 
 -- | Returns the number of items that preced the current item.
 webBackForwardListGetBackLength
@@ -118,7 +113,7 @@ webBackForwardListGetBackListWithLimit
 webBackForwardListGetBackListWithLimit list limit =
     withWebBackForwardList list $ \ptr ->
         {#call web_back_forward_list_get_back_list_with_limit#} ptr (fromIntegral limit)
-            >>= fromGList >>= mapM (makeNewObject mkWebHistoryItem . return) 
+            >>= fromGList >>= mapM (makeWebHistoryItem . return) 
 
 -- | Returns the current item.
 webBackForwardListGetCurrentItem
@@ -128,7 +123,7 @@ webBackForwardListGetCurrentItem
 webBackForwardListGetCurrentItem list =
     withWebBackForwardList list $ \ptr -> do
         item <- {#call web_back_forward_list_get_current_item#} ptr
-        maybePeek ((makeNewObject mkWebHistoryItem) . return) item
+        maybePeek (makeWebHistoryItem . return) item
 
 -- | Returns the item that succeeds the current item.
 webBackForwardListGetForwardItem
@@ -138,7 +133,7 @@ webBackForwardListGetForwardItem
 webBackForwardListGetForwardItem list = 
     withWebBackForwardList list $ \ptr -> do
         item <- {#call web_back_forward_list_get_forward_item#} ptr
-        maybePeek ((makeNewObject mkWebHistoryItem) . return) item
+        maybePeek (makeWebHistoryItem . return) item
 
 -- | Returns the number of items that succeed the current item.
 webBackForwardListGetForwardLength
@@ -161,7 +156,7 @@ webBackForwardListGetForwardListWithLimit list limit =
         {#call web_back_forward_list_get_forward_list_with_limit#} ptr
             (fromIntegral limit)
                 >>= fromGList
-                    >>= mapM (makeNewObject mkWebHistoryItem . return) 
+                    >>= mapM (makeWebHistoryItem . return) 
 
 -- | Returns the maximum limit of the 'WebBackForwardList'.
 webBackForwardListGetLimit
@@ -182,7 +177,7 @@ webBackForwardListGetNthItem list index =
     withWebBackForwardList list $ \ptr -> do
         item <- {#call web_back_forward_list_get_nth_item#} ptr
                     (fromIntegral index)
-        maybePeek ((makeNewObject mkWebHistoryItem) . return) item
+        maybePeek (makeWebHistoryItem . return) item
 
 -- | Steps backward in the 'WebBackForwardList'.
 webBackForwardListGoBack
@@ -218,7 +213,7 @@ webBackForwardListNewWithWebView
     -> IO WebBackForwardList -- ^ the list
 webBackForwardListNewWithWebView view =
     withWebView view $ \ptr ->
-       makeNewObject  mkWebBackForwardList $
+        makeWebBackForwardList $
             {#call web_back_forward_list_new_with_web_view#} ptr
 
 {- | Sets the maximum limit of the 'WebBackForwardList'. If the

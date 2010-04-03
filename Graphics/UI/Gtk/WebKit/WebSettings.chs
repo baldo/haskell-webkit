@@ -128,23 +128,16 @@ module Graphics.UI.Gtk.WebKit.WebSettings
 #include <webkit/webkitwebsettings.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 
 import System.Glib.Properties
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebSettings
 
-    , mkWebSettings
-    , unWebSettings 
-
+    , makeWebSettings
     , withWebSettings
     )
 
@@ -156,11 +149,11 @@ import Graphics.UI.Gtk.Abstract.Object
 webSettingsCopy :: WebSettings -> IO WebSettings
 webSettingsCopy settings = 
     withWebSettings settings $ \ptr ->
-        makeNewObject mkWebSettings $ {#call web_settings_copy#} ptr 
+        makeWebSettings $ {#call web_settings_copy#} ptr 
 
 webSettingsNew :: IO WebSettings 
 webSettingsNew =
-    makeNewObject mkWebSettings $ {#call web_settings_new#}
+    makeWebSettings $ {#call web_settings_new#}
 
 -- Properties -----------------------------------------------------------------
 

@@ -15,20 +15,14 @@ module Graphics.UI.Gtk.WebKit.WebPolicyDecision
 #include <webkit/webkitwebpolicydecision.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebPolicyDecision
 
-    , mkWebPolicyDecision
     , withWebPolicyDecision
     )
 

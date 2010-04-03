@@ -21,7 +21,9 @@ module Network.Soup.General.Types
 import System.Glib.FFI
 
 import Graphics.UI.Gtk.Abstract.Object  
-    ( makeNewObject )
+    ( makeNewObject
+    )
+
 import Graphics.UI.Gtk.Types
     ( ObjectClass
     , GObjectClass (..)

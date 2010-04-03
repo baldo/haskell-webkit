@@ -55,7 +55,6 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 #include <webkit/webkitwebframe.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 import Graphics.UI.Gtk.General.Enums 

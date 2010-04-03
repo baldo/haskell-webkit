@@ -17,21 +17,13 @@ module Graphics.UI.Gtk.WebKit.WebNavigationAction
 #include <webkit/webkitwebnavigationaction.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebNavigationAction
-
-    , mkWebNavigationAction
-    , unWebNavigationAction
 
     , withWebNavigationAction
     )

@@ -38,7 +38,6 @@ module Graphics.UI.Gtk.WebKit.WebDataSource
 #include <webkit/webkitwebdatasource.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 import System.Glib.GType
 import System.Glib.GList 
@@ -46,10 +45,6 @@ import System.Glib.GList
     )
 
 import Control.Monad
-
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebDataSource
@@ -59,15 +54,14 @@ import Graphics.UI.Gtk.Abstract.Object
 
     , withWebDataSource
     , makeWebDataSource
-    , mkWebDataSource
     , unWebDataSource
     
-    , mkNetworkRequest
+    , makeNetworkRequest
     , withNetworkRequest
     
-    , mkWebResource
+    , makeWebResource
     
-    , mkWebFrame
+    , makeWebFrame
     )
 
 webDataSourceGetType
@@ -110,8 +104,8 @@ webDataSourceGetInitialRequest
     -> IO NetworkRequest -- ^ the request
 webDataSourceGetInitialRequest source =
     withWebDataSource source $ \ptr ->
-        makeNewObject mkNetworkRequest $
-        {#call web_data_source_get_initial_request#} ptr 
+        makeNetworkRequest $
+            {#call web_data_source_get_initial_request#} ptr 
 
 -- | Returns the main 'WebResource' of the 'WebDataSource'.
 webDataSourceGetMainResource
@@ -120,8 +114,8 @@ webDataSourceGetMainResource
                       --   the data source
 webDataSourceGetMainResource source =
     withWebDataSource source $ \ptr ->
-        makeNewObject mkWebResource $
-        {#call web_data_source_get_main_resource#} ptr 
+        makeWebResource $
+            {#call web_data_source_get_main_resource#} ptr 
 
 {- | Returns a 'NetworkRequest' that was used to create this 'WebDataSource'.
      The 'NetworkRequest' returned by this function is the request that was
@@ -135,8 +129,8 @@ webDataSourceGetRequest
                                  --   the frame hasn't been loaded
 webDataSourceGetRequest source =
     withWebDataSource source $ maybePeek $ \ptr ->
-        makeNewObject mkNetworkRequest $
-        {#call web_data_source_get_request#} ptr
+        makeNetworkRequest $
+            {#call web_data_source_get_request#} ptr
 
 {- | Gives you a list of 'WebResource's that compose the 'WebView' to which this
      'WebDataSource' is attached.
@@ -148,7 +142,7 @@ webDataSourceGetSubresources source =
     withWebDataSource source $ \ptr ->
         {#call web_data_source_get_subresources#} ptr >>=
             fromGList >>=
-                mapM (makeNewObject mkWebResource . return) 
+                mapM (makeWebResource . return) 
 
 {- | Return the unreachable URI of the data source. The data source will have an
      unreachable URL if it was created using 'webFrameLoadAlternateHtmlString'.
@@ -170,8 +164,8 @@ webDataSourceGetWebFrame
                            --   attached to a frame. 
 webDataSourceGetWebFrame source =
     withWebDataSource source $ maybePeek $ \ptr ->
-        makeNewObject mkWebFrame $
-        {#call web_data_source_get_web_frame#} ptr 
+        makeWebFrame $
+            {#call web_data_source_get_web_frame#} ptr 
 
 {- | Determines whether the data source is in the process of loading its
      content.
@@ -191,7 +185,7 @@ webDataSourceIsLoading source =
 webDataSourceNew
     :: IO WebDataSource -- ^ the new data source
 webDataSourceNew =
-    makeNewObject mkWebDataSource $
+    makeWebDataSource $
         {#call web_data_source_new#} 
 
 webDataSourceNewWithRequest 

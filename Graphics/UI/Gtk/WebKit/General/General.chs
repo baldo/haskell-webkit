@@ -8,8 +8,6 @@ module Graphics.UI.Gtk.WebKit.General.General
  
 #include <glib/gthread.h>
 
-import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 
 import Graphics.UI.Gtk

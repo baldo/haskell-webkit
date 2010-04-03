@@ -36,7 +36,6 @@ module Graphics.UI.Gtk.WebKit.SecurityOrigin
 #include <webkit/webkitsecurityorigin.h>
 
 import Foreign.C
-import GHC.Ptr
 import System.Glib.FFI
 
 import System.Glib.GList
@@ -44,17 +43,13 @@ import System.Glib.GType
 
 import Control.Monad
 
-import Graphics.UI.Gtk.Abstract.Object
-    ( makeNewObject
-    )
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( SecurityOrigin
     , WebDatabase
 
-    , mkSecurityOrigin
+    , makeSecurityOrigin
     , withSecurityOrigin
-    , mkWebDatabase
+    , makeWebDatabase
     )
 
 -- | Returns a list of all 'WebDatabase's in the 'SecurityOrigin'.
@@ -64,7 +59,7 @@ securityOriginGetAllWebDatabase
 securityOriginGetAllWebDatabase origin = 
     withSecurityOrigin origin $ \ptr -> 
         {#call security_origin_get_all_web_databases#} ptr
-            >>= fromGList >>= mapM (makeNewObject mkWebDatabase . return)
+            >>= fromGList >>= mapM (makeWebDatabase . return)
 
 -- | Returns the hostname for the 'SecurityOrigin'.
 securityOriginGetHost
