@@ -7,6 +7,7 @@ License-File:  LICENSE
 Build-Type:    Simple
 Cabal-Version: >=1.4
 Category:      Graphics
+Tested-With:   GHC == 6.12.1
 
 Library
     Build-Depends:
@@ -51,8 +52,8 @@ Library
         Graphics.UI.Gtk.WebKit.WebView
 
     Pkgconfig-Depends:
-        webkit-1.0,
-        libsoup-2.4
+        webkit-1.0  >= 1.1.22,
+        libsoup-2.4 >= 2.28.2
 
     Extensions:
         ForeignFunctionInterface
