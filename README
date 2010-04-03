@@ -4,7 +4,7 @@ Haskell WebKit provides lowlevel bindings to WebKitGTK+ (http://webkitgtk.org/).
 
 Installation
 ============
-At the moment there is no way to really install Haskell WebKit.
+We provide a cabal file for easy installation.
 
 Haskell WebKit depends on:
 
@@ -14,9 +14,14 @@ Haskell WebKit depends on:
 4. ghc >= 6.12 (don't know if it builds any longer with 6.10)
 5. c2hs >= 0.16.0 (with patches for 6.12) 
 6. haddock >= 2.4.2 (required only to build documentation)
+7. cabal >= 1.6
 
-To build Haskell WebKit simply type
-    make
+Build Haskell WebKit as follows (optional):
+    cabal configure
+    cabal build
+
+Install Haskell WebKit by typing:
+    cabal install
 
 Documentation
 =============
@@ -32,9 +37,10 @@ grow and become more usefull. For the moment refer to libsoup's documentation at
 http://library.gnome.org/devel/libsoup/stable/.
 
 To build the docs available with Haskell WebKit simply type
-    make docs
+    cabal configure
+    cabal haddock
 
-The build docs can be found in doc/.
+The build docs can be found in dist/doc.
 
 Licensing
 =========
