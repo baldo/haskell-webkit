@@ -134,6 +134,8 @@ Network/Soup/Message.hs: \
 	Network/Soup/General/Enums.hs \
 	Network/Soup/General/Types.hs
 
+docs: doc
+
 doc: $(hs_files)
 	@mkdir -p doc/
 	@haddock -h -t "Haskell WebKit" -o doc/ $(hs_files)
