@@ -12,16 +12,17 @@ Haskell WebKit depends on:
 2. libsoup >= 2.28.2
 3. gtk2hs >= 0.10.1 
 4. ghc >= 6.12 (don't know if it builds any longer with 6.10)
-5. c2hs >= 0.16.0 (with patches for 6.12) 
+5. c2hs >= 0.16.0 (with patches for GHC 6.12) 
 6. haddock >= 2.4.2 (required only to build documentation)
 7. cabal >= 1.6
 
-Build Haskell WebKit as follows (optional):
-    cabal configure
-    cabal build
+Build Haskell WebKit as follows (give --user option to configure, if you want to
+install Haskell WebKit as a user package):
+    runhaskell Setup.hs configure
+    runhaskell Setup.hs build
 
 Install Haskell WebKit by typing:
-    cabal install
+    runhaskell Setup.hs install
 
 Documentation
 =============
@@ -37,10 +38,10 @@ grow and become more usefull. For the moment refer to libsoup's documentation at
 http://library.gnome.org/devel/libsoup/stable/.
 
 To build the docs available with Haskell WebKit simply type
-    cabal configure
-    cabal haddock
+    runhaskell Setup.hs configure
+    runhaskell Setup.hs haddock
 
-The build docs can be found in dist/doc.
+The build docs can be found in dist/doc/html/webkit/index.html.
 
 Licensing
 =========
