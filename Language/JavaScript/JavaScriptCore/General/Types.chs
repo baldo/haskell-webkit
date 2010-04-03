@@ -1,4 +1,5 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-} 
 
 {# context lib="webkit" prefix="JS" #}
 
