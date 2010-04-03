@@ -36,10 +36,6 @@ import System.Glib.FFI
 import System.Glib.GType
 import System.Glib.Properties
 
-import Control.Monad
-
-import Graphics.UI.Gtk.Signals
-
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
 

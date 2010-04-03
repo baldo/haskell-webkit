@@ -136,6 +136,9 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewCutClipboard
     , afterWebViewCutClipboard
 
+    , onWebViewDatabaseQuotaExceeded
+    , afterWebViewDatabaseQuotaExceeded
+
     , onWebViewHoveringOverLink
     , afterWebViewHoveringOverLink
 
@@ -148,6 +151,9 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewPasteClipboard
     , afterWebViewPasteClipboard
 
+    , onWebViewPopulatePopup
+    , afterWebViewPopulatePopup
+
     , onWebViewSelectAll
     , afterWebViewSelectAll
 
@@ -156,6 +162,14 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewStatusbarTextChanged
     , afterWebViewStatusbarTextChanged
+
+    , onWebViewPrintRequested
+    , afterWebViewPrintRequested
+
+    , onWebViewPrintRequestedWrapper 
+
+    , onWebViewRedo
+    , afterWebViewRedo
 
     , onWebViewResourceRequestStarting 
     , afterWebViewResourceRequestStarting 
@@ -177,6 +191,12 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewScriptPrompt
     , afterWebViewScriptPrompt 
+
+    , onWebViewReady
+    , afterWebViewReady
+
+    , onWebViewUndo
+    , afterWebViewUndo
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -189,8 +209,8 @@ import System.Glib.GObject
 import System.Glib.FFI
 import System.Glib.GType
 import System.Glib.Properties
-import System.Glib.Types 
-    ( objectUnref )
+--import System.Glib.Types 
+--    ( objectUnref )
 
 import Graphics.UI.Gtk.Types
 import Graphics.UI.Gtk.Signals
@@ -199,12 +219,6 @@ import Graphics.UI.Gtk.General.Enums
     ( MovementStep )
 import Graphics.UI.Gtk.Abstract.Object  
     ( makeNewObject )
-import Graphics.UI.Gtk.Misc.Adjustment 
-import Graphics.UI.Gtk.Gdk.Events 
-    ( Event (..)
-    , EventButton 
-    , marshalEvent
-    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
@@ -214,7 +228,6 @@ import Graphics.UI.Gtk.Gdk.Events
     , WebBackForwardList
     , WebHistoryItem
     , WebInspector
-    , HitTestResult
     , WebResource 
     , NetworkResponse
     , Download
@@ -222,22 +235,18 @@ import Graphics.UI.Gtk.Gdk.Events
 
     , withNetworkRequest
     , makeNetworkRequest
-    , withWebFrame
     , makeWebFrame
     , withWebView
     , makeWebView
     , withWebSettings
     , makeWebSettings
-    , withWebBackForwardList 
     , makeWebBackForwardList
     , withWebHistoryItem
-    , makeWebHistoryItem
     , withWebView
     , makeWebView
     , withWebSettings
     , makeWebSettings
     , makeWebInspector
-    , makeHitTestResult
     , makeNetworkResponse
     , makeNetworkRequest
     , makeWebResource
@@ -943,7 +952,6 @@ afterWebViewRedo web_view f =
     after web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
         x <-  makeWebView $ return wv 
         f x 
-       
 
 onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
    WebView
