@@ -3,7 +3,8 @@
 {# context lib="libwebkit" prefix="webkit" #}
 
 module Graphics.UI.Gtk.WebKit.General.Enums
-    ( DownloadStatus (..)
+    ( DOMButton (..)
+    , DownloadStatus (..)
     , DownloadError (..)
     , NetworkError (..)
     , PolicyError (..)
@@ -34,6 +35,24 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 
 import System.Glib.FFI
 import System.Glib.GType
+
+data DOMButton = ButtonLeft
+               | ButtonMiddle
+               | ButtonRight
+               | ButtonNone
+
+instance Enum DOMButton where
+    toEnum   0  = ButtonLeft
+    toEnum   1  = ButtonMiddle
+    toEnum   2  = ButtonRight
+    toEnum (-1) = ButtonNone
+    toEnum unmatched = error ("DOMButton.toEnum: Cannot match "
+                           ++ show unmatched)
+
+    fromEnum ButtonLeft   =  0
+    fromEnum ButtonMiddle =  1
+    fromEnum ButtonRight  =  2
+    fromEnum ButtonNone   = -1
 
 -- Error.h --------------------------------------------------------------------
 
