@@ -9,12 +9,12 @@ The content of a 'WebView' can request to change certain properties of a
 height but also if a toolbar, scrollbar, statusbar, locationbar should be 
 visible to the user, the request to show the 'WebView' fullscreen.
 
-In the normal case one will use 'WebView.webViewGetWindowFeatures' to get 
+In the normal case one will use 'webViewGetWindowFeatures' to get 
 the 'WebWindowFeatures' and then monitor the property changes. Be aware that 
 the WebWindowFeatures might change change before "web-view-ready" signal is 
 emitted. To be safe listen to the notify::window-features signal of the 
-WebView and reconnect the signals whenever the WebWindowFeatures of a 
-WebView changes.
+'WebView' and reconnect the signals whenever the 'WebWindowFeatures' of a 
+'WebView' changes.
 -}
 
 module Graphics.UI.Gtk.WebKit.WebWindowFeatures
@@ -106,102 +106,248 @@ webWindowFeaturesNew =
 
 -- Properties -----------------------------------------------------------------
 
-webWindowFeaturesGetFullscreen :: WebWindowFeatures -> IO Bool
+{- | Returns whether window will be displayed fullscreen.
+
+     Default value: 'False'
+-}
+webWindowFeaturesGetFullscreen
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Bool           -- ^ 'True' if window will be displayed fullscreen
 webWindowFeaturesGetFullscreen = 
   objectGetPropertyBool
     "fullscreen"
 
-webWindowFeaturesSetFullscreen :: WebWindowFeatures -> Bool -> IO ()
+{- | Sets whether window will be displayed fullscreen.
+
+     Default value: 'False'
+-}
+webWindowFeaturesSetFullscreen
+    :: WebWindowFeatures -- ^ window featuress
+    -> Bool              -- ^ 'True' to display window fullscreen
+    -> IO ()
 webWindowFeaturesSetFullscreen = 
   objectSetPropertyBool
     "fullscreen"
 
-webWindowFeaturesGetHeight :: WebWindowFeatures -> IO Int
+{- | Returns the height of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesGetHeight
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Int            -- ^ the height
 webWindowFeaturesGetHeight = 
   objectGetPropertyInt
     "height"
 
-webWindowFeaturesSetHeight :: WebWindowFeatures -> Int -> IO ()
+{- | Sets the height of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesSetHeight
+    :: WebWindowFeatures -- ^ window featuress
+    -> Int               -- ^ the height
+    -> IO ()
 webWindowFeaturesSetHeight = 
   objectSetPropertyInt
     "height"
 
-webWindowFeaturesGetLocationbarVisible :: WebWindowFeatures -> IO Bool
+{- | Returns whether the locationbar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesGetLocationbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Bool           -- ^ 'True' if locationbar should be visible
 webWindowFeaturesGetLocationbarVisible = 
   objectGetPropertyBool
     "locationbar-visible"
 
-webWindowFeaturesSetLocationbarVisible :: WebWindowFeatures -> Bool -> IO ()
+{- | Sets whether the locationbar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesSetLocationbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> Bool              -- ^ 'False' if locationbar should not be visible
+    -> IO ()
 webWindowFeaturesSetLocationbarVisible = 
   objectSetPropertyBool
     "locationbar-visible"
 
-webWindowFeaturesGetMenubarVisible :: WebWindowFeatures -> IO Bool
+{- | Returns whether the menubar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesGetMenubarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Bool           -- ^ 'True' if menubar should be visible
 webWindowFeaturesGetMenubarVisible = 
   objectGetPropertyBool
     "menubar-visible"
 
-webWindowFeaturesSetMenubarVisible :: WebWindowFeatures -> Bool -> IO ()
+{- | Sets whether the menubar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesSetMenubarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> Bool              -- ^ 'False' if menubar should no be visible
+    -> IO ()
 webWindowFeaturesSetMenubarVisible = 
   objectSetPropertyBool
     "menubar-visible"
 
-webWindowFeaturesGetScrollbarVisible :: WebWindowFeatures -> IO Bool
+{- | Returns whether the scrollbars should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesGetScrollbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Bool           -- ^ 'True' if scrollbars should be visible
 webWindowFeaturesGetScrollbarVisible = 
   objectGetPropertyBool
     "scrollbar-visible"
 
-webWindowFeaturesSetScrollbarVisible :: WebWindowFeatures -> Bool -> IO ()
+{- | Sets whether the scrollbars should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesSetScrollbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> Bool              -- ^ 'True' if scrollbars should be visible
+    -> IO ()
 webWindowFeaturesSetScrollbarVisible = 
   objectSetPropertyBool
     "scrollbar-visible"
 
-webWindowFeaturesGetStatusbarVisible :: WebWindowFeatures -> IO Bool
+{- | Returns whether the statusbar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesGetStatusbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Bool           -- ^ 'True' if statusbar should be visible
 webWindowFeaturesGetStatusbarVisible = 
   objectGetPropertyBool
     "statusbar-visible"
 
-webWindowFeaturesSetStatusbarVisible :: WebWindowFeatures -> Bool -> IO ()
+{- | Sets whether the statusbar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesSetStatusbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> Bool              -- ^ 'True' if statusbar should be visible
+    -> IO ()
 webWindowFeaturesSetStatusbarVisible = 
   objectSetPropertyBool
     "statusbar-visible"
 
-webWindowFeaturesGetToolbarVisible :: WebWindowFeatures -> IO Bool
+{- | Returns whether the toolbar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesGetToolbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Bool           -- ^ 'True' if toolbar should be visible
 webWindowFeaturesGetToolbarVisible = 
   objectGetPropertyBool
     "toolbar-visible"
 
-webWindowFeaturesSetToolbarVisible :: WebWindowFeatures -> Bool -> IO ()
+{- | Sets whether the toolbar should be visible for the window.
+
+     Default value: 'True'
+-}
+webWindowFeaturesSetToolbarVisible
+    :: WebWindowFeatures -- ^ window featuress
+    -> Bool              -- ^ 'True' if toolbar should be visible
+    -> IO ()
 webWindowFeaturesSetToolbarVisible = 
   objectSetPropertyBool
     "toolbar-visible"
 
-webWindowFeaturesGetWidth :: WebWindowFeatures -> IO Int
+{- | Returns the width of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesGetWidth
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Int            -- ^ the width
 webWindowFeaturesGetWidth = 
   objectGetPropertyInt
     "width"
 
-webWindowFeaturesSetWidth :: WebWindowFeatures -> Int -> IO ()
+{- | Sets the width of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesSetWidth
+    :: WebWindowFeatures -- ^ window featuress
+    -> Int               -- ^ the width
+    -> IO ()
 webWindowFeaturesSetWidth = 
   objectSetPropertyInt
     "width"
 
-webWindowFeaturesGetX :: WebWindowFeatures -> IO Int
+{- | Returns the starting x position of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesGetX
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Int            -- ^ the starting x position
 webWindowFeaturesGetX = 
   objectGetPropertyInt
     "x"
 
-webWindowFeaturesSetX :: WebWindowFeatures -> Int -> IO ()
+{- | Sets the starting x position of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesSetX
+    :: WebWindowFeatures -- ^ window featuress
+    -> Int               -- ^ the starting x position
+    -> IO ()
 webWindowFeaturesSetX = 
   objectSetPropertyInt
     "x"
 
-webWindowFeaturesGetY :: WebWindowFeatures -> IO Int
+{- | Returns the starting y position of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesGetY
+    :: WebWindowFeatures -- ^ window featuress
+    -> IO Int            -- ^ the starting y position
 webWindowFeaturesGetY = 
   objectGetPropertyInt
     "y"
 
-webWindowFeaturesSetY :: WebWindowFeatures -> Int -> IO ()
+{- | Sets the starting y position of the window on the screen.
+
+     Allowed values: >= G_MAXULONG
+
+     Default value: -1
+-}
+webWindowFeaturesSetY
+    :: WebWindowFeatures -- ^ window featuress
+    -> Int               -- ^ the starting y position
+    -> IO ()
 webWindowFeaturesSetY = 
   objectSetPropertyInt
     "y"
