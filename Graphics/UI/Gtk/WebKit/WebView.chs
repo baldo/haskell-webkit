@@ -197,6 +197,10 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewUndo
     , afterWebViewUndo
+
+    , onWebViewNavigationPolicyDecisionRequested
+    , afterWebViewNavigationPolicyDecisionRequested
+ 
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -232,6 +236,8 @@ import Graphics.UI.Gtk.Abstract.Object
     , NetworkResponse
     , Download
     , WebDatabase
+    , WebNavigationAction
+    , WebPolicyDecision
 
     , withNetworkRequest
     , makeNetworkRequest
@@ -252,6 +258,9 @@ import Graphics.UI.Gtk.Abstract.Object
     , makeWebResource
     , makeDownload
     , makeWebDatabase
+    , makeWebNavigationAction
+    , makeWebPolicyDecision
+
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -897,9 +906,28 @@ afterWebViewLoadCommitted =
 "load-error" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gchar *uri, gpointer web_error, gpointer user_data) : Run Last
 "mime-type-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, gchar *mimetype, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
-"navigation-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
+
+onWebViewNavigationPolicyDecisionRequested, afterWebViewNavigationPolicyDecisionRequested ::
+    WebView -> (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) -> IO (ConnectId WebView)
+onWebViewNavigationPolicyDecisionRequested web_view f =
+    on web_view (Signal (connectGeneric "navigation-policy-decision-requested")) 
+        (webViewNavigationPolicyDecisionRequestedWrapper f)
+afterWebViewNavigationPolicyDecisionRequested web_view f =
+    after web_view (Signal (connectGeneric "navigation-policy-decision-requested")) 
+        (webViewNavigationPolicyDecisionRequestedWrapper f)
+
+webViewNavigationPolicyDecisionRequestedWrapper ::
+    (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) 
+    -> Ptr WebView -> Ptr WebFrame -> Ptr NetworkRequest -> Ptr WebNavigationAction -> Ptr WebPolicyDecision -> IO ()
+webViewNavigationPolicyDecisionRequestedWrapper f x1 x2 x3 x4 x5 = do
+        y1 <- makeWebView $ return x1
+        y2 <- makeWebFrame $ return x2
+        y3 <- makeNetworkRequest $ return x3
+        y4 <- makeWebNavigationAction $ return x4
+        y5 <- makeWebPolicyDecision $ return x5
+        f y1 y2 y3 y4 y5 
 
 onWebViewPasteClipboard, afterWebViewPasteClipboard ::
     WebView -> IO () -> IO (ConnectId WebView)
