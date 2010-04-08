@@ -141,6 +141,10 @@ module Graphics.UI.Gtk.WebKit.WebSettings
 
     , webSettingsGetZoomStep
     , webSettingsSetZoomStep
+
+	, webSettingsSetEnableSpartialNavigation 
+	, webSettingsGetEnableSpartialNavigation 
+
     ) where
 
 #include <webkit/webkitwebsettings.h>
@@ -754,7 +758,28 @@ webSettingsSetEnableSiteSpecificQuirks =
     objectSetPropertyBool
         "enable-site-specific-quirks"
 
--- TODO: new in 1.1.23 - "enable-spatial-navigation"
+{- | Sets wheter to enable spartial-navigation.
+	
+	Default value: 'False'
+-}
+webSettingsSetEnableSpartialNavigation 
+	:: WebSettings -- ^ settings
+	-> Bool 	   -- ^ 'True' to enable spartial-navigation
+	-> IO ()
+webSettingsSetEnableSpartialNavigation =
+	objectSetPropertyBool
+		"enable-spatial-navigation"
+
+{- | Returns whether spartial-navigation is enabled.
+
+	Default value: 'False'
+-} 
+webSettingsGetEnableSpartialNavigation 
+	:: WebSettings -- ^ settings
+	-> IO Bool     -- ^ 'True' if spartial-navigation is enabled
+webSettingsGetEnableSpartialNavigation =
+	objectGetPropertyBool 
+		"enabled-spartial-navigation"
 
 {- | Returns whether spell checking while typing is enabled.
 
