@@ -279,26 +279,37 @@ import Graphics.UI.Gtk.Abstract.Object
 webViewGetType :: IO GType
 webViewGetType =
     {#call web_view_get_type#}
-
-webViewNew :: IO WebView
+-- | Create a new Instance of a WebView Object
+webViewNew 
+    :: IO WebView -- ^ new instance
 webViewNew = do
     ptr <- {#call web_view_new#}
     let ptr' = castPtr ptr
     makeWebView (return ptr')
 
-webViewGetTitle :: WebView -> IO (Maybe String)
+-- | Returns the web_view's document title 
+webViewGetTitle 
+    :: WebView           -- ^ a WebView
+    -> IO (Maybe String) -- ^ 'Just String' the title of web_view or 'Nothing'
 webViewGetTitle web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_get_title#} ptr
             >>= maybePeek peekCString
 
-webViewGetUri :: WebView -> IO (Maybe String)
+-- | Returns the current URI of the contents displayed by the 'WebView'
+webViewGetUri
+    :: WebView -- ^ a 'WebView'
+    -> IO (Maybe String) -- ^ 'Just' the URI of 'WebView' or 'Nothing'
 webViewGetUri web_view = do
     withWebView web_view $ \ptr ->
         {#call web_view_get_uri#} ptr
             >>= maybePeek peekCString
 
-webViewSetMaintainsBackForwardList :: WebView -> Bool -> IO ()
+--| Set the view to maintain a back or forward list of history items.
+webViewSetMaintainsBackForwardList 
+    :: WebView -- ^ a 'WebView'
+    -> Bool -- ^ to tell the 'WebView' to maintain a back or forward list 
+    -> IO ()
 webViewSetMaintainsBackForwardList web_view flag =
     withWebView web_view $ \ptr ->
         {#call web_view_set_maintains_back_forward_list#}
@@ -313,7 +324,11 @@ webViewGetBackForwardList view =
         makeWebBackForwardList $
             {#call web_view_get_back_forward_list#} ptr
 
-webViewGoToBackForwardItem :: WebView -> WebHistoryItem -> IO Bool
+-- | Go to the specified 'WebHistoryItem' on a given 'WebView'
+webViewGoToBackForwardItem 
+    :: WebView -- ^ the 'WebView'
+    -> WebHistoryItem -- ^ the 'WebHistoryItem'
+    -> IO Bool -- ^ 'True' if loading of item is successful, 'False' if not 
 webViewGoToBackForwardItem view item =
     withWebView view $ \ptr ->
         withWebHistoryItem item $ \iptr ->
@@ -379,7 +394,11 @@ webViewGoForward web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_go_forward#} ptr
 
-webViewStopLoading :: WebView -> IO ()
+
+-- | Stops any ongoing load in the 'WebView'.
+webViewStopLoading 
+    :: WebView -- ^ the 'WebView'
+    -> IO ()
 webViewStopLoading web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_stop_loading#} ptr
@@ -392,12 +411,18 @@ webViewOpen web_view uri = do
             {#call web_view_open#} ptr c_uri
 -}
 
-webViewReload :: WebView -> IO ()
+-- | Reloads the 'WebView' without using any cached data.
+webViewReload 
+    :: WebView -- ^ the 'WebView'
+    -> IO ()
 webViewReload web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_reload#} ptr
 
-webViewReloadBypassCache :: WebView -> IO ()
+-- | Reloads the 'WebView' without using any cached data.
+webViewReloadBypassCache 
+    :: WebView -- ^ the 'WebView' to reload
+    -> IO ()
 webViewReloadBypassCache web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_reload_bypass_cache#} ptr
