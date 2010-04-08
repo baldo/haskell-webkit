@@ -43,7 +43,7 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , webViewLoadUri
     , webViewLoadString
-    , webViewLoadHtmlString
+    -- , webViewLoadHtmlString -- DEPRECATED
     , webViewLoadRequest 
 
     , webViewSearchText
@@ -213,8 +213,6 @@ import System.Glib.GObject
 import System.Glib.FFI
 import System.Glib.GType
 import System.Glib.Properties
---import System.Glib.Types 
---    ( objectUnref )
 
 import Graphics.UI.Gtk.Types
 import Graphics.UI.Gtk.Signals
@@ -424,6 +422,7 @@ webViewLoadString web_view content mime_type encoding base_uri = do
                         {#call web_view_load_string#}
                             ptr c_content c_mime_type c_encoding c_base_uri
 
+{- DEPRECATED
 webViewLoadHtmlString :: WebView -> String -> String -> IO ()
 webViewLoadHtmlString web_view content base_uri = do
     withCString content $ \c_content ->
@@ -431,6 +430,7 @@ webViewLoadHtmlString web_view content base_uri = do
             withWebView web_view $ \ptr ->
                 {#call web_view_load_html_string#}
                     ptr c_content c_base_uri
+-}
 
 {- | Requests loading of the specified asynchronous client 'NetworkRequest'.
 
@@ -716,7 +716,12 @@ webViewUndo web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_undo#} ptr 
 
-webViewCanUndo :: WebView -> IO Bool
+{- | Determines whether or not it is currently possible to undo the last editing
+     command in the view.
+-}
+webViewCanUndo
+    :: WebView -- a 'WebView'
+    -> IO Bool -- 'True' if possible to undo last editing command
 webViewCanUndo web_view =
     withWebView web_view $ \ptr ->
         liftM toBool $ 
@@ -727,7 +732,12 @@ webViewRedo web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_redo#} ptr 
 
-webViewCanRedo :: WebView -> IO Bool
+{- | Determines whether or not it is currently possible to redo the last editing
+     command in the view.
+-}
+webViewCanRedo
+    :: WebView -- ^ a 'WebView'
+    -> IO Bool -- ^ 'True' if possible to redo last editing command
 webViewCanRedo web_view =
     withWebView web_view $ \ptr ->
         liftM toBool $ 

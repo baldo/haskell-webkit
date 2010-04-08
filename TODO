@@ -1,3 +1,7 @@
+Add docs to:
+    Graphics/UI/Gtk/WebKit/WebView.chs
+    every .chs file not matching Graphics/UI/Gtk/WebKit/*.chs
+
 Implement following functions (if neccessary):
     check_version
     major_version

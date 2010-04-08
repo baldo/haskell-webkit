@@ -145,7 +145,7 @@ webInspectorSetJavascriptProfilingEnabled =
     objectSetPropertyBool
         "javascript-profiling-enabled"
 
-{- | Determines wheter JavaScript profiling is enabled in the inspector.
+{- | Determines whether JavaScript profiling is enabled in the inspector.
 
      Disabled by default.
 -}
@@ -168,7 +168,7 @@ webInspectorSetTimeLineProfilingEnabled =
     objectSetPropertyBool
         "timeline-profiling-enabled"
 
-{- | Determines wheter Timeline profiling is enabled in the inspector.
+{- | Determines whether Timeline profiling is enabled in the inspector.
 
      Disabled by default.
 -}
