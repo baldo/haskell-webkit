@@ -200,7 +200,10 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewNavigationPolicyDecisionRequested
     , afterWebViewNavigationPolicyDecisionRequested
- 
+
+    , afterWebViewMimeTypePolicyDecisionRequested
+    , onWebViewMimeTypePolicyDecisionRequested
+
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -305,7 +308,7 @@ webViewGetUri web_view = do
         {#call web_view_get_uri#} ptr
             >>= maybePeek peekCString
 
---| Set the view to maintain a back or forward list of history items.
+-- | Set the view to maintain a back or forward list of history items.
 webViewSetMaintainsBackForwardList 
     :: WebView -- ^ a 'WebView'
     -> Bool -- ^ to tell the 'WebView' to maintain a back or forward list 
@@ -943,6 +946,34 @@ afterWebViewLoadCommitted =
 "move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
 "new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
+
+onWebViewMimeTypePolicyDecisionRequested, afterWebViewMimeTypePolicyDecisionRequested 
+    :: WebView
+    -> (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool) 
+    -> IO (ConnectId WebView)
+onWebViewMimeTypePolicyDecisionRequested web_view f =
+    on web_view (Signal (connectGeneric "mime-type-policy-decision-requested")) 
+        (webViewMimeTypePolicyDecisionRequestedWrapper f)
+afterWebViewMimeTypePolicyDecisionRequested web_view f =
+    after web_view (Signal (connectGeneric "mime-type-policy-decision-requested")) 
+        (webViewMimeTypePolicyDecisionRequestedWrapper f)
+
+webViewMimeTypePolicyDecisionRequestedWrapper 
+    :: (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool)
+    -> Ptr WebView 
+    -> Ptr WebFrame 
+    -> Ptr NetworkRequest 
+    -> CString 
+    -> Ptr WebPolicyDecision
+    -> IO Bool
+webViewMimeTypePolicyDecisionRequestedWrapper f z1 z2 z3 z4 z5 = do
+    x1 <- makeWebView $ return z1
+    x2 <- makeWebFrame $ return z2 
+    x3 <- makeNetworkRequest $ return z3
+    x4 <- peekCString z4
+    x5 <- makeWebPolicyDecision $ return z5
+    f x1 x2 x3 x4 x5
+
 
 onWebViewNavigationPolicyDecisionRequested, afterWebViewNavigationPolicyDecisionRequested ::
     WebView -> (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) -> IO (ConnectId WebView)
