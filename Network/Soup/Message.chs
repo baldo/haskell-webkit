@@ -104,16 +104,28 @@ void soup_message_set_uri (SoupMessage *msg, SoupURI *uri);
 SoupAddress *soup_message_get_address (SoupMessage *msg);
 -}
 
-messageSetFlags :: Message -> MessageFlags -> IO ()
+messageSetFlags
+    :: Message
+    -> [MessageFlags]
+    -> IO ()
 messageSetFlags message flags =
     withMessage message $ \ptr ->
         {#call message_set_flags#} ptr
-            ((fromIntegral . fromEnum) flags)
+            (fromIntegral $ foldl (\x y -> x .|. fromEnum y)  0 flags)
 
-messageGetFlags :: Message -> IO MessageFlags
+toBits :: Integral a => a -> [a]
+toBits m = toBits' m 1
+    where
+        toBits' 0 _ = []
+        toBits' n b
+            | n `mod` 2 == 0 =     toBits' (n `div` 2) (b * 2)
+            | otherwise      = b : toBits' (n `div` 2) (b * 2)
+
+-- TODO/FIXME  -> IO [MessageFlags]
+messageGetFlags :: Message -> IO [MessageFlags]
 messageGetFlags message =
     withMessage message $ \ptr ->
-        liftM (toEnum . fromIntegral) $
+        liftM ((map toEnum) . toBits . fromIntegral) $
             {#call message_get_flags#} ptr
 
 {- TODO
