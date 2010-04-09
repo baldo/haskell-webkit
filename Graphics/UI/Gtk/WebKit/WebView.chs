@@ -120,7 +120,7 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , webViewGetIconUri
 
-    -- , webViewGetImContext -- TODO
+    , webViewGetIMContext 
 
     , webViewGetWindowFeatures
     , webViewSetWindowFeatures
@@ -200,6 +200,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     ) where
  
 #include <webkit/webkitwebview.h>
+#include <gtk/gtkimcontext.h>
 
 import Foreign.C
 import Control.Monad
@@ -764,9 +765,13 @@ webViewGetIconUri =
     objectGetPropertyString
         "icon-uri"
 
-{- TODO / new in 1.1.20
-"im-context" GtkIMContext* : Read
--}
+ebViewGetIMContext
+	:: WebView 
+	-> IO IMContext
+webViewGetIMContext web_view = do
+    -- TODO this call a gtk function directly, this should happen in gtk2hs!
+	imct <- {#call gtk_im_context_get_type#}
+	objectGetPropertyGObject imct "im-context" web_view
 
 webViewSetWindowFeatures :: WebView -> WebWindowFeatures -> IO ()
 webViewSetWindowFeatures web_view web_window_features = do
