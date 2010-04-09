@@ -1046,9 +1046,22 @@ afterWebViewRedo web_view f =
     after web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
         x <-  makeWebView $ return wv 
         f x 
+{- | Emitted when a request is about to be sent. You can modify the request
+     while handling this signal. You can set the URI in the 'NetworkRequest'
+     object itself, and add/remove/replace headers using the 'Message' object it
+     carries, if it is present. See 'networkRequestGetMessage'. Setting the
+     request URI to "about:blank" will effectively cause the request to load nothing,
+     and can be used to disable the loading of specific resources.
 
+     Notice that information about an eventual redirect is available in response's
+     'Message', not in the 'Message' carried by the request. If response is 'Nothing',
+     then this is not a redirected request.
+
+     The 'Resource' object will be the same throughout all the lifetime of the
+     resource, but the contents may change from inbetween signal emissions. 
+-}
 onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
-   WebView
+   WebView -- ^ the 'WebView' to bind on
    -> (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ()) 
    -> IO (ConnectId WebView)
 onWebViewResourceRequestStarting wV f = 
