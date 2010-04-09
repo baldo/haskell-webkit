@@ -802,7 +802,7 @@ webViewGetIconUri =
     objectGetPropertyString
         "icon-uri"
 
-ebViewGetIMContext
+webViewGetIMContext
 	:: WebView 
 	-> IO IMContext
 webViewGetIMContext web_view = do
