@@ -61,7 +61,8 @@ Library
 
     Pkgconfig-Depends:
         webkit-1.0  >= 1.1.22,
-        libsoup-2.4 >= 2.28.2
+        libsoup-2.4 >= 2.28.2,
+        gtk+-2.0 >= 2.20.0
 
     Extensions:
         ForeignFunctionInterface
