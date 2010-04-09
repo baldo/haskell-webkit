@@ -99,7 +99,11 @@ startBrowser = do
        \ wv wf wr nreq _ -> do 
             putStrLn "onWebViewResourceRequestStarting"
             nr <- networkRequestGetUri nreq 
+            mime <- webResourceGetMimeType wr
+            encoding <- webResourceGetEncoding wr 
             putStrLn $ "-- URI: " ++ nr
+            putStrLn $ "-- MIME: " ++ (show  mime)
+            putStrLn $ "-- Encoding: " ++ (show encoding)
             
     onWebViewStatusbarTextChanged wvBrowser $ 
         (\ x -> putStrLn $ "onWebViewStatusbarTextChanged" ++ x)
@@ -136,8 +140,6 @@ startBrowser = do
 
     loadAddress eAddress wvBrowser
 
-
-
     widgetGrabFocus wvBrowser
     widgetShowAll wMain
     mainGUI
@@ -154,7 +156,7 @@ loadAddress eAddress wvBrowser = do
     -- entrySetText eAddress newUri
 
     ws <- webSettingsNew
-    webSettingsGetUserAgent ws >>= print
+    -- webSettingsGetUserAgent ws >>= print
     webViewSetSettings wvBrowser ws 
 
     return ()
