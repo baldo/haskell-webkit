@@ -1,12 +1,24 @@
 module Main where
 
 import System
+import System.Glib.Signals
+import System.Glib.GType
 
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Glade
 import Graphics.UI.Gtk.WebKit
+import Graphics.UI.Gtk.WebKit.General.Types
+
+import Language.JavaScript.JavaScriptCore
+
 
 import Network.Soup
+
+import Graphics.UI.Gtk.Abstract.Object
+    ( makeNewObject
+    )
+
+
 
 main = startBrowser
 
@@ -75,12 +87,53 @@ startBrowser = do
 
     onActivateLeaf imiQuit $ widgetDestroy wMain
 
-    onWebViewStatusbarTextChanged wvBrowser $
-        \text -> putStrLn $ "SB: " ++ text
+    -- WebKit Events ----------------------------------------------------------    
+
+    --onWebViewStatusbarTextChanged wvBrowser $
+    --    \text -> putStrLn $ "SB: " ++ text
 
     onWebViewCopyClipboard wvBrowser $
         putStrLn "Copy"
 
+    onWebViewResourceRequestStarting wvBrowser $ 
+       \ wv wf wr nreq _ -> do 
+            putStrLn "onWebViewResourceRequestStarting"
+            nr <- networkRequestGetUri nreq 
+            mime <- webResourceGetMimeType wr
+            encoding <- webResourceGetEncoding wr 
+            putStrLn $ "-- URI: " ++ nr
+            putStrLn $ "-- MIME: " ++ (show  mime)
+            putStrLn $ "-- Encoding: " ++ (show encoding)
+            
+    onWebViewStatusbarTextChanged wvBrowser $ 
+        (\ x -> putStrLn $ "onWebViewStatusbarTextChanged" ++ x)
+
+    onWebViewScriptPrompt wvBrowser $
+        \ wv wf message def text -> do
+            putStrLn "onWebViewScriptPrompt"
+            webViewGetUri wv >>= print
+            putStrLn message
+            putStrLn def
+            putStrLn text
+            return False
+
+    onWebViewDownloadRequested wvBrowser $
+        \ webView download -> do
+            putStrLn "onWebViewDownloadRequested"
+            return True
+
+    onWebViewNavigationPolicyDecisionRequested wvBrowser $
+        \ webView webFrame networkRequest webNavigationAction webPolicyDecision ->
+            putStrLn "onWebViewNavigationPolicyDecisionRequested"
+
+    
+    onWebViewMimeTypePolicyDecisionRequested wvBrowser $
+        \ webView webFrame networkRequest mimetype policyDecision -> do
+            putStrLn "onWebViewMimeTypePolicyDecisionRequested" 
+            putStrLn $ "-- MIME: " ++ mimetype
+            webPolicyDecisionUse policyDecision 
+            return True
+        
     -- Show and run GUI -------------------------------------------------------
 
     widgetSetSensitive tbStop False
@@ -103,7 +156,7 @@ loadAddress eAddress wvBrowser = do
     -- entrySetText eAddress newUri
 
     ws <- webSettingsNew
-    webSettingsGetUserAgent ws >>= print
+    -- webSettingsGetUserAgent ws >>= print
     webViewSetSettings wvBrowser ws 
 
     return ()

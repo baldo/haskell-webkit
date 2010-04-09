@@ -197,6 +197,13 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewUndo
     , afterWebViewUndo
+
+    , onWebViewNavigationPolicyDecisionRequested
+    , afterWebViewNavigationPolicyDecisionRequested
+
+    , afterWebViewMimeTypePolicyDecisionRequested
+    , onWebViewMimeTypePolicyDecisionRequested
+
     ) where
  
 #include <webkit/webkitwebview.h>
@@ -231,6 +238,8 @@ import Graphics.UI.Gtk.Abstract.Object
     , NetworkResponse
     , Download
     , WebDatabase
+    , WebNavigationAction
+    , WebPolicyDecision
 
     , withNetworkRequest
     , makeNetworkRequest
@@ -251,6 +260,9 @@ import Graphics.UI.Gtk.Abstract.Object
     , makeWebResource
     , makeDownload
     , makeWebDatabase
+    , makeWebNavigationAction
+    , makeWebPolicyDecision
+
     )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
@@ -271,26 +283,37 @@ import Graphics.UI.Gtk.Abstract.Object
 webViewGetType :: IO GType
 webViewGetType =
     {#call web_view_get_type#}
-
-webViewNew :: IO WebView
+-- | Create a new Instance of a WebView Object
+webViewNew 
+    :: IO WebView -- ^ new instance
 webViewNew = do
     ptr <- {#call web_view_new#}
     let ptr' = castPtr ptr
     makeWebView (return ptr')
 
-webViewGetTitle :: WebView -> IO (Maybe String)
+-- | Returns the web_view's document title 
+webViewGetTitle 
+    :: WebView           -- ^ a WebView
+    -> IO (Maybe String) -- ^ 'Just String' the title of web_view or 'Nothing'
 webViewGetTitle web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_get_title#} ptr
             >>= maybePeek peekCString
 
-webViewGetUri :: WebView -> IO (Maybe String)
+-- | Returns the current URI of the contents displayed by the 'WebView'
+webViewGetUri
+    :: WebView -- ^ a 'WebView'
+    -> IO (Maybe String) -- ^ 'Just' the URI of 'WebView' or 'Nothing'
 webViewGetUri web_view = do
     withWebView web_view $ \ptr ->
         {#call web_view_get_uri#} ptr
             >>= maybePeek peekCString
 
-webViewSetMaintainsBackForwardList :: WebView -> Bool -> IO ()
+-- | Set the view to maintain a back or forward list of history items.
+webViewSetMaintainsBackForwardList 
+    :: WebView -- ^ a 'WebView'
+    -> Bool -- ^ to tell the 'WebView' to maintain a back or forward list 
+    -> IO ()
 webViewSetMaintainsBackForwardList web_view flag =
     withWebView web_view $ \ptr ->
         {#call web_view_set_maintains_back_forward_list#}
@@ -305,7 +328,11 @@ webViewGetBackForwardList view =
         makeWebBackForwardList $
             {#call web_view_get_back_forward_list#} ptr
 
-webViewGoToBackForwardItem :: WebView -> WebHistoryItem -> IO Bool
+-- | Go to the specified 'WebHistoryItem' on a given 'WebView'
+webViewGoToBackForwardItem 
+    :: WebView -- ^ the 'WebView'
+    -> WebHistoryItem -- ^ the 'WebHistoryItem'
+    -> IO Bool -- ^ 'True' if loading of item is successful, 'False' if not 
 webViewGoToBackForwardItem view item =
     withWebView view $ \ptr ->
         withWebHistoryItem item $ \iptr ->
@@ -371,7 +398,11 @@ webViewGoForward web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_go_forward#} ptr
 
-webViewStopLoading :: WebView -> IO ()
+
+-- | Stops any ongoing load in the 'WebView'.
+webViewStopLoading 
+    :: WebView -- ^ the 'WebView'
+    -> IO ()
 webViewStopLoading web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_stop_loading#} ptr
@@ -384,12 +415,18 @@ webViewOpen web_view uri = do
             {#call web_view_open#} ptr c_uri
 -}
 
-webViewReload :: WebView -> IO ()
+-- | Reloads the 'WebView' without using any cached data.
+webViewReload 
+    :: WebView -- ^ the 'WebView'
+    -> IO ()
 webViewReload web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_reload#} ptr
 
-webViewReloadBypassCache :: WebView -> IO ()
+-- | Reloads the 'WebView' without using any cached data.
+webViewReloadBypassCache 
+    :: WebView -- ^ the 'WebView' to reload
+    -> IO ()
 webViewReloadBypassCache web_view =
     withWebView web_view $ \ptr ->
         {#call web_view_reload_bypass_cache#} ptr
@@ -910,11 +947,57 @@ afterWebViewLoadCommitted =
 
 {- TODO
 "load-error" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *web_frame, gchar *uri, gpointer web_error, gpointer user_data) : Run Last
-"mime-type-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, gchar *mimetype, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "move-cursor" : gboolean user_function (WebKitWebView *web_view, GtkMovementStep step, gint count, gpointer user_data) : Run Last / Action
-"navigation-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 "new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
+
+onWebViewMimeTypePolicyDecisionRequested, afterWebViewMimeTypePolicyDecisionRequested 
+    :: WebView
+    -> (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool) 
+    -> IO (ConnectId WebView)
+onWebViewMimeTypePolicyDecisionRequested web_view f =
+    on web_view (Signal (connectGeneric "mime-type-policy-decision-requested")) 
+        (webViewMimeTypePolicyDecisionRequestedWrapper f)
+afterWebViewMimeTypePolicyDecisionRequested web_view f =
+    after web_view (Signal (connectGeneric "mime-type-policy-decision-requested")) 
+        (webViewMimeTypePolicyDecisionRequestedWrapper f)
+
+webViewMimeTypePolicyDecisionRequestedWrapper 
+    :: (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool)
+    -> Ptr WebView 
+    -> Ptr WebFrame 
+    -> Ptr NetworkRequest 
+    -> CString 
+    -> Ptr WebPolicyDecision
+    -> IO Bool
+webViewMimeTypePolicyDecisionRequestedWrapper f z1 z2 z3 z4 z5 = do
+    x1 <- makeWebView $ return z1
+    x2 <- makeWebFrame $ return z2 
+    x3 <- makeNetworkRequest $ return z3
+    x4 <- peekCString z4
+    x5 <- makeWebPolicyDecision $ return z5
+    f x1 x2 x3 x4 x5
+
+
+onWebViewNavigationPolicyDecisionRequested, afterWebViewNavigationPolicyDecisionRequested ::
+    WebView -> (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) -> IO (ConnectId WebView)
+onWebViewNavigationPolicyDecisionRequested web_view f =
+    on web_view (Signal (connectGeneric "navigation-policy-decision-requested")) 
+        (webViewNavigationPolicyDecisionRequestedWrapper f)
+afterWebViewNavigationPolicyDecisionRequested web_view f =
+    after web_view (Signal (connectGeneric "navigation-policy-decision-requested")) 
+        (webViewNavigationPolicyDecisionRequestedWrapper f)
+
+webViewNavigationPolicyDecisionRequestedWrapper ::
+    (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) 
+    -> Ptr WebView -> Ptr WebFrame -> Ptr NetworkRequest -> Ptr WebNavigationAction -> Ptr WebPolicyDecision -> IO ()
+webViewNavigationPolicyDecisionRequestedWrapper f x1 x2 x3 x4 x5 = do
+        y1 <- makeWebView $ return x1
+        y2 <- makeWebFrame $ return x2
+        y3 <- makeNetworkRequest $ return x3
+        y4 <- makeWebNavigationAction $ return x4
+        y5 <- makeWebPolicyDecision $ return x5
+        f y1 y2 y3 y4 y5 
 
 onWebViewPasteClipboard, afterWebViewPasteClipboard ::
     WebView -> IO () -> IO (ConnectId WebView)
@@ -967,9 +1050,22 @@ afterWebViewRedo web_view f =
     after web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
         x <-  makeWebView $ return wv 
         f x 
+{- | Emitted when a request is about to be sent. You can modify the request
+     while handling this signal. You can set the URI in the 'NetworkRequest'
+     object itself, and add/remove/replace headers using the 'Message' object it
+     carries, if it is present. See 'networkRequestGetMessage'. Setting the
+     request URI to "about:blank" will effectively cause the request to load nothing,
+     and can be used to disable the loading of specific resources.
 
+     Notice that information about an eventual redirect is available in response's
+     'Message', not in the 'Message' carried by the request. If response is 'Nothing',
+     then this is not a redirected request.
+
+     The 'Resource' object will be the same throughout all the lifetime of the
+     resource, but the contents may change from inbetween signal emissions. 
+-}
 onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
-   WebView
+   WebView -- ^ the 'WebView' to bind on
    -> (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ()) 
    -> IO (ConnectId WebView)
 onWebViewResourceRequestStarting wV f = 

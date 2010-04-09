@@ -34,6 +34,8 @@ import System.Glib.GType
     , makeWebResource
     )
 
+
+
 -- | Returns the data of the 'WebResource'.
 webResourceGetData
     :: WebResource -- ^ a resource
@@ -41,7 +43,7 @@ webResourceGetData
 webResourceGetData resource = 
     withWebResource resource $ \rptr ->
         {#call web_resource_get_data#} rptr >>=
-            {#get GString->str#} >>= peekCString
+            {#get GString->str#} >>= peekCString -- this will segfault when null is returned
 
 -- | Returns the encoding name of the 'WebResource'.
 webResourceGetEncoding
@@ -64,10 +66,10 @@ webResourceGetFrameName resource =
 -- | Returns the MIME type of the 'WebResource'.
 webResourceGetMimeType
     :: WebResource -- ^ a resource
-    -> IO String   -- ^ the MIME type of the resource
+    -> IO (Maybe String)   -- ^ the MIME type of the resource
 webResourceGetMimeType resource =
     withWebResource resource $ \ptr ->
-        {#call web_resource_get_mime_type#} ptr >>= peekCString
+        {#call web_resource_get_mime_type#} ptr >>= maybePeek peekCString
 
 webResourceGetType :: IO GType 
 webResourceGetType = 
