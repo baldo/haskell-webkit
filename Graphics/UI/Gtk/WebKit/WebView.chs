@@ -138,6 +138,9 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , onWebViewDatabaseQuotaExceeded
     , afterWebViewDatabaseQuotaExceeded
+    
+    , onWebViewDocumentLoadFinished
+    , afterWebViewDocumentLoadFinished 
 
     , onWebViewHoveringOverLink
     , afterWebViewHoveringOverLink
@@ -905,6 +908,23 @@ webViewDatabaseQuotaExceededWrapper f webViewPtr webFramePtr databasePtr = do
     x2 <- makeWebFrame $ return webFramePtr 
     x3 <- makeWebDatabase $ return databasePtr
     f x1 x2 x3 
+
+onWebViewDocumentLoadFinished, afterWebViewDocumentLoadFinished 
+    :: WebView -> (WebView -> WebFrame -> IO ()) -> IO (ConnectId WebView)
+onWebViewDocumentLoadFinished web_view f =
+    on web_view (Signal (connectGeneric "document-load-finished"))
+        (webViewDocumentLoadFinishedWrapper f)
+afterWebViewDocumentLoadFinished web_view f =
+    after web_view (Signal (connectGeneric "document-load-finished"))
+        (webViewDocumentLoadFinishedWrapper f)
+
+webViewDocumentLoadFinishedWrapper :: 
+    (WebView -> WebFrame -> IO ())
+    -> Ptr WebView -> Ptr WebFrame -> IO ()
+webViewDocumentLoadFinishedWrapper f webViewPtr webFramePtr = do
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeWebFrame $ return webFramePtr 
+    f x1 x2 
 
 onWebViewDownloadRequested, afterWebViewDownloadRequested :: 
     WebView -> (WebView -> Download -> IO Bool) -> IO (ConnectId WebView)
