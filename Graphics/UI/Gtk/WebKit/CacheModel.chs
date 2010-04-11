@@ -31,8 +31,6 @@ module Graphics.UI.Gtk.WebKit.CacheModel
 #include <webkit/webkitenumtypes.h>
 
 import Foreign.C
-    ( CInt
-    )
 
 import Control.Monad.Trans
     ( MonadIO
