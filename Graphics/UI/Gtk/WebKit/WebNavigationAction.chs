@@ -18,17 +18,21 @@ module Graphics.UI.Gtk.WebKit.WebNavigationAction
     , webNavigationActionGetType
     , webNavigationActionGetTargetFrame
     , webNavigationActionGetOriginalUri
-    , webNavigationActionGetReason 
+    , webNavigationActionGetReason
     , webNavigationActionGetModifierState
     ) where
 
 #include <webkit/webkitwebnavigationaction.h>
 
-import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
+    ( GType
+    )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebNavigationAction
@@ -45,74 +49,84 @@ import Control.Monad
      action was not initiated by a mouse click, returns 'ButtonNone'.
 -}
 webNavigationActionGetButton
-    :: WebNavigationAction -- ^ a navigation action
-    -> IO DOMButton        -- ^ mouse button that used to click
-webNavigationActionGetButton action = 
-    withWebNavigationAction action $ \ptr -> 
-        liftM (toEnum . fromIntegral) $
-            {#call webkit_web_navigation_action_get_button#} ptr 
+    :: MonadIO m
+    => WebNavigationAction -- ^ a navigation action
+    -> m DOMButton         -- ^ mouse button that used to click
+webNavigationActionGetButton action = liftIO $
+    withWebNavigationAction action $ \ptr ->
+        {#call webkit_web_navigation_action_get_button#} ptr >>=
+            return . toEnum . fromIntegral
 
 -- | Returns a bitmask with the the state of the modifier keys.
 webNavigationActionGetModifierState
-    :: WebNavigationAction -- ^ a navigation action
-    -> IO Int              -- ^ a bitmask with the state of the modifier keys
-webNavigationActionGetModifierState action = 
-    withWebNavigationAction action $ \ptr -> 
-       liftM fromIntegral $ {#call webkit_web_navigation_action_get_modifier_state#} ptr 
+    :: MonadIO m
+    => WebNavigationAction -- ^ a navigation action
+    -> m Int               -- ^ a bitmask with the state of the modifier keys
+webNavigationActionGetModifierState action = liftIO $
+    withWebNavigationAction action $ \ptr ->
+        {#call webkit_web_navigation_action_get_modifier_state#} ptr >>=
+            return . fromIntegral
 
 {- | Returns the URI that was originally requested. This may differ from the
      navigation target, for instance because of a redirect.
 -}
 webNavigationActionGetOriginalUri
-    :: WebNavigationAction -- ^ a navigation action
-    -> IO String           -- ^ the URI
-webNavigationActionGetOriginalUri action = 
-    withWebNavigationAction action $ \ptr -> 
+    :: MonadIO m
+    => WebNavigationAction -- ^ a navigation action
+    -> m String            -- ^ the URI
+webNavigationActionGetOriginalUri action = liftIO $
+    withWebNavigationAction action $ \ptr ->
         {#call webkit_web_navigation_action_get_original_uri#} ptr >>=
             peekCString
 
 -- | Returns the reason why WebKit is requesting a navigation.
 webNavigationActionGetReason
-    :: WebNavigationAction    -- ^ a navigation action
-    -> IO WebNavigationReason -- ^ the reason for the navigation
-webNavigationActionGetReason action =
-    withWebNavigationAction action $ \ptr -> 
-        liftM (toEnum . fromIntegral) $
-        {#call web_navigation_action_get_reason#} ptr 
+    :: MonadIO m
+    => WebNavigationAction   -- ^ a navigation action
+    -> m WebNavigationReason -- ^ the reason for the navigation
+webNavigationActionGetReason action = liftIO $
+    withWebNavigationAction action $ \ptr ->
+        {#call web_navigation_action_get_reason#} ptr >>=
+            return . toEnum . fromIntegral
 
 -- | Returns the target frame of the action.
 webNavigationActionGetTargetFrame
-    :: WebNavigationAction -- ^ a navigation action
-    -> IO (Maybe String)   -- ^ 'Just' the target frame or 'Nothing' if there
+    :: MonadIO m
+    => WebNavigationAction -- ^ a navigation action
+    -> m (Maybe String)    -- ^ 'Just' the target frame or 'Nothing' if there
                            --   is no target.
-webNavigationActionGetTargetFrame action =
+webNavigationActionGetTargetFrame action = liftIO $
     withWebNavigationAction action $ \ptr ->
         {#call web_navigation_action_get_target_frame#} ptr >>=
             maybePeek peekCString
 
-webNavigationActionGetType :: IO GType 
-webNavigationActionGetType =
+webNavigationActionGetType
+    :: MonadIO m
+    => m GType
+webNavigationActionGetType = liftIO $
     {#call web_navigation_action_get_type#}
 
 {- | Sets the URI that was originally requested. This may differ from the
      navigation target, for instance because of a redirect.
 -}
 webNavigationActionSetOrginalUri
-    :: WebNavigationAction -- ^ a navigation action
+    :: MonadIO m
+    => WebNavigationAction -- ^ a navigation action
     -> String              -- ^ a URI
-    -> IO ()
-webNavigationActionSetOrginalUri action uri = 
-    withWebNavigationAction action $ \ptr -> 
+    -> m ()
+webNavigationActionSetOrginalUri action uri = liftIO $
+    withWebNavigationAction action $ \ptr ->
         newCString uri >>=
             {#call webkit_web_navigation_action_set_original_uri#} ptr
 
 -- | Sets the reason why WebKit is requesting a navigation.
 webNavigationActionSetReason
-    :: WebNavigationAction -- ^ a navigation action
+    :: MonadIO m
+    => WebNavigationAction -- ^ a navigation action
     -> WebNavigationReason -- ^ the reason for the navigation
-    -> IO ()
-webNavigationActionSetReason action reason =
-    withWebNavigationAction action $ \ptr -> 
+    -> m ()
+webNavigationActionSetReason action reason = liftIO $
+    withWebNavigationAction action $ \ptr ->
         {#call web_navigation_action_set_reason#} ptr $
             (fromIntegral . fromEnum)  reason
 

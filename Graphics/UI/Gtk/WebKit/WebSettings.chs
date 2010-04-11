@@ -142,8 +142,8 @@ module Graphics.UI.Gtk.WebKit.WebSettings
     , webSettingsGetZoomStep
     , webSettingsSetZoomStep
 
-	, webSettingsSetEnableSpartialNavigation 
-	, webSettingsGetEnableSpartialNavigation 
+    , webSettingsSetEnableSpartialNavigation
+    , webSettingsGetEnableSpartialNavigation
 
     ) where
 
@@ -151,6 +151,26 @@ module Graphics.UI.Gtk.WebKit.WebSettings
 
 import System.Glib.FFI
 import System.Glib.Properties
+    ( objectGetPropertyBool
+    , objectSetPropertyBool
+
+    , objectGetPropertyFloat
+    , objectSetPropertyFloat
+
+    , objectGetPropertyInt
+    , objectSetPropertyInt
+
+    , objectGetPropertyMaybeString
+    , objectSetPropertyMaybeString
+
+    , objectGetPropertyString
+    , objectSetPropertyString
+    )
+
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebSettings
@@ -168,9 +188,10 @@ import System.Glib.Properties
 
 -- | Creates a copy of the given 'WebSettings'.
 webSettingsCopy
-    :: WebSettings    -- ^ settings
-    -> IO WebSettings -- ^ the copy
-webSettingsCopy settings =
+    :: MonadIO m
+    => WebSettings   -- ^ settings
+    -> m WebSettings -- ^ the copy
+webSettingsCopy settings = liftIO $
     withWebSettings settings $ \ptr ->
         makeWebSettings $ {#call web_settings_copy#} ptr
 
@@ -178,8 +199,9 @@ webSettingsCopy settings =
      to a 'WebView'.
 -}
 webSettingsNew
-    :: IO WebSettings -- ^ the new 'WebSettings'
-webSettingsNew =
+    :: MonadIO m
+    => m WebSettings -- ^ the new 'WebSettings'
+webSettingsNew = liftIO $
     makeWebSettings $ {#call web_settings_new#}
 
 -- Properties -----------------------------------------------------------------
@@ -189,23 +211,25 @@ webSettingsNew =
      Default value: 'True'
 -}
 webSettingsGetAutoLoadImages
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if images are automatically loaded
-webSettingsGetAutoLoadImages =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if images are automatically loaded
+webSettingsGetAutoLoadImages ws = liftIO $
     objectGetPropertyBool
-        "auto-load-images"
+        "auto-load-images" ws
 
 {- | Set whether to load images automatically.
 
      Default value: 'True'
 -}
 webSettingsSetAutoLoadImages
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' if images shall be automatically loaded
-    -> IO ()
-webSettingsSetAutoLoadImages =
+    -> m ()
+webSettingsSetAutoLoadImages ws b = liftIO $
     objectSetPropertyBool
-        "auto-load-images"
+        "auto-load-images" ws b
 
 {- | Gets the value of this property. For more information look at
      'webSettingsSetAutoResizeWindow'.
@@ -213,11 +237,12 @@ webSettingsSetAutoLoadImages =
      Default value: 'False'
 -}
 webSettingsGetAutoResizeWindow
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if automatic resizing is enabled
-webSettingsGetAutoResizeWindow =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if automatic resizing is enabled
+webSettingsGetAutoResizeWindow ws = liftIO $
     objectGetPropertyBool
-        "auto-resize-window"
+        "auto-resize-window" ws
 
 {- | Web pages can request to modify the size and position of the window
      containing the 'WebView' through various DOM methods (resizeTo, moveTo,
@@ -229,104 +254,113 @@ webSettingsGetAutoResizeWindow =
      Default value: 'False'
 -}
 webSettingsSetAutoResizeWindow
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' if automatic resizing shall be enabled
-    -> IO ()
-webSettingsSetAutoResizeWindow =
+    -> m ()
+webSettingsSetAutoResizeWindow ws b = liftIO $
     objectSetPropertyBool
-        "auto-resize-window"
+        "auto-resize-window" ws b
 
 {- | Returns whether standalone images are automatically shrinked to fit.
 
      Default value: 'True'
 -}
 webSettingsGetAutoShrinkImages
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if automatic shrinking is enabled
-webSettingsGetAutoShrinkImages =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if automatic shrinking is enabled
+webSettingsGetAutoShrinkImages ws = liftIO $
     objectGetPropertyBool
-        "auto-shrink-images"
+        "auto-shrink-images" ws
 
 {- | Sets whether to automatically shrink standalone images to fit.
 
      Default value: 'True'
 -}
 webSettingsSetAutoShrinkImages
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable automatic shrinking
-    -> IO ()
-webSettingsSetAutoShrinkImages =
+    -> m ()
+webSettingsSetAutoShrinkImages ws b = liftIO $
     objectSetPropertyBool
-        "auto-shrink-images"
+        "auto-shrink-images" ws b
 
 {- | Returns the default Cursive font family used to display text.
 
      Default value: \"serif\"
 -}
 webSettingsGetCursiveFontFamily
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the font family
-webSettingsGetCursiveFontFamily =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the font family
+webSettingsGetCursiveFontFamily ws = liftIO $
     objectGetPropertyString
-        "cursive-font-family"
+        "cursive-font-family" ws
 
 {- | Sets the default Cursive font family used to display text.
 
      Default value: \"serif\"
 -}
 webSettingsSetCursiveFontFamily
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the font family
-    -> IO ()
-webSettingsSetCursiveFontFamily =
+    -> m ()
+webSettingsSetCursiveFontFamily ws s = liftIO $
     objectSetPropertyString
-        "cursive-font-family"
+        "cursive-font-family" ws s
 
 {- | Returns the default encoding used to display text.
 
      Default value: \"iso-8859-1\"
 -}
 webSettingsGetDefaultEncoding
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the encoding
-webSettingsGetDefaultEncoding =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the encoding
+webSettingsGetDefaultEncoding ws = liftIO $
     objectGetPropertyString
-        "default-encoding"
+        "default-encoding" ws 
 
 {- | Sets the default encoding used to display text.
 
      Default value: \"iso-8859-1\"
 -}
 webSettingsSetDefaultEncoding
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the encoding
-    -> IO ()
-webSettingsSetDefaultEncoding =
+    -> m ()
+webSettingsSetDefaultEncoding ws s = liftIO $
     objectSetPropertyString
-        "default-encoding"
+        "default-encoding" ws s
 
 {- | Returns the default font family used to display text.
 
      Default value: \"sans-serif\"
 -}
 webSettingsGetDefaultFontFamily
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the font family
-webSettingsGetDefaultFontFamily =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the font family
+webSettingsGetDefaultFontFamily ws = liftIO $
     objectGetPropertyString
-        "default-font-family"
+        "default-font-family" ws
 
 {- | Sets the default font family used to display text.
 
      Default value: \"sans-serif\"
 -}
 webSettingsSetDefaultFontFamily
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the font family
-    -> IO ()
-webSettingsSetDefaultFontFamily =
+    -> m ()
+webSettingsSetDefaultFontFamily ws s = liftIO $
     objectSetPropertyString
-        "default-font-family"
+        "default-font-family" ws s
 
 {- | Returns the default font size used to display text.
 
@@ -335,11 +369,12 @@ webSettingsSetDefaultFontFamily =
      Default value: 12
 -}
 webSettingsGetDefaultFontSize
-    :: WebSettings -- ^ settings
-    -> IO Int      -- ^ the font size
-webSettingsGetDefaultFontSize =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Int       -- ^ the font size
+webSettingsGetDefaultFontSize ws = liftIO $
     objectGetPropertyInt
-        "default-font-size"
+        "default-font-size" ws
 
 {- | Sets the default font size used to display text.
 
@@ -348,12 +383,13 @@ webSettingsGetDefaultFontSize =
      Default value: 12
 -}
 webSettingsSetDefaultFontSize
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Int         -- ^ the font size
-    -> IO ()
-webSettingsSetDefaultFontSize =
+    -> m ()
+webSettingsSetDefaultFontSize ws i = liftIO $
     objectSetPropertyInt
-        "default-font-size"
+        "default-font-size" ws i
 
 {- | Returns the default font size used to display monospace text.
 
@@ -362,11 +398,12 @@ webSettingsSetDefaultFontSize =
      Default value: 10
 -}
 webSettingsGetDefaultMonospaceFontSize
-    :: WebSettings -- ^ settings
-    -> IO Int      -- ^ the font size
-webSettingsGetDefaultMonospaceFontSize =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Int       -- ^ the font size
+webSettingsGetDefaultMonospaceFontSize ws = liftIO $
     objectGetPropertyInt
-        "default-monospace-font-size"
+        "default-monospace-font-size" ws
 
 {- | Sets the default font size used to display monospace text.
 
@@ -375,20 +412,22 @@ webSettingsGetDefaultMonospaceFontSize =
      Default value: 10
 -}
 webSettingsSetDefaultMonospaceFontSize
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Int         -- ^ the font size
-    -> IO ()
-webSettingsSetDefaultMonospaceFontSize =
+    -> m ()
+webSettingsSetDefaultMonospaceFontSize ws i = liftIO $
     objectSetPropertyInt
-        "default-monospace-font-size"
+        "default-monospace-font-size" ws i
 
 {- | Returns the 'EditingBehavior'. For more information have a look at
      'webSettingsSetEditingBehavior'.
 -}
 webSettingsGetEditingBehavior
-    :: WebSettings        -- ^ settings
-    -> IO EditingBehavior -- ^ the editing behavior
-webSettingsGetEditingBehavior ws =
+    :: MonadIO m
+    => WebSettings       -- ^ settings
+    -> m EditingBehavior -- ^ the editing behavior
+webSettingsGetEditingBehavior ws = liftIO $
     (objectGetPropertyInt
         "editing-behavior" ws)
             >>= (return . toEnum)
@@ -408,10 +447,11 @@ webSettingsGetEditingBehavior ws =
      Default value: 'EditingBehaviorMac'
 -}
 webSettingsSetEditingBehavior
-    :: WebSettings     -- ^ settings
+    :: MonadIO m
+    => WebSettings     -- ^ settings
     -> EditingBehavior -- ^ the editing behavior
-    -> IO ()
-webSettingsSetEditingBehavior ws enum =
+    -> m ()
+webSettingsSetEditingBehavior ws enum = liftIO $
     objectSetPropertyInt
         "editing-behavior" ws
             $ fromEnum enum
@@ -421,33 +461,36 @@ webSettingsSetEditingBehavior ws enum =
      Default value: 'False'
 -}
 webSettingsGetEnableCaretBrowsing
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if caret browsing mode is enabled
-webSettingsGetEnableCaretBrowsing =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if caret browsing mode is enabled
+webSettingsGetEnableCaretBrowsing ws = liftIO $
     objectGetPropertyBool
-        "enable-caret-browsing"
+        "enable-caret-browsing" ws
 
 {- | Sets whether to enable caret browsing mode.
 
      Default value: 'False'
 -}
 webSettingsSetEnableCaretBrowsing
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable caret browsing mode
-    -> IO ()
-webSettingsSetEnableCaretBrowsing =
+    -> m ()
+webSettingsSetEnableCaretBrowsing ws b = liftIO $
     objectSetPropertyBool
-        "enable-caret-browsing"
+        "enable-caret-browsing" ws b
 
 {- | Returns whether context menu is enabled by default. For more information
      have a look at 'webSettingsSetEnableDefaultContextMenu'.
 -}
 webSettingsGetEnableDefaultContextMenu
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'False' if context menu is disabled by default
-webSettingsGetEnableDefaultContextMenu =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'False' if context menu is disabled by default
+webSettingsGetEnableDefaultContextMenu ws = liftIO $
     objectGetPropertyBool
-        "enable-default-context-menu"
+        "enable-default-context-menu" ws
 
 {- | Whether right-clicks should be handled automatically to create, and display
      the context menu. Turning this off will make WebKitGTK+ not emit the
@@ -458,22 +501,24 @@ webSettingsGetEnableDefaultContextMenu =
      Default value: 'True'
 -}
 webSettingsSetEnableDefaultContextMenu
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable context menu by default
-    -> IO ()
-webSettingsSetEnableDefaultContextMenu =
+    -> m ()
+webSettingsSetEnableDefaultContextMenu ws b = liftIO $
     objectSetPropertyBool
-        "enable-default-context-menu"
+        "enable-default-context-menu" ws b
 
 {- | Returns whether developer extensions are enabled. For more information have
      a look at 'webSettingsSetEnableDeveloperExtras'.
 -}
 webSettingsGetEnableDeveloperExtras
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if developer extensions are enabled
-webSettingsGetEnableDeveloperExtras =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if developer extensions are enabled
+webSettingsGetEnableDeveloperExtras ws = liftIO $
     objectGetPropertyBool
-        "enable-developer-extras"
+        "enable-developer-extras" ws
 
 {- | Whether developer extensions should be enabled. This enables, for now, the
      Web Inspector, which can be controlled using the 'WebInspector' held by the
@@ -482,22 +527,24 @@ webSettingsGetEnableDeveloperExtras =
      Default value: 'False'
 -}
 webSettingsSetEnableDeveloperExtras
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable developer extensions
-    -> IO ()
-webSettingsSetEnableDeveloperExtras =
+    -> m ()
+webSettingsSetEnableDeveloperExtras ws b = liftIO $
     objectSetPropertyBool
-        "enable-developer-extras"
+        "enable-developer-extras" ws b
 
 {- | Returns whether DOM paste is enabled. For further information have a look
      at 'webSettingsSetEnableDomPaste'.
 -}
 webSettingsGetEnableDomPaste
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if DOM paste is enabled
-webSettingsGetEnableDomPaste =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if DOM paste is enabled
+webSettingsGetEnableDomPaste ws = liftIO $
     objectGetPropertyBool
-        "enable-dom-paste"
+        "enable-dom-paste" ws
 
 {- | Sets whether to enable DOM paste. If set to 'True',
      document.execCommand(\"Paste\") will correctly execute and paste content
@@ -506,22 +553,24 @@ webSettingsGetEnableDomPaste =
      Default value: 'False'
 -}
 webSettingsSetEnableDomPaste
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable DOM paste
-    -> IO ()
-webSettingsSetEnableDomPaste =
+    -> m ()
+webSettingsSetEnableDomPaste ws b = liftIO $
     objectSetPropertyBool
-        "enable-dom-paste"
+        "enable-dom-paste" ws b
 
 {- | Returns whether enable-file-access-from-file-uris property is enabled. For
      more information look at 'webSettingsSetEnableFileAccessFromFileUris'.
 -}
 webSettingsGetEnableFileAccessFromFileUris
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if enabled
-webSettingsGetEnableFileAccessFromFileUris =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if enabled
+webSettingsGetEnableFileAccessFromFileUris ws = liftIO $
     objectGetPropertyBool
-        "enable-file-access-from-file-uris"
+        "enable-file-access-from-file-uris" ws
 
 {- | Boolean property to control file access for file:// URIs. If this option is
      enabled every file:// will have its own security unique domain.
@@ -529,22 +578,24 @@ webSettingsGetEnableFileAccessFromFileUris =
      Default value: 'False'
 -}
 webSettingsSetEnableFileAccessFromFileUris
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable
-    -> IO ()
-webSettingsSetEnableFileAccessFromFileUris =
+    -> m ()
+webSettingsSetEnableFileAccessFromFileUris ws b = liftIO $
     objectSetPropertyBool
-        "enable-file-access-from-file-uris"
+        "enable-file-access-from-file-uris" ws b
 
 {- | Returns whether HTML5 client-side SQL database support is enabled. For
      further information look at 'webSettingsSetEnableHtml5Database'.
 -}
 webSettingsGetEnableHtml5Database
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if client-side SQL database support is enabled
-webSettingsGetEnableHtml5Database =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if client-side SQL database support is enabled
+webSettingsGetEnableHtml5Database ws = liftIO $
     objectGetPropertyBool
-        "enable-html5-database"
+        "enable-html5-database" ws
 
 {- | Whether to enable HTML5 client-side SQL database support. Client-side SQL
      database allows web pages to store structured data and be able to use SQL
@@ -553,12 +604,13 @@ webSettingsGetEnableHtml5Database =
      Default value: 'True'
 -}
 webSettingsSetEnableHtml5Database
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable client-side SQL database support
-    -> IO ()
-webSettingsSetEnableHtml5Database =
+    -> m ()
+webSettingsSetEnableHtml5Database ws b = liftIO $
     objectSetPropertyBool
-        "enable-html5-database"
+        "enable-html5-database" ws b
 
 {- | Returns whether HTML5 localStorage support is enabled. localStorage
      provides simple synchronous storage access.
@@ -566,11 +618,12 @@ webSettingsSetEnableHtml5Database =
      Default value: 'True'
 -}
 webSettingsGetEnableHtml5LocalStorage
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if localStorage support is enabled
-webSettingsGetEnableHtml5LocalStorage =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if localStorage support is enabled
+webSettingsGetEnableHtml5LocalStorage ws = liftIO $
     objectGetPropertyBool
-        "enable-html5-local-storage"
+        "enable-html5-local-storage" ws
 
 {- | Sets whether to enable HTML5 localStorage support. localStorage
      provides simple synchronous storage access.
@@ -578,22 +631,24 @@ webSettingsGetEnableHtml5LocalStorage =
      Default value: 'True'
 -}
 webSettingsSetEnableHtml5LocalStorage
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable localStorage support
-    -> IO ()
-webSettingsSetEnableHtml5LocalStorage =
+    -> m ()
+webSettingsSetEnableHtml5LocalStorage ws b = liftIO $
     objectSetPropertyBool
-        "enable-html5-local-storage"
+        "enable-html5-local-storage" ws b
 
 {- | Returns whether the Java \<applet\> tag is enabled. For further information
      have a look at 'webSettingsSetEnableJavaApplet'.
 -}
 webSettingsGetEnableJavaApplet
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if \<applet\> tag is enabled
-webSettingsGetEnableJavaApplet =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if \<applet\> tag is enabled
+webSettingsGetEnableJavaApplet ws = liftIO $
     objectGetPropertyBool
-        "enable-java-applet"
+        "enable-java-applet" ws
 
 {- | Enable or disable support for the Java \<applet\> tag. Keep in mind that
      Java content can be still shown in the page through \<object\> or
@@ -602,22 +657,24 @@ webSettingsGetEnableJavaApplet =
      Default value: 'True'
 -}
 webSettingsSetEnableJavaApplet
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable the Java \<applet\> tag
-    -> IO ()
-webSettingsSetEnableJavaApplet =
+    -> m ()
+webSettingsSetEnableJavaApplet ws b = liftIO $
     objectSetPropertyBool
-        "enable-java-applet"
+        "enable-java-applet" ws b
 
 {- | Returns wether offline web application cache support is enabled. For more
      information look at 'webSettingsSetEnableOfflineWebApplicationCache'.
 -}
 webSettingsGetEnableOfflineWebApplicationCache
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if offline web application cache is enabled
-webSettingsGetEnableOfflineWebApplicationCache =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool     -- ^ 'True' if offline web application cache is enabled
+webSettingsGetEnableOfflineWebApplicationCache ws = liftIO $
     objectGetPropertyBool
-        "enable-offline-web-application-cache"
+        "enable-offline-web-application-cache" ws
 
 {- | Whether to enable HTML5 offline web application cache support. Offline Web
      Application Cache ensures web applications are available even when the user
@@ -626,22 +683,24 @@ webSettingsGetEnableOfflineWebApplicationCache =
      Default value: 'True'
 -}
 webSettingsSetEnableOfflineWebApplicationCache
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable offline web application cache support
-    -> IO ()
-webSettingsSetEnableOfflineWebApplicationCache =
+    -> m ()
+webSettingsSetEnableOfflineWebApplicationCache ws b = liftIO $
     objectSetPropertyBool
-        "enable-offline-web-application-cache"
+        "enable-offline-web-application-cache" ws b
 
 {- | Returns whether page cache is enabled. For further information have a look
      at 'webSettingsSetEnablePageCache'.
 -}
 webSettingsGetEnablePageCache
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if page cache is enabled
-webSettingsGetEnablePageCache =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if page cache is enabled
+webSettingsGetEnablePageCache ws = liftIO $
     objectGetPropertyBool
-        "enable-page-cache"
+        "enable-page-cache" ws
 
 {- | Enable or disable the page cache. Disabling the page cache is generally
      only useful for special circumstances like low-memory scenarios or special
@@ -655,45 +714,49 @@ webSettingsGetEnablePageCache =
      Default value: 'False'
 -}
 webSettingsSetEnablePageCache
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable page cache
-    -> IO ()
-webSettingsSetEnablePageCache =
+    -> m ()
+webSettingsSetEnablePageCache ws b = liftIO $
     objectSetPropertyBool
-        "enable-page-cache"
+        "enable-page-cache" ws b
 
 {- | Returns whether embedded plugin objects are enabled.
 
      Default value: 'True'
 -}
 webSettingsGetEnablePlugins
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if embedded plugin objects are enabled
-webSettingsGetEnablePlugins =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if embedded plugin objects are enabled
+webSettingsGetEnablePlugins ws = liftIO $
     objectGetPropertyBool
-        "enable-plugins"
+        "enable-plugins" ws
 
 {- | Sets whether to enable embedded plugin objects.
 
      Default value: 'True'
 -}
 webSettingsSetEnablePlugins
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable embedded plugin objects
-    -> IO ()
-webSettingsSetEnablePlugins =
+    -> m ()
+webSettingsSetEnablePlugins ws b = liftIO $
     objectSetPropertyBool
-        "enable-plugins"
+        "enable-plugins" ws b
 
 {- | Returns wheter private browsing mode is enabled. For further information
      have a look at 'webSettingsSetEnablePrivateBrowsing'.
 -}
 webSettingsGetEnablePrivateBrowsing
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if private browsing mode is enabled
-webSettingsGetEnablePrivateBrowsing =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if private browsing mode is enabled
+webSettingsGetEnablePrivateBrowsing ws = liftIO $
     objectGetPropertyBool
-        "enable-private-browsing"
+        "enable-private-browsing" ws
 
 {- | Whether to enable private browsing mode. Private browsing mode prevents
      WebKit from updating the global history and storing any session information
@@ -705,104 +768,113 @@ webSettingsGetEnablePrivateBrowsing =
      Default value: 'False'
 -}
 webSettingsSetEnablePrivateBrowsing
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable private browsing mode
-    -> IO ()
-webSettingsSetEnablePrivateBrowsing =
+    -> m ()
+webSettingsSetEnablePrivateBrowsing ws b = liftIO $
     objectSetPropertyBool
-        "enable-private-browsing"
+        "enable-private-browsing" ws b
 
 {- | Returns wheter embedded scripting languages are enabled.
 
      Default value: 'True'
 -}
 webSettingsGetEnableScripts
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if embedded scripting languages are enabled
-webSettingsGetEnableScripts =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if embedded scripting languages are enabled
+webSettingsGetEnableScripts ws = liftIO $
     objectGetPropertyBool
-        "enable-scripts"
+        "enable-scripts" ws
 
 {- | Sets wether to enable embedded scripting languages.
 
      Default value: 'True'
 -}
 webSettingsSetEnableScripts
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable embedded scripting languages
-    -> IO ()
-webSettingsSetEnableScripts =
+    -> m ()
+webSettingsSetEnableScripts ws b = liftIO $
     objectSetPropertyBool
-        "enable-scripts"
+        "enable-scripts" ws b
 
 {- | Returns wheter the site-specific compatibility workarounds are enabled.
 
      Default value: 'False'
 -}
 webSettingsGetEnableSiteSpecificQuirks
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if site-specific workarounds are enabled
-webSettingsGetEnableSiteSpecificQuirks =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if site-specific workarounds are enabled
+webSettingsGetEnableSiteSpecificQuirks ws = liftIO $
     objectGetPropertyBool
-        "enable-site-specific-quirks"
+        "enable-site-specific-quirks" ws
 
 {- | Sets wheter to enable the site-specific compatibility workarounds.
 
      Default value: 'False'
 -}
 webSettingsSetEnableSiteSpecificQuirks
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable site-specific workarounds
-    -> IO ()
-webSettingsSetEnableSiteSpecificQuirks =
+    -> m ()
+webSettingsSetEnableSiteSpecificQuirks ws b = liftIO $
     objectSetPropertyBool
-        "enable-site-specific-quirks"
+        "enable-site-specific-quirks" ws b
 
 {- | Sets wheter to enable spartial-navigation.
-	
-	Default value: 'False'
+
+     Default value: 'False'
 -}
-webSettingsSetEnableSpartialNavigation 
-	:: WebSettings -- ^ settings
-	-> Bool 	   -- ^ 'True' to enable spartial-navigation
-	-> IO ()
-webSettingsSetEnableSpartialNavigation =
-	objectSetPropertyBool
-		"enable-spatial-navigation"
+webSettingsSetEnableSpartialNavigation
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> Bool        -- ^ 'True' to enable spartial-navigation
+    -> m ()
+webSettingsSetEnableSpartialNavigation ws b = liftIO $
+    objectSetPropertyBool
+        "enable-spatial-navigation" ws b
 
 {- | Returns whether spartial-navigation is enabled.
 
-	Default value: 'False'
--} 
-webSettingsGetEnableSpartialNavigation 
-	:: WebSettings -- ^ settings
-	-> IO Bool     -- ^ 'True' if spartial-navigation is enabled
-webSettingsGetEnableSpartialNavigation =
-	objectGetPropertyBool 
-		"enabled-spartial-navigation"
+     Default value: 'False'
+-}
+webSettingsGetEnableSpartialNavigation
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if spartial-navigation is enabled
+webSettingsGetEnableSpartialNavigation ws = liftIO $
+    objectGetPropertyBool
+        "enabled-spartial-navigation" ws
 
 {- | Returns whether spell checking while typing is enabled.
 
      Default value: 'False'
 -}
 webSettingsGetEnableSpellChecking
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if spell checking while typing is enabled
-webSettingsGetEnableSpellChecking =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if spell checking while typing is enabled
+webSettingsGetEnableSpellChecking ws = liftIO $
     objectGetPropertyBool
-        "enable-spell-checking"
+        "enable-spell-checking" ws
 
 {- | Sets whether to enable spell checking while typing.
 
      Default value: 'False'
 -}
 webSettingsSetEnableSpellChecking
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enable spell checking while typing
-    -> IO ()
-webSettingsSetEnableSpellChecking =
+    -> m ()
+webSettingsSetEnableSpellChecking ws b = liftIO $
     objectSetPropertyBool
-        "enable-spell-checking"
+        "enable-spell-checking" ws b
 
 {- | Returns whether it is allowed for files loaded through file:// URIs
      to have universal access to all pages.
@@ -810,11 +882,12 @@ webSettingsSetEnableSpellChecking =
      Default value: 'False'
 -}
 webSettingsGetEnableUniversalAccessFromFileUris
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if universal access is granted
-webSettingsGetEnableUniversalAccessFromFileUris =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if universal access is granted
+webSettingsGetEnableUniversalAccessFromFileUris ws = liftIO $
     objectGetPropertyBool
-        "enable-universal-access-from-file-uris"
+        "enable-universal-access-from-file-uris" ws
 
 {- | Sets whether to allow files loaded through file:// URIs universal access
      to all pages.
@@ -822,12 +895,13 @@ webSettingsGetEnableUniversalAccessFromFileUris =
      Default value: 'False'
 -}
 webSettingsSetEnableUniversalAccessFromFileUris
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to grant universal access
-    -> IO ()
-webSettingsSetEnableUniversalAccessFromFileUris =
+    -> m ()
+webSettingsSetEnableUniversalAccessFromFileUris ws b = liftIO $
     objectSetPropertyBool
-        "enable-universal-access-from-file-uris"
+        "enable-universal-access-from-file-uris" ws b
 
 {- | Returns whether the XSS Auditor is enabled. This feature filters some kinds
      of reflective XSS attacks on vulnerable web sites.
@@ -835,11 +909,12 @@ webSettingsSetEnableUniversalAccessFromFileUris =
      Default value: 'True'
 -}
 webSettingsGetEnableXssAuditor
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if XSS Auditor is enabled
-webSettingsGetEnableXssAuditor =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if XSS Auditor is enabled
+webSettingsGetEnableXssAuditor ws = liftIO $
     objectGetPropertyBool
-        "enable-xss-auditor"
+        "enable-xss-auditor" ws
 
 {- | Sets whether to enable the XSS Auditor. This feature filters some kinds of
      reflective XSS attacks on vulnerable web sites.
@@ -847,22 +922,24 @@ webSettingsGetEnableXssAuditor =
      Default value: 'True'
 -}
 webSettingsSetEnableXssAuditor
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to disable XSS Auditor
-    -> IO ()
-webSettingsSetEnableXssAuditor =
+    -> m ()
+webSettingsSetEnableXssAuditor ws b = liftIO $
     objectSetPropertyBool
-        "enable-xss-auditor"
+        "enable-xss-auditor" ws b
 
 {- | Returns whether a resolution of 96 DPI is enforced. For further information
      have a look at 'webSettingsSetEnforce96Dpi'.
 -}
 webSettingsGetEnforce96Dpi
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if resolution of 96 DPI is enforced
-webSettingsGetEnforce96Dpi =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if resolution of 96 DPI is enforced
+webSettingsGetEnforce96Dpi ws = liftIO $
     objectGetPropertyBool
-        "enforce-96-dpi"
+        "enforce-96-dpi" ws
 
 {- | Enforce a resolution of 96 DPI. This is meant for compatibility with web
      pages which cope badly with different screen resolutions and for automated
@@ -872,35 +949,38 @@ webSettingsGetEnforce96Dpi =
      Default value: 'False'
 -}
 webSettingsSetEnforce96Dpi
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to enforce resolution of 96 DPI
-    -> IO ()
-webSettingsSetEnforce96Dpi =
+    -> m ()
+webSettingsSetEnforce96Dpi ws b = liftIO $
     objectSetPropertyBool
-        "enforce-96-dpi"
+        "enforce-96-dpi" ws b
 
 {- | Returns the default Fantasy font family used to display text.
 
      Default value: \"serif\"
 -}
 webSettingsGetFantasyFontFamily
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the font family
-webSettingsGetFantasyFontFamily =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the font family
+webSettingsGetFantasyFontFamily ws = liftIO $
     objectGetPropertyString
-        "fantasy-font-family"
+        "fantasy-font-family" ws
 
 {- | Sets the default Fantasy font family used to display text.
 
      Default value: \"serif\"
 -}
 webSettingsSetFantasyFontFamily
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the font family
-    -> IO ()
-webSettingsSetFantasyFontFamily =
+    -> m ()
+webSettingsSetFantasyFontFamily ws s = liftIO $
     objectSetPropertyString
-        "fantasy-font-family"
+        "fantasy-font-family" ws s
 
 {- | Returns whether JavaScript can open popup windows automatically without
      user intervention.
@@ -908,11 +988,12 @@ webSettingsSetFantasyFontFamily =
      Default value: 'False'
 -}
 webSettingsGetJavascriptCanOpenWindowsAutomatically
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if allowed
-webSettingsGetJavascriptCanOpenWindowsAutomatically =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if allowed
+webSettingsGetJavascriptCanOpenWindowsAutomatically ws = liftIO $
     objectGetPropertyBool
-        "javascript-can-open-windows-automatically"
+        "javascript-can-open-windows-automatically" ws
 
 {- | Sets whether JavaScript can open popup windows automatically without user
      intervention.
@@ -920,12 +1001,13 @@ webSettingsGetJavascriptCanOpenWindowsAutomatically =
      Default value: 'False'
 -}
 webSettingsSetJavascriptCanOpenWindowsAutomatically
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'True' to allow
-    -> IO ()
-webSettingsSetJavascriptCanOpenWindowsAutomatically =
+    -> m ()
+webSettingsSetJavascriptCanOpenWindowsAutomatically ws b = liftIO $
     objectSetPropertyBool
-        "javascript-can-open-windows-automatically"
+        "javascript-can-open-windows-automatically" ws b
 
 {- | Returns the minimum font size used to display text.
 
@@ -934,11 +1016,12 @@ webSettingsSetJavascriptCanOpenWindowsAutomatically =
      Default value: 5
 -}
 webSettingsGetMinimumFontSize
-    :: WebSettings -- ^ settings
-    -> IO Int      -- ^ minimum font size
-webSettingsGetMinimumFontSize =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Int       -- ^ minimum font size
+webSettingsGetMinimumFontSize ws = liftIO $
     objectGetPropertyInt
-        "minimum-font-size"
+        "minimum-font-size" ws
 
 {- | Sets the minimum font size used to display text.
 
@@ -947,12 +1030,13 @@ webSettingsGetMinimumFontSize =
      Default value: 5
 -}
 webSettingsSetMinimumFontSize
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Int         -- ^ minimum font size
-    -> IO ()
-webSettingsSetMinimumFontSize =
+    -> m ()
+webSettingsSetMinimumFontSize ws i = liftIO $
     objectSetPropertyInt
-        "minimum-font-size"
+        "minimum-font-size" ws i
 
 {- | Returns the minimum logical font size used to display text.
 
@@ -961,11 +1045,12 @@ webSettingsSetMinimumFontSize =
      Default value: 5
 -}
 webSettingsGetMinimumLogicalFontSize
-    :: WebSettings -- ^ settings
-    -> IO Int      -- ^ minimum logical font size
-webSettingsGetMinimumLogicalFontSize =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Int       -- ^ minimum logical font size
+webSettingsGetMinimumLogicalFontSize ws = liftIO $
     objectGetPropertyInt
-        "minimum-logical-font-size"
+        "minimum-logical-font-size" ws
 
 {- | Sets the minimum logical font size used to display text.
 
@@ -974,137 +1059,149 @@ webSettingsGetMinimumLogicalFontSize =
      Default value: 5
 -}
 webSettingsSetMinimumLogicalFontSize
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Int         -- ^ minimum logical font size
-    -> IO ()
-webSettingsSetMinimumLogicalFontSize =
+    -> m ()
+webSettingsSetMinimumLogicalFontSize ws i = liftIO $
     objectSetPropertyInt
-        "minimum-logical-font-size"
+        "minimum-logical-font-size" ws i
 
 {- | Returns the default font family used to display monospace text.
 
      Default value: \"monospace\"
 -}
 webSettingsGetMonospaceFontFamily
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the font family
-webSettingsGetMonospaceFontFamily =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the font family
+webSettingsGetMonospaceFontFamily ws = liftIO $
     objectGetPropertyString
-        "monospace-font-family"
+        "monospace-font-family" ws
 
 {- | Sets the default font family used to display monospace text.
 
      Default value: \"monospace\"
 -}
 webSettingsSetMonospaceFontFamily
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the font family
-    -> IO ()
-webSettingsSetMonospaceFontFamily =
+    -> m ()
+webSettingsSetMonospaceFontFamily ws s = liftIO $
     objectSetPropertyString
-        "monospace-font-family"
+        "monospace-font-family" ws s
 
 {- | Returns whether background images should be printed.
 
      Default value: 'True'
 -}
 webSettingsGetPrintBackgrounds
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if background images should be printed
-webSettingsGetPrintBackgrounds =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if background images should be printed
+webSettingsGetPrintBackgrounds ws = liftIO $
     objectGetPropertyBool
-        "print-backgrounds"
+        "print-backgrounds" ws
 
 {- | Sets whether background images should be printed.
 
      Default value: 'True'
 -}
 webSettingsSetPrintBackgrounds
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' to prevent background images from being printed
-    -> IO ()
-webSettingsSetPrintBackgrounds =
+    -> m ()
+webSettingsSetPrintBackgrounds ws b = liftIO $
     objectSetPropertyBool
-        "print-backgrounds"
+        "print-backgrounds" ws b
 
 {- | Returns whether text areas are resizable.
 
      Default value: 'True'
 -}
 webSettingsGetResizableTextAreas
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if text areas are resizable
-webSettingsGetResizableTextAreas =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool     -- ^ 'True' if text areas are resizable
+webSettingsGetResizableTextAreas ws = liftIO $
     objectGetPropertyBool
-        "resizable-text-areas"
+        "resizable-text-areas" ws
 
 {- | Sets whether text areas are resizable.
 
      Default value: 'True'
 -}
 webSettingsSetResizableTextAreas
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' if text areas should not be resizable
-    -> IO ()
-webSettingsSetResizableTextAreas =
+    -> m ()
+webSettingsSetResizableTextAreas ws b = liftIO $
     objectSetPropertyBool
-        "resizable-text-areas"
+        "resizable-text-areas" ws b
 
 {- | Returns the default Sans Serif font family used to display text.
 
      Default value: \"sans-serif\"
 -}
 webSettingsGetSansSerifFontFamily
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the font family
-webSettingsGetSansSerifFontFamily =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the font family
+webSettingsGetSansSerifFontFamily ws = liftIO $
     objectGetPropertyString
-        "sans-serif-font-family"
+        "sans-serif-font-family" ws
 
 {- | Sets the default Sans Serif font family used to display text.
 
      Default value: \"sans-serif\"
 -}
 webSettingsSetSansSerifFontFamily
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the font family
-    -> IO ()
-webSettingsSetSansSerifFontFamily =
+    -> m ()
+webSettingsSetSansSerifFontFamily ws s = liftIO $
     objectSetPropertyString
-        "sans-serif-font-family"
+        "sans-serif-font-family" ws s
 
 {- | Returns the default Serif font family used to display text.
 
      Default value: \"serif\"
 -}
 webSettingsGetSerifFontFamily
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ the font family
-webSettingsGetSerifFontFamily =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ the font family
+webSettingsGetSerifFontFamily ws = liftIO $
     objectGetPropertyString
-        "serif-font-family"
+        "serif-font-family" ws
 
 {- | Sets the default Serif font family used to display text.
 
      Default value: \"serif\"
 -}
 webSettingsSetSerifFontFamily
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ the font family
-    -> IO ()
-webSettingsSetSerifFontFamily =
+    -> m ()
+webSettingsSetSerifFontFamily ws s = liftIO $
     objectSetPropertyString
-        "serif-font-family"
+        "serif-font-family" ws s
 
 {- | Returns the languages to be used for spell checking. For further
      information have a look at 'webSettingsSetSpellCheckingLanguages'.
 -}
 webSettingsGetSpellCheckingLanguages
-    :: WebSettings       -- ^ settings
-    -> IO (Maybe String) -- ^ 'Just' the languages or 'Nothing'
-webSettingsGetSpellCheckingLanguages =
+    :: MonadIO m
+    => WebSettings      -- ^ settings
+    -> m (Maybe String) -- ^ 'Just' the languages or 'Nothing'
+webSettingsGetSpellCheckingLanguages ws = liftIO $
     objectGetPropertyMaybeString
-        "spell-checking-languages"
+        "spell-checking-languages" ws
 
 {- | The languages to be used for spell checking, separated by commas.
 
@@ -1119,22 +1216,24 @@ webSettingsGetSpellCheckingLanguages =
      Default value: 'Nothing'
 -}
 webSettingsSetSpellCheckingLanguages
-    :: WebSettings  -- ^ settings
+    :: MonadIO m
+    => WebSettings  -- ^ settings
     -> Maybe String -- ^ 'Just' the languages to use or 'Nothing'
-    -> IO ()
-webSettingsSetSpellCheckingLanguages =
+    -> m ()
+webSettingsSetSpellCheckingLanguages ws ms = liftIO $
     objectSetPropertyMaybeString
-        "spell-checking-languages"
+        "spell-checking-languages" ws ms
 
 {- | Returns whether the tab key cycles through elements on the page. For
      further information look at 'webSettingsSetTabKeyCyclesThroughElements'.
 -}
 webSettingsGetTabKeyCyclesThroughElements
-    :: WebSettings -- ^ settings
-    -> IO Bool     -- ^ 'True' if tab key cycles through elements
-webSettingsGetTabKeyCyclesThroughElements =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Bool      -- ^ 'True' if tab key cycles through elements
+webSettingsGetTabKeyCyclesThroughElements ws = liftIO $
     objectGetPropertyBool
-        "tab-key-cycles-through-elements"
+        "tab-key-cycles-through-elements" ws
 
 {- | Whether the tab key cycles through elements on the page.
 
@@ -1146,22 +1245,24 @@ webSettingsGetTabKeyCyclesThroughElements =
      Default value: 'True'
 -}
 webSettingsSetTabKeyCyclesThroughElements
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Bool        -- ^ 'False' if tab key should not cycle through elements
-    -> IO ()
-webSettingsSetTabKeyCyclesThroughElements =
+    -> m ()
+webSettingsSetTabKeyCyclesThroughElements ws b = liftIO $
     objectSetPropertyBool
-        "tab-key-cycles-through-elements"
+        "tab-key-cycles-through-elements" ws b
 
 {- | Get the User-Agent string used by WebKitGtk. For further information have a
      look at 'webSettingsSetUserAgent'.
 -}
 webSettingsGetUserAgent
-    :: WebSettings -- ^ settings
-    -> IO String   -- ^ User-Agent in use
-webSettingsGetUserAgent =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m String    -- ^ User-Agent in use
+webSettingsGetUserAgent ws = liftIO $
     objectGetPropertyString
-        "user-agent"
+        "user-agent" ws
 
 {- | Set the User-Agent string used by WebKitGtk.
 
@@ -1174,12 +1275,13 @@ webSettingsGetUserAgent =
      (I guess it doesn't always look exactly like this.)
 -}
 webSettingsSetUserAgent
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> String      -- ^ User-Agent string to use
-    -> IO ()
-webSettingsSetUserAgent =
+    -> m ()
+webSettingsSetUserAgent ws s = liftIO $
     objectSetPropertyString
-        "user-agent"
+        "user-agent" ws s
 
 {- | Returns 'Just' the URI of a stylesheet that is applied to every page or
      'Nothing' if none is set.
@@ -1187,11 +1289,12 @@ webSettingsSetUserAgent =
      Default value: 'Nothing'
 -}
 webSettingsGetUserStylesheetUri
-    :: WebSettings       -- ^ settings
-    -> IO (Maybe String) -- ^ 'Just' the URI of the stylesheet or 'Nothing'
-webSettingsGetUserStylesheetUri =
+    :: MonadIO m
+    => WebSettings      -- ^ settings
+    -> m (Maybe String) -- ^ 'Just' the URI of the stylesheet or 'Nothing'
+webSettingsGetUserStylesheetUri ws = liftIO $
     objectGetPropertyMaybeString
-        "user-stylesheet-uri"
+        "user-stylesheet-uri" ws
 
 {- | Set the URI of a stylesheet that is applied to every page. Use 'Nothing' to
      set none.
@@ -1199,12 +1302,13 @@ webSettingsGetUserStylesheetUri =
      Default value: 'Nothing'
 -}
 webSettingsSetUserStylesheetUri
-    :: WebSettings  -- ^ settings
+    :: MonadIO m
+    => WebSettings  -- ^ settings
     -> Maybe String -- ^ 'Just' the URI of the stylesheet or 'Nothing'
-    -> IO ()
-webSettingsSetUserStylesheetUri =
+    -> m ()
+webSettingsSetUserStylesheetUri ws ms = liftIO $
     objectSetPropertyMaybeString
-        "user-stylesheet-uri"
+        "user-stylesheet-uri" ws ms
 
 {- | Returns the value by which the zoom level is changed when zooming in
      or out.
@@ -1214,11 +1318,12 @@ webSettingsSetUserStylesheetUri =
      Default value: 0.1
 -}
 webSettingsGetZoomStep
-    :: WebSettings -- ^ settings
-    -> IO Float    -- ^ the step
-webSettingsGetZoomStep =
+    :: MonadIO m
+    => WebSettings -- ^ settings
+    -> m Float     -- ^ the step
+webSettingsGetZoomStep ws = liftIO $
     objectGetPropertyFloat
-        "zoom-step"
+        "zoom-step" ws
 
 {- | Sets the value by which the zoom level is changed when zooming in or out.
 
@@ -1227,10 +1332,11 @@ webSettingsGetZoomStep =
      Default value: 0.1
 -}
 webSettingsSetZoomStep
-    :: WebSettings -- ^ settings
+    :: MonadIO m
+    => WebSettings -- ^ settings
     -> Float       -- ^ the step
-    -> IO ()
-webSettingsSetZoomStep =
+    -> m ()
+webSettingsSetZoomStep ws f = liftIO $
     objectSetPropertyFloat
-        "zoom-step"
+        "zoom-step" ws f
 

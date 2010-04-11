@@ -27,7 +27,7 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , webViewSetMaintainsBackForwardList
     , webViewGetBackForwardList
-    , webViewGoToBackForwardItem 
+    , webViewGoToBackForwardItem
 
     , webViewCanGoBack
     , webViewCanGoBackOrForward
@@ -44,7 +44,7 @@ module Graphics.UI.Gtk.WebKit.WebView
     , webViewLoadUri
     , webViewLoadString
     -- , webViewLoadHtmlString -- DEPRECATED
-    , webViewLoadRequest 
+    , webViewLoadRequest
 
     , webViewSearchText
     , webViewMarkTextMatches
@@ -120,7 +120,7 @@ module Graphics.UI.Gtk.WebKit.WebView
 
     , webViewGetIconUri
 
-    , webViewGetIMContext 
+    , webViewGetIMContext
 
     , webViewGetWindowFeatures
     , webViewSetWindowFeatures
@@ -131,16 +131,16 @@ module Graphics.UI.Gtk.WebKit.WebView
     , afterWebViewCopyClipboard
 
     , onWebViewConsoleMessage
-    , afterWebViewConsoleMessage 
+    , afterWebViewConsoleMessage
 
     , onWebViewCutClipboard
     , afterWebViewCutClipboard
 
     , onWebViewDatabaseQuotaExceeded
     , afterWebViewDatabaseQuotaExceeded
-    
+
     , onWebViewDocumentLoadFinished
-    , afterWebViewDocumentLoadFinished 
+    , afterWebViewDocumentLoadFinished
 
     , onWebViewHoveringOverLink
     , afterWebViewHoveringOverLink
@@ -169,13 +169,13 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewPrintRequested
     , afterWebViewPrintRequested
 
-    , onWebViewPrintRequestedWrapper 
+    , onWebViewPrintRequestedWrapper
 
     , onWebViewRedo
     , afterWebViewRedo
 
-    , onWebViewResourceRequestStarting 
-    , afterWebViewResourceRequestStarting 
+    , onWebViewResourceRequestStarting
+    , afterWebViewResourceRequestStarting
 
     , onWebViewCreateWebView
     , afterWebViewCreateWebView
@@ -190,10 +190,10 @@ module Graphics.UI.Gtk.WebKit.WebView
     , afterWebViewDownloadRequested
 
     , onWebViewSetCrollAdjustments
-    , afterWebViewSetCrollAdjustments 
+    , afterWebViewSetCrollAdjustments
 
     , onWebViewScriptPrompt
-    , afterWebViewScriptPrompt 
+    , afterWebViewScriptPrompt
 
     , onWebViewReady
     , afterWebViewReady
@@ -208,26 +208,57 @@ module Graphics.UI.Gtk.WebKit.WebView
     , onWebViewMimeTypePolicyDecisionRequested
 
     ) where
- 
+
 #include <webkit/webkitwebview.h>
 #include <gtk/gtkimcontext.h>
 
-import Foreign.C
-import Control.Monad
-
 import System.Glib.Signals
+    ( Signal (..)
+    , ConnectId
+
+    , after
+    , on
+
+    , connectGeneric
+    )
 import System.Glib.GObject
+    ( objectUnref
+    )
 import System.Glib.FFI
 import System.Glib.GType
+    ( GType
+    )
 import System.Glib.Properties
+    ( objectGetPropertyGObject
+    , objectSetPropertyGObject
+
+    , objectGetPropertyString
+    )
+
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 import Graphics.UI.Gtk.Types
+    ( Adjustment (..)
+    , IMContext
+    , Menu (..)
+    )
 import Graphics.UI.Gtk.Signals
+    ( connect_NONE__NONE
+    , connect_STRING_STRING__NONE
+    )
 import Graphics.UI.Gtk.General.DNDTypes
-import Graphics.UI.Gtk.General.Enums 
-    ( MovementStep )
-import Graphics.UI.Gtk.Abstract.Object  
-    ( makeNewObject )
+    ( TargetList
+    , mkTargetList
+    )
+import Graphics.UI.Gtk.General.Enums
+    ( MovementStep
+    )
+import Graphics.UI.Gtk.Abstract.Object
+    ( makeNewObject
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
@@ -237,7 +268,7 @@ import Graphics.UI.Gtk.Abstract.Object
     , WebBackForwardList
     , WebHistoryItem
     , WebInspector
-    , WebResource 
+    , WebResource
     , NetworkResponse
     , Download
     , WebDatabase
@@ -283,101 +314,116 @@ import Graphics.UI.Gtk.Abstract.Object
     , makeSoupSession
     )
 
-webViewGetType :: IO GType
-webViewGetType =
+webViewGetType
+    :: MonadIO m
+    => m GType
+webViewGetType = liftIO $
     {#call web_view_get_type#}
 -- | Create a new Instance of a WebView Object
-webViewNew 
-    :: IO WebView -- ^ new instance
-webViewNew = do
+webViewNew
+    :: MonadIO m
+    => m WebView -- ^ new instance
+webViewNew = liftIO $ do
     ptr <- {#call web_view_new#}
     let ptr' = castPtr ptr
     makeWebView (return ptr')
 
--- | Returns the web_view's document title 
-webViewGetTitle 
-    :: WebView           -- ^ a WebView
-    -> IO (Maybe String) -- ^ 'Just String' the title of web_view or 'Nothing'
-webViewGetTitle web_view =
+-- | Returns the web_view's document title
+webViewGetTitle
+    :: MonadIO m
+    => WebView          -- ^ a WebView
+    -> m (Maybe String) -- ^ 'Just String' the title of web_view or 'Nothing'
+webViewGetTitle web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_get_title#} ptr
             >>= maybePeek peekCString
 
 -- | Returns the current URI of the contents displayed by the 'WebView'
 webViewGetUri
-    :: WebView -- ^ a 'WebView'
-    -> IO (Maybe String) -- ^ 'Just' the URI of 'WebView' or 'Nothing'
-webViewGetUri web_view = do
+    :: MonadIO m
+    => WebView          -- ^ a 'WebView'
+    -> m (Maybe String) -- ^ 'Just' the URI of 'WebView' or 'Nothing'
+webViewGetUri web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_get_uri#} ptr
             >>= maybePeek peekCString
 
 -- | Set the view to maintain a back or forward list of history items.
-webViewSetMaintainsBackForwardList 
-    :: WebView -- ^ a 'WebView'
-    -> Bool -- ^ to tell the 'WebView' to maintain a back or forward list 
-    -> IO ()
-webViewSetMaintainsBackForwardList web_view flag =
+webViewSetMaintainsBackForwardList
+    :: MonadIO m
+    => WebView -- ^ a 'WebView'
+    -> Bool    -- ^ to tell the 'WebView' to maintain a back or forward list
+    -> m ()
+webViewSetMaintainsBackForwardList web_view flag = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_set_maintains_back_forward_list#}
             ptr $ fromBool flag
 
 -- | Returns the 'WebBackForwardList' for the given 'WebView'.
 webViewGetBackForwardList
-    :: WebView               -- ^ the 'WebView'
-    -> IO WebBackForwardList -- ^ the 'WebBackForwardList'
-webViewGetBackForwardList view =
+    :: MonadIO m
+    => WebView              -- ^ the 'WebView'
+    -> m WebBackForwardList -- ^ the 'WebBackForwardList'
+webViewGetBackForwardList view = liftIO $
     withWebView view $ \ptr ->
         makeWebBackForwardList $
             {#call web_view_get_back_forward_list#} ptr
 
--- | Go to the specified 'WebHistoryItem' on a given 'WebView'
-webViewGoToBackForwardItem 
-    :: WebView -- ^ the 'WebView'
+-- | Go to the specified 'WebHistoryItem' on a given 'WebView'.
+webViewGoToBackForwardItem
+    :: MonadIO m
+    => WebView        -- ^ the 'WebView'
     -> WebHistoryItem -- ^ the 'WebHistoryItem'
-    -> IO Bool -- ^ 'True' if loading of item is successful, 'False' if not 
-webViewGoToBackForwardItem view item =
+    -> m Bool         -- ^ 'True' if loading of item is successful,
+                      --   'False' if not
+webViewGoToBackForwardItem view item = liftIO $
     withWebView view $ \ptr ->
         withWebHistoryItem item $ \iptr ->
-            liftM toBool $
-                {#call web_view_go_to_back_forward_item#} ptr iptr 
- 
+            {#call web_view_go_to_back_forward_item#} ptr iptr >>=
+                return . toBool
+
 -- | Determines whether the given 'WebView' has a previous history item.
 webViewCanGoBack
-    :: WebView -- ^ lookup history for this 'WebView'
-    -> IO Bool -- ^ 'True' if able to move back, 'False' otherwise
-webViewCanGoBack web_view = do
+    :: MonadIO m
+    => WebView -- ^ lookup history for this 'WebView'
+    -> m Bool  -- ^ 'True' if able to move back, 'False' otherwise
+webViewCanGoBack web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_can_go_back#} ptr
+        {#call web_view_can_go_back#} ptr >>=
+            return . toBool
 
 {- | Determines whether the given 'WebView' has a history item a given number
      of steps away. Negative values represent steps backward while positive
      values represent steps forward.
 -}
 webViewCanGoBackOrForward
-    :: WebView -- ^ lookup history for this 'WebView'
-    -> Int     -- ^ the number of steps 
-    -> IO Bool -- ^ 'True' if able to move back or forward the given number of
-               --   steps, 'False' otherwise 
-webViewCanGoBackOrForward web_view steps = do
+    :: MonadIO m
+    => WebView -- ^ lookup history for this 'WebView'
+    -> Int     -- ^ the number of steps
+    -> m Bool  -- ^ 'True' if able to move back or forward the given number of
+               --   steps, 'False' otherwise
+webViewCanGoBackOrForward web_view steps = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $
-            {#call web_view_can_go_back_or_forward#}
-                ptr (fromIntegral steps)
+        {#call web_view_can_go_back_or_forward#}
+            ptr (fromIntegral steps) >>=
+                return . toBool
 
 -- | Determines whether the given 'WebView' has a next history item.
 webViewCanGoForward
-    :: WebView -- ^ lookup history for this 'WebView'
-    -> IO Bool -- ^ 'True' if able to move forward, 'False' otherwise
-webViewCanGoForward web_view = do
+    :: MonadIO m
+    => WebView -- ^ lookup history for this 'WebView'
+    -> m Bool  -- ^ 'True' if able to move forward, 'False' otherwise
+webViewCanGoForward web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_can_go_forward#} ptr
+        {#call web_view_can_go_forward#} ptr >>=
+            return . toBool
 
 -- | Loads the previous history item.
 webViewGoBack
-    :: WebView -- ^ the 'WebView' that should go back
-    -> IO ()
-webViewGoBack web_view =
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' that should go back
+    -> m ()
+webViewGoBack web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_go_back#} ptr
 
@@ -386,66 +432,83 @@ webViewGoBack web_view =
      represent steps forward.
 -}
 webViewGoBackOrForward
-    :: WebView -- ^ the 'WebView' that should go back or forward
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' that should go back or forward
     -> Int     -- ^ number of steps
-    -> IO ()
-webViewGoBackOrForward web_view steps =
+    -> m ()
+webViewGoBackOrForward web_view steps = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_go_back_or_forward#} ptr (fromIntegral steps)
 
 -- | Loads the next history item.
 webViewGoForward
-    :: WebView -- ^ the 'WebView' that should go forward
-    -> IO ()
-webViewGoForward web_view =
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' that should go forward
+    -> m ()
+webViewGoForward web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_go_forward#} ptr
 
 
 -- | Stops any ongoing load in the 'WebView'.
-webViewStopLoading 
-    :: WebView -- ^ the 'WebView'
-    -> IO ()
-webViewStopLoading web_view =
+webViewStopLoading
+    :: MonadIO m
+    => WebView -- ^ the 'WebView'
+    -> m ()
+webViewStopLoading web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_stop_loading#} ptr
 
 {- DEPRECATED since 1.1.1
-webViewOpen :: WebView -> String -> IO ()
-webViewOpen web_view uri = do
+webViewOpen
+    :: MonadIO m
+    => WebView
+    -> String
+    -> m ()
+webViewOpen web_view uri = liftIO $
     withCString uri $ \c_uri ->
         withWebView web_view $ \ptr ->
             {#call web_view_open#} ptr c_uri
 -}
 
 -- | Reloads the 'WebView' without using any cached data.
-webViewReload 
-    :: WebView -- ^ the 'WebView'
-    -> IO ()
-webViewReload web_view =
+webViewReload
+    :: MonadIO m
+    => WebView -- ^ the 'WebView'
+    -> m ()
+webViewReload web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_reload#} ptr
 
 -- | Reloads the 'WebView' without using any cached data.
-webViewReloadBypassCache 
-    :: WebView -- ^ the 'WebView' to reload
-    -> IO ()
-webViewReloadBypassCache web_view =
+webViewReloadBypassCache
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' to reload
+    -> m ()
+webViewReloadBypassCache web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_reload_bypass_cache#} ptr
 
 -- | Requests loading of the specified URI string.
 webViewLoadUri
-    :: WebView -- ^ load in this 'WebView'
+    :: MonadIO m
+    => WebView -- ^ load in this 'WebView'
     -> String  -- ^ URI to load
-    -> IO ()
-webViewLoadUri web_view uri = do
+    -> m ()
+webViewLoadUri web_view uri = liftIO $
     withCString uri $ \c_uri ->
         withWebView web_view $ \ptr ->
             {#call web_view_load_uri#} ptr c_uri
 
-webViewLoadString :: WebView -> String -> String -> String -> String -> IO ()
-webViewLoadString web_view content mime_type encoding base_uri = do
+webViewLoadString
+    :: MonadIO m
+    => WebView
+    -> String
+    -> String
+    -> String
+    -> String
+    -> m ()
+webViewLoadString web_view content mime_type encoding base_uri = liftIO $
     withCString content $ \c_content ->
         withCString mime_type $ \c_mime_type ->
             withCString encoding $ \c_encoding ->
@@ -455,8 +518,13 @@ webViewLoadString web_view content mime_type encoding base_uri = do
                             ptr c_content c_mime_type c_encoding c_base_uri
 
 {- DEPRECATED
-webViewLoadHtmlString :: WebView -> String -> String -> IO ()
-webViewLoadHtmlString web_view content base_uri = do
+webViewLoadHtmlString
+    :: MonadIO m
+    => WebView
+    -> String
+    -> String
+    -> m ()
+webViewLoadHtmlString web_view content base_uri = liftIO $
     withCString content $ \c_content ->
         withCString base_uri $ \c_base_uri ->
             withWebView web_view $ \ptr ->
@@ -471,111 +539,165 @@ webViewLoadHtmlString web_view content base_uri = do
      to stop the load.
 -}
 webViewLoadRequest
-    :: WebView        -- ^ load in this 'WebView'
+    :: MonadIO m
+    => WebView        -- ^ load in this 'WebView'
     -> NetworkRequest -- ^ 'NetworkRequest' to load
-    -> IO ()
-webViewLoadRequest web_view request =
+    -> m ()
+webViewLoadRequest web_view request = liftIO $
     withWebView web_view $ \wv_ptr ->
         withNetworkRequest request $ \r_ptr ->
             {#call web_view_load_request#} wv_ptr r_ptr
 
-webViewSearchText :: WebView -> String -> Bool -> Bool -> Bool -> IO Bool
-webViewSearchText web_view text case_sensitive forward wrap =
+webViewSearchText
+    :: MonadIO m
+    => WebView
+    -> String
+    -> Bool
+    -> Bool
+    -> Bool
+    -> m Bool
+webViewSearchText web_view text case_sensitive forward wrap = liftIO $
     withCString text $ \c_text ->
         withWebView web_view $ \ptr ->
-            liftM toBool $
-                {#call web_view_search_text#}
-                    ptr c_text (fromBool case_sensitive)
-                    (fromBool forward) (fromBool wrap)
+            {#call web_view_search_text#}
+                ptr c_text (fromBool case_sensitive)
+                (fromBool forward) (fromBool wrap) >>=
+                    return . toBool
 
-webViewMarkTextMatches :: WebView -> String -> Bool -> Int -> IO Int
-webViewMarkTextMatches web_view string case_sensitive limit =
+webViewMarkTextMatches
+    :: MonadIO m
+    => WebView
+    -> String
+    -> Bool
+    -> Int
+    -> m Int
+webViewMarkTextMatches web_view string case_sensitive limit = liftIO $
     withCString string $ \c_string ->
         withWebView web_view $ \ptr ->
-            liftM fromIntegral $
-                {#call web_view_mark_text_matches#}
-                    ptr c_string (fromBool case_sensitive) (fromIntegral limit)
+            {#call web_view_mark_text_matches#}
+                ptr c_string (fromBool case_sensitive) (fromIntegral limit) >>=
+                    return . fromIntegral
 
-webViewSetHighlightTextMatches :: WebView -> Bool -> IO ()
-webViewSetHighlightTextMatches web_view highlight =
+webViewSetHighlightTextMatches
+    :: MonadIO m
+    => WebView
+    -> Bool
+    -> m ()
+webViewSetHighlightTextMatches web_view highlight = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_set_highlight_text_matches#} ptr $ fromBool highlight
 
-webViewUnmarkTextMatches :: WebView -> IO ()
-webViewUnmarkTextMatches web_view =
+webViewUnmarkTextMatches
+    :: MonadIO m
+    => WebView
+    -> m ()
+webViewUnmarkTextMatches web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_unmark_text_matches#} ptr
 
-webViewGetMainFrame :: WebView -> IO WebFrame
-webViewGetMainFrame web_view =
+webViewGetMainFrame
+    :: MonadIO m
+    => WebView
+    -> m WebFrame
+webViewGetMainFrame web_view = liftIO $
     withWebView web_view $ \ptr ->
         makeWebFrame $ {#call web_view_get_main_frame#} ptr
 
-webViewGetFocusedFrame :: WebView -> IO WebFrame
-webViewGetFocusedFrame web_view =
+webViewGetFocusedFrame
+    :: MonadIO m
+    => WebView
+    -> m WebFrame
+webViewGetFocusedFrame web_view = liftIO $
     withWebView web_view $ \ptr ->
         makeWebFrame $ {#call web_view_get_focused_frame#} ptr
 
-webViewExecuteScript :: WebView -> String -> IO ()
-webViewExecuteScript web_view script = do
+webViewExecuteScript
+    :: MonadIO m
+    => WebView
+    -> String
+    -> m ()
+webViewExecuteScript web_view script = liftIO $
     withCString script $ \c_script ->
         withWebView web_view $ \ptr ->
             {#call web_view_execute_script#} ptr c_script
 
-webViewCanCutClipboard :: WebView -> IO Bool
-webViewCanCutClipboard web_view = do
+webViewCanCutClipboard
+    :: MonadIO m
+    => WebView
+    -> m Bool
+webViewCanCutClipboard web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_can_cut_clipboard#} ptr
+        {#call web_view_can_cut_clipboard#} ptr >>=
+            return . toBool
 
-webViewCanCopyClipboard :: WebView -> IO Bool
-webViewCanCopyClipboard web_view = do
+webViewCanCopyClipboard
+    :: MonadIO m
+    => WebView
+    -> m Bool
+webViewCanCopyClipboard web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_can_copy_clipboard#} ptr
+        {#call web_view_can_copy_clipboard#} ptr >>=
+            return . toBool
 
-webViewCanPasteClipboard :: WebView -> IO Bool
-webViewCanPasteClipboard web_view = do
+webViewCanPasteClipboard
+    :: MonadIO m
+    => WebView
+    -> m Bool
+webViewCanPasteClipboard web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_can_paste_clipboard#} ptr
+        {#call web_view_can_paste_clipboard#} ptr >>=
+            return . toBool
 
 -- | Cuts the current selection inside the 'WebView' to the clipboard.
 webViewCutClipboard
-    :: WebView  -- ^ the 'WebView' to cut from
-    -> IO ()
-webViewCutClipboard web_view =
+    :: MonadIO m
+    => WebView  -- ^ the 'WebView' to cut from
+    -> m ()
+webViewCutClipboard web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_cut_clipboard#} ptr
 
 -- | Copies the current selection inside the 'WebView' to the clipboard.
 webViewCopyClipboard
-    :: WebView -- ^ the 'WebView' to copy from
-    -> IO ()
-webViewCopyClipboard web_view =
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' to copy from
+    -> m ()
+webViewCopyClipboard web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_copy_clipboard#} ptr
 
 -- | Pastes the current contents of the clipboard to the 'WebView'.
 webViewPasteClipboard
-    :: WebView -- ^ the 'WebView' to paste to
-    -> IO ()
-webViewPasteClipboard web_view =
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' to paste to
+    -> m ()
+webViewPasteClipboard web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_paste_clipboard#} ptr
 
 -- | Deletes the current selection inside the 'WebView'.
 webViewDeleteSelection
-    :: WebView -- ^ the 'WebView' to delete from
-    -> IO ()
-webViewDeleteSelection web_view =
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' to delete from
+    -> m ()
+webViewDeleteSelection web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_delete_selection#} ptr
 
-webViewHasSelection :: WebView -> IO Bool
-webViewHasSelection web_view = do
+webViewHasSelection
+    :: MonadIO m
+    => WebView
+    -> m Bool
+webViewHasSelection web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_has_selection#} ptr
+        {#call web_view_has_selection#} ptr >>=
+            return . toBool
 
-webViewSelectAll :: WebView -> IO ()
-webViewSelectAll web_view =
+webViewSelectAll
+    :: MonadIO m
+    => WebView
+    -> m ()
+webViewSelectAll web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_select_all#} ptr
 
@@ -586,44 +708,66 @@ webViewSelectAll web_view =
      regardless of this setting.
 -}
 webViewGetEditable
-    :: WebView -- ^ the 'WebView'
-    -> IO Bool -- ^ indicates the editable state
-webViewGetEditable web_view = do
+    :: MonadIO m
+    => WebView -- ^ the 'WebView'
+    -> m Bool  -- ^ indicates the editable state
+webViewGetEditable web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ {#call web_view_get_editable#} ptr
+        {#call web_view_get_editable#} ptr >>=
+            return . toBool
 
-webViewSetEditable :: WebView -> Bool -> IO ()
-webViewSetEditable web_view flag =
+webViewSetEditable
+    :: MonadIO m
+    => WebView
+    -> Bool
+    -> m ()
+webViewSetEditable web_view flag = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_set_editable#} ptr $ fromBool flag
 
 -- TODO: Understand this stuff and check wether this does work as it should...
-webViewGetCopyTargetList :: WebView -> IO TargetList
-webViewGetCopyTargetList web_view =
+webViewGetCopyTargetList
+    :: MonadIO m
+    => WebView
+    -> m TargetList
+webViewGetCopyTargetList web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_get_copy_target_list#} ptr
             >>= mkTargetList . castPtr -- TODO: is this okay?
 
 -- TODO: Understand this stuff and check wether this does work as it should...
-webViewGetPasteTargetList :: WebView -> IO TargetList
-webViewGetPasteTargetList web_view =
+webViewGetPasteTargetList
+    :: MonadIO m
+    => WebView
+    -> m TargetList
+webViewGetPasteTargetList web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_get_paste_target_list#} ptr
             >>= mkTargetList . castPtr -- TODO: is this okay?
 
-webViewSetSettings :: WebView -> WebSettings -> IO ()
-webViewSetSettings web_view settings = 
+webViewSetSettings
+    :: MonadIO m
+    => WebView
+    -> WebSettings
+    -> m ()
+webViewSetSettings web_view settings = liftIO $
     withWebView web_view $ \vptr ->
         withWebSettings settings $ \sptr ->
             {#call web_view_set_settings#} vptr sptr
 
-webViewGetSettings :: WebView -> IO WebSettings 
-webViewGetSettings web_view =
+webViewGetSettings
+    :: MonadIO m
+    => WebView
+    -> m WebSettings
+webViewGetSettings web_view = liftIO $
     withWebView web_view $ \ptr ->
         makeWebSettings $ {#call web_view_get_settings#} ptr
 
-webViewGetInspector :: WebView -> IO WebInspector
-webViewGetInspector web_view =
+webViewGetInspector
+    :: MonadIO m
+    => WebView
+    -> m WebInspector
+webViewGetInspector web_view = liftIO $
     withWebView web_view $ \ptr ->
         makeWebInspector $ {#call web_view_get_inspector#} ptr
 
@@ -631,27 +775,33 @@ webViewGetInspector web_view =
      this view.
 -}
 webViewCanShowMimeType
-    :: WebView -- ^ the 'WebView' to check
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' to check
     -> String  -- ^ the MIME type
-    -> IO Bool -- ^ 'Bool' indicating if MIME type can be displayed
-webViewCanShowMimeType web_view mime_type = do
+    -> m Bool  -- ^ 'Bool' indicating if MIME type can be displayed
+webViewCanShowMimeType web_view mime_type = liftIO $
     withCString mime_type $ \c_mime_type ->
         withWebView web_view $ \ptr ->
-            liftM toBool $
-                {#call web_view_can_show_mime_type#} ptr c_mime_type
+            {#call web_view_can_show_mime_type#} ptr c_mime_type >>=
+                return . toBool
 
 -- | Returns whether the 'WebView' has a transparent background.
 webViewGetTransparent
-    :: WebView -- ^ the 'WebView'
-    -> IO Bool -- ^ 'False' when the 'WebView' draws a solid background
-               -- ^ (the default), otherwise 'True'
-webViewGetTransparent web_view = do
+    :: MonadIO m
+    => WebView -- ^ the 'WebView'
+    -> m Bool  -- ^ 'False' when the 'WebView' draws a solid background
+               --   (the default), otherwise 'True'
+webViewGetTransparent web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $
-            {#call web_view_get_transparent#} ptr
+        {#call web_view_get_transparent#} ptr >>=
+            return . toBool
 
-webViewSetTransparent :: WebView -> Bool -> IO ()
-webViewSetTransparent web_view flag =
+webViewSetTransparent
+    :: MonadIO m
+    => WebView
+    -> Bool
+    -> m ()
+webViewSetTransparent web_view flag = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_set_transparent#} ptr $
             fromBool flag
@@ -663,53 +813,80 @@ webViewSetTransparent web_view flag =
      page.
 -}
 webViewGetZoomLevel
-    :: WebView  -- ^ the 'WebView'
-    -> IO Float -- ^ the zoom level
-webViewGetZoomLevel web_view =
+    :: MonadIO m
+    => WebView -- ^ the 'WebView'
+    -> m Float -- ^ the zoom level
+webViewGetZoomLevel web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM realToFrac $
-            {#call web_view_get_zoom_level#} ptr
+        {#call web_view_get_zoom_level#} ptr >>=
+            return . realToFrac
 
-webViewSetZoomLevel :: WebView -> Float -> IO ()
-webViewSetZoomLevel web_view zoom_level =
+webViewSetZoomLevel
+    :: MonadIO m
+    => WebView
+    -> Float
+    -> m ()
+webViewSetZoomLevel web_view zoom_level = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_set_zoom_level#} ptr $
             realToFrac zoom_level
 
-webViewZoomIn :: WebView -> IO ()
-webViewZoomIn web_view =
+webViewZoomIn
+    :: MonadIO m
+    => WebView
+    -> m ()
+webViewZoomIn web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_zoom_in#} ptr
 
-webViewZoomOut :: WebView -> IO ()
-webViewZoomOut web_view =
+webViewZoomOut
+    :: MonadIO m
+    => WebView
+    -> m ()
+webViewZoomOut web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_zoom_out#} ptr
 
-webViewGetFullContentZoom :: WebView -> IO Bool
-webViewGetFullContentZoom web_view = do
+webViewGetFullContentZoom
+    :: MonadIO m
+    => WebView
+    -> m Bool
+webViewGetFullContentZoom web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $
-            {#call web_view_get_full_content_zoom#} ptr
+        {#call web_view_get_full_content_zoom#} ptr >>=
+            return . toBool
 
-webViewSetFullContentZoom :: WebView -> Bool -> IO ()
-webViewSetFullContentZoom web_view full_content_zoom =
+webViewSetFullContentZoom
+    :: MonadIO m
+    => WebView
+    -> Bool
+    -> m ()
+webViewSetFullContentZoom web_view full_content_zoom = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_set_full_content_zoom#} ptr $
             fromBool full_content_zoom
 
-getDefaultSession :: IO SoupSession
-getDefaultSession =
+getDefaultSession
+    :: MonadIO m
+    => m SoupSession
+getDefaultSession = liftIO $
     makeSoupSession {#call get_default_session#}
 
-webViewGetEncoding :: WebView -> IO (Maybe String)
-webViewGetEncoding web_view =
+webViewGetEncoding
+    :: MonadIO m
+    => WebView
+    -> m (Maybe String)
+webViewGetEncoding web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_get_encoding#} ptr
             >>= maybePeek peekCString
 
-webViewSetCustomEncoding :: WebView -> String -> IO ()
-webViewSetCustomEncoding web_view encoding = do
+webViewSetCustomEncoding
+    :: MonadIO m
+    => WebView
+    -> String
+    -> m ()
+webViewSetCustomEncoding web_view encoding = liftIO $
     withCString encoding $ \c_encoding ->
         withWebView web_view $ \ptr ->
             {#call web_view_set_custom_encoding#} ptr c_encoding
@@ -718,250 +895,337 @@ webViewSetCustomEncoding web_view encoding = do
      of 'WebSettings'.
 -}
 webViewGetCustomEncoding
-    :: WebView           -- ^ the 'WebView'
-    -> IO (Maybe String) -- ^ 'Just' encoding if set, otherwise 'Nothing'
-webViewGetCustomEncoding web_view =
+    :: MonadIO m
+    => WebView          -- ^ the 'WebView'
+    -> m (Maybe String) -- ^ 'Just' encoding if set, otherwise 'Nothing'
+webViewGetCustomEncoding web_view = liftIO $
     withWebView web_view $ \ptr ->
         {#call web_view_get_custom_encoding#} ptr
             >>= maybePeek peekCString
 
-webViewMoveCursor :: WebView -> MovementStep -> Int -> IO ()
-webViewMoveCursor web_view movement_step count =
+webViewMoveCursor
+    :: MonadIO m
+    => WebView
+    -> MovementStep
+    -> Int
+    -> m ()
+webViewMoveCursor web_view movement_step count = liftIO $
     withWebView web_view $ \wvptr ->
-        {#call web_view_move_cursor#} wvptr 
+        {#call web_view_move_cursor#} wvptr
             ((fromIntegral . fromEnum) movement_step) (fromIntegral count)
 
-webViewGetLoadStatus :: WebView -> IO LoadStatus
-webViewGetLoadStatus web_view =
+webViewGetLoadStatus
+    :: MonadIO m
+    => WebView
+    -> m LoadStatus
+webViewGetLoadStatus web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM (toEnum . fromIntegral) $
-            {#call web_view_get_load_status#} ptr
+        {#call web_view_get_load_status#} ptr >>=
+            return . toEnum . fromIntegral
 
-webViewGetProgress :: WebView -> IO Double
-webViewGetProgress web_view =
+webViewGetProgress
+    :: MonadIO m
+    => WebView
+    -> m Double
+webViewGetProgress web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM realToFrac $
-            {#call web_view_get_progress#} ptr
+        {#call web_view_get_progress#} ptr >>=
+            return . realToFrac
 
-webViewUndo :: WebView -> IO ()
-webViewUndo web_view =
+webViewUndo
+    :: MonadIO m
+    => WebView
+    -> m ()
+webViewUndo web_view = liftIO $
     withWebView web_view $ \ptr ->
-        {#call web_view_undo#} ptr 
+        {#call web_view_undo#} ptr
 
 {- | Determines whether or not it is currently possible to undo the last editing
      command in the view.
 -}
 webViewCanUndo
-    :: WebView -- a 'WebView'
-    -> IO Bool -- 'True' if possible to undo last editing command
-webViewCanUndo web_view =
+    :: MonadIO m
+    => WebView -- a 'WebView'
+    -> m Bool  -- 'True' if possible to undo last editing command
+webViewCanUndo web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ 
-            {#call web_view_can_undo#} ptr
+        {#call web_view_can_undo#} ptr >>=
+            return . toBool
 
-webViewRedo :: WebView -> IO ()
-webViewRedo web_view =
+webViewRedo
+    :: MonadIO m
+    => WebView
+    -> m ()
+webViewRedo web_view = liftIO $
     withWebView web_view $ \ptr ->
-        {#call web_view_redo#} ptr 
+        {#call web_view_redo#} ptr
 
 {- | Determines whether or not it is currently possible to redo the last editing
      command in the view.
 -}
 webViewCanRedo
-    :: WebView -- ^ a 'WebView'
-    -> IO Bool -- ^ 'True' if possible to redo last editing command
-webViewCanRedo web_view =
+    :: MonadIO m
+    => WebView -- ^ a 'WebView'
+    -> m Bool  -- ^ 'True' if possible to redo last editing command
+webViewCanRedo web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ 
-            {#call web_view_can_redo#} ptr
+        {#call web_view_can_redo#} ptr >>=
+            return . toBool
 
-webViewSetViewSourceMode :: WebView -> Bool -> IO ()
-webViewSetViewSourceMode web_view source_mode =
+webViewSetViewSourceMode
+    :: MonadIO m
+    => WebView
+    -> Bool
+    -> m ()
+webViewSetViewSourceMode web_view source_mode = liftIO $
     withWebView web_view $ \ptr ->
-        {#call web_view_set_view_source_mode#} ptr 
-            (fromBool source_mode) 
+        {#call web_view_set_view_source_mode#} ptr
+            (fromBool source_mode)
 
-webViewGetViewSourceMode :: WebView -> IO Bool
-webViewGetViewSourceMode web_view =
+webViewGetViewSourceMode
+    :: MonadIO m
+    => WebView
+    -> m Bool
+webViewGetViewSourceMode web_view = liftIO $
     withWebView web_view $ \ptr ->
-        liftM toBool $ 
-            {#call web_view_get_view_source_mode#} ptr
+        {#call web_view_get_view_source_mode#} ptr >>=
+            return . toBool
 
 {- TODO
 WebKitHitTestResult* webkit_web_view_get_hit_test_result (WebKitWebView *webView, GdkEventButton *event);
 
-webViewGetHitTestResult :: WebView -> EventButton -> IO HitTestResult 
-webViewGetHitTestResult web_view event_button =
+webViewGetHitTestResult
+    :: MonadIO m
+    => WebView
+    -> EventButton
+    -> m HitTestResult
+webViewGetHitTestResult web_view event_button = liftIO $
     withWebView web_view $ \wptr ->
         makeHitTestResult $ do
-            {#call web_view_get_hit_test_result#} wptr ??? 
+            {#call web_view_get_hit_test_result#} wptr ???
 
 -}
 
 -- Properties ------------------------------------------------------------------
 
-webViewGetIconUri :: WebView -> IO String
-webViewGetIconUri =
+webViewGetIconUri
+    :: MonadIO m
+    => WebView
+    -> m String
+webViewGetIconUri wv = liftIO $
     objectGetPropertyString
-        "icon-uri"
+        "icon-uri" wv
 
 webViewGetIMContext
-	:: WebView 
-	-> IO IMContext
-webViewGetIMContext web_view = do
+    :: MonadIO m
+    => WebView
+    -> m IMContext
+webViewGetIMContext web_view = liftIO $ do
     -- TODO this call a gtk function directly, this should happen in gtk2hs!
-	imct <- {#call gtk_im_context_get_type#}
-	objectGetPropertyGObject imct "im-context" web_view
+    imct <- {#call gtk_im_context_get_type#}
+    objectGetPropertyGObject imct "im-context" web_view
 
-webViewSetWindowFeatures :: WebView -> WebWindowFeatures -> IO ()
-webViewSetWindowFeatures web_view web_window_features = do
+webViewSetWindowFeatures
+    :: MonadIO m
+    => WebView
+    -> WebWindowFeatures
+    -> m ()
+webViewSetWindowFeatures web_view web_window_features = liftIO $ do
     wwft <- webWindowFeaturesGetType
     objectSetPropertyGObject wwft "window-features" web_view web_window_features
 
-webViewGetWindowFeatures :: WebView -> IO WebWindowFeatures
-webViewGetWindowFeatures web_view = do
+webViewGetWindowFeatures
+    :: MonadIO m
+    => WebView
+    -> m WebWindowFeatures
+webViewGetWindowFeatures web_view = liftIO $ do
     wwft <- webWindowFeaturesGetType
     objectGetPropertyGObject wwft "window-features" web_view
 
 -- Signals ---------------------------------------------------------------------
 
-onWebViewCloseWebView, afterWebViewCloseWebView :: 
-    WebView -> (WebView -> IO Bool) -> IO (ConnectId WebView)
-onWebViewCloseWebView web_view f = 
+onWebViewCloseWebView, afterWebViewCloseWebView
+    :: MonadIO m
+    => WebView
+    -> (WebView -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewCloseWebView web_view f = liftIO $
     on web_view (Signal (connectGeneric "close-web-view")) $
-        \ webViewPtr -> do 
-            x1 <- makeWebView $ return webViewPtr 
+        \ webViewPtr -> do
+            x1 <- makeWebView $ return webViewPtr
             f x1
-afterWebViewCloseWebView web_view f = 
+afterWebViewCloseWebView web_view f = liftIO $
     on web_view (Signal (connectGeneric "close-web-view")) $
-        \ webViewPtr -> do 
-            x1 <- makeWebView $ return webViewPtr 
+        \ webViewPtr -> do
+            x1 <- makeWebView $ return webViewPtr
             f x1
 
-onWebViewConsoleMessage,afterWebViewConsoleMessage :: 
-    WebView -> (WebView -> String -> Int -> String -> IO Bool) -> IO (ConnectId WebView)
-onWebViewConsoleMessage web_view f = 
-    on web_view (Signal (connectGeneric "console-message")) 
+onWebViewConsoleMessage, afterWebViewConsoleMessage
+    :: MonadIO m
+    => WebView
+    -> (WebView -> String -> Int -> String -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewConsoleMessage web_view f = liftIO $
+    on web_view (Signal (connectGeneric "console-message"))
         (webViewConsoleMessageWrapper f)
-afterWebViewConsoleMessage web_view f = 
-    after web_view (Signal (connectGeneric "console-message")) 
+afterWebViewConsoleMessage web_view f = liftIO $
+    after web_view (Signal (connectGeneric "console-message"))
         (webViewConsoleMessageWrapper f)
 
-webViewConsoleMessageWrapper ::
-    (WebView -> String -> Int -> String -> IO Bool)
-    -> Ptr WebView -> CString -> CInt -> CString -> IO Bool
+webViewConsoleMessageWrapper
+    :: (WebView -> String -> Int -> String -> IO Bool)
+    -> Ptr WebView
+    -> CString
+    -> CInt
+    -> CString
+    -> IO Bool
 webViewConsoleMessageWrapper f webViewPtr message line source_id = do
     x1 <- makeWebView $ return webViewPtr
     x2 <- peekCString message
     x4 <- peekCString source_id
-    f x1 x2 (fromIntegral line) x4 
+    f x1 x2 (fromIntegral line) x4
 
-onWebViewCopyClipboard, afterWebViewCopyClipboard ::
-    WebView -> IO () -> IO (ConnectId WebView)
-onWebViewCopyClipboard =
-    connect_NONE__NONE "copy-clipboard" False
-afterWebViewCopyClipboard =
-    connect_NONE__NONE "copy-clipboard" True
+onWebViewCopyClipboard, afterWebViewCopyClipboard
+    :: MonadIO m
+    => WebView
+    -> IO ()
+    -> m (ConnectId WebView)
+onWebViewCopyClipboard wv h = liftIO $
+    connect_NONE__NONE "copy-clipboard" False wv h
+afterWebViewCopyClipboard wv h = liftIO $
+    connect_NONE__NONE "copy-clipboard" True wv h
 
 {- TODO "create-plugin-widget" : GtkWidget* user_function (WebKitWebView *web_view, gchar *mime_type, gchar *uri, GHashTable *param, gpointer user_data) : Run Last / Action -}
 
-onWebViewCreateWebView, afterWebViewCreateWebView::
-    WebView -> (WebView -> WebFrame -> IO WebView) -> IO (ConnectId WebView)
-onWebViewCreateWebView web_view f = 
-    on web_view (Signal (connectGeneric "create-web-view")) 
-        (webViewCreateWebViewWrapper f) 
-afterWebViewCreateWebView web_view f = 
+onWebViewCreateWebView, afterWebViewCreateWebView
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> IO WebView)
+    -> m (ConnectId WebView)
+onWebViewCreateWebView web_view f = liftIO $
+    on web_view (Signal (connectGeneric "create-web-view"))
+        (webViewCreateWebViewWrapper f)
+afterWebViewCreateWebView web_view f = liftIO $
     after web_view (Signal (connectGeneric "create-web-view"))
         (webViewCreateWebViewWrapper f)
 
-webViewCreateWebViewWrapper :: 
-    (WebView -> WebFrame -> IO WebView) 
-    -> Ptr WebView -> Ptr WebFrame -> IO WebView
+webViewCreateWebViewWrapper
+    :: (WebView -> WebFrame -> IO WebView)
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> IO WebView
 webViewCreateWebViewWrapper f webViewPtr webFramePtr = do
-            x1 <- makeWebView $ return webViewPtr
-            x2 <- makeWebFrame $ return webFramePtr
-            f x1 x2 
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeWebFrame $ return webFramePtr
+    f x1 x2
 
-onWebViewCutClipboard, afterWebViewCutClipboard ::
-    WebView -> IO () -> IO (ConnectId WebView)
-onWebViewCutClipboard =
-    connect_NONE__NONE "cut-clipboard" False
-afterWebViewCutClipboard =
-    connect_NONE__NONE "cut-clipboard" True
+onWebViewCutClipboard, afterWebViewCutClipboard
+    :: MonadIO m
+    => WebView
+    -> IO ()
+    -> m (ConnectId WebView)
+onWebViewCutClipboard wv h = liftIO $
+    connect_NONE__NONE "cut-clipboard" False wv h
+afterWebViewCutClipboard wv h = liftIO $
+    connect_NONE__NONE "cut-clipboard" True wv h
 
-onWebViewDatabaseQuotaExceeded, afterWebViewDatabaseQuotaExceeded ::
-    WebView 
+onWebViewDatabaseQuotaExceeded, afterWebViewDatabaseQuotaExceeded
+    :: MonadIO m
+    => WebView
     -> (WebView -> WebFrame -> WebDatabase -> IO ())
-    -> IO (ConnectId WebView)
-onWebViewDatabaseQuotaExceeded web_view f =
+    -> m (ConnectId WebView)
+onWebViewDatabaseQuotaExceeded web_view f = liftIO $
     on web_view (Signal (connectGeneric "database-quota-exceeded"))
         (webViewDatabaseQuotaExceededWrapper f)
-afterWebViewDatabaseQuotaExceeded web_view f =
+afterWebViewDatabaseQuotaExceeded web_view f = liftIO $
     after web_view (Signal (connectGeneric "database-quota-exceeded"))
         (webViewDatabaseQuotaExceededWrapper f)
 
-webViewDatabaseQuotaExceededWrapper :: 
-    (WebView -> WebFrame -> WebDatabase -> IO ())
-    -> Ptr WebView -> Ptr WebFrame -> Ptr WebDatabase -> IO ()
+webViewDatabaseQuotaExceededWrapper
+    :: (WebView -> WebFrame -> WebDatabase -> IO ())
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> Ptr WebDatabase
+    -> IO ()
 webViewDatabaseQuotaExceededWrapper f webViewPtr webFramePtr databasePtr = do
     x1 <- makeWebView $ return webViewPtr
-    x2 <- makeWebFrame $ return webFramePtr 
+    x2 <- makeWebFrame $ return webFramePtr
     x3 <- makeWebDatabase $ return databasePtr
-    f x1 x2 x3 
+    f x1 x2 x3
 
-onWebViewDocumentLoadFinished, afterWebViewDocumentLoadFinished 
-    :: WebView -> (WebView -> WebFrame -> IO ()) -> IO (ConnectId WebView)
-onWebViewDocumentLoadFinished web_view f =
+onWebViewDocumentLoadFinished, afterWebViewDocumentLoadFinished
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> IO ())
+    -> m (ConnectId WebView)
+onWebViewDocumentLoadFinished web_view f = liftIO $
     on web_view (Signal (connectGeneric "document-load-finished"))
         (webViewDocumentLoadFinishedWrapper f)
-afterWebViewDocumentLoadFinished web_view f =
+afterWebViewDocumentLoadFinished web_view f = liftIO $
     after web_view (Signal (connectGeneric "document-load-finished"))
         (webViewDocumentLoadFinishedWrapper f)
 
-webViewDocumentLoadFinishedWrapper :: 
-    (WebView -> WebFrame -> IO ())
-    -> Ptr WebView -> Ptr WebFrame -> IO ()
+webViewDocumentLoadFinishedWrapper
+    :: (WebView -> WebFrame -> IO ())
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> IO ()
 webViewDocumentLoadFinishedWrapper f webViewPtr webFramePtr = do
     x1 <- makeWebView $ return webViewPtr
-    x2 <- makeWebFrame $ return webFramePtr 
-    f x1 x2 
+    x2 <- makeWebFrame $ return webFramePtr
+    f x1 x2
 
-onWebViewDownloadRequested, afterWebViewDownloadRequested :: 
-    WebView -> (WebView -> Download -> IO Bool) -> IO (ConnectId WebView)
-onWebViewDownloadRequested web_view f =
-    on web_view (Signal (connectGeneric "download-requested")) 
+onWebViewDownloadRequested, afterWebViewDownloadRequested
+    :: MonadIO m
+    => WebView
+    -> (WebView -> Download -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewDownloadRequested web_view f = liftIO $
+    on web_view (Signal (connectGeneric "download-requested"))
         (webViewDownloadRequestedWrapper f)
-afterWebViewDownloadRequested web_view f =
-    after web_view (Signal (connectGeneric "download-requested")) 
+afterWebViewDownloadRequested web_view f = liftIO $
+    after web_view (Signal (connectGeneric "download-requested"))
         (webViewDownloadRequestedWrapper f)
-  
-webViewDownloadRequestedWrapper ::
-     (WebView -> Download -> IO Bool) -> Ptr WebView -> Ptr Download -> IO Bool
+
+webViewDownloadRequestedWrapper
+    :: (WebView -> Download -> IO Bool)
+    -> Ptr WebView
+    -> Ptr Download
+    -> IO Bool
 webViewDownloadRequestedWrapper f webViewPtr downloadPtr = do
-    x1 <- makeWebView $ return webViewPtr 
-    x2 <- makeDownload $ return downloadPtr 
-    f x1 x2 
+    x1 <- makeWebView $ return webViewPtr
+    x2 <- makeDownload $ return downloadPtr
+    f x1 x2
 
-onWebViewHoveringOverLink, afterWebViewHoveringOverLink ::
-    WebView -> (String -> String -> IO ()) -> IO (ConnectId WebView)
-onWebViewHoveringOverLink =
-    connect_STRING_STRING__NONE "hovering-over-link" False
-afterWebViewHoveringOverLink =
-    connect_STRING_STRING__NONE "hovering-over-link" True
+onWebViewHoveringOverLink, afterWebViewHoveringOverLink
+    :: MonadIO m
+    => WebView
+    -> (String -> String -> IO ())
+    -> m (ConnectId WebView)
+onWebViewHoveringOverLink wv h = liftIO $
+    connect_STRING_STRING__NONE "hovering-over-link" False wv h
+afterWebViewHoveringOverLink wv h = liftIO $
+    connect_STRING_STRING__NONE "hovering-over-link" True wv h
 
-onWebViewIconLoaded, afterWebViewIconLoaded ::
-    WebView -> IO () -> IO (ConnectId WebView)
-onWebViewIconLoaded =
-    connect_NONE__NONE "icon-loaded" False
-afterWebViewIconLoaded =
-    connect_NONE__NONE "icon-loaded" True
+onWebViewIconLoaded, afterWebViewIconLoaded
+    :: MonadIO m
+    => WebView
+    -> IO ()
+    -> m (ConnectId WebView)
+onWebViewIconLoaded wv h = liftIO $
+    connect_NONE__NONE "icon-loaded" False wv h
+afterWebViewIconLoaded wv h = liftIO $
+    connect_NONE__NONE "icon-loaded" True wv h
 
 {- DEPRECATED
-onWebViewLoadCommitted, afterWebViewLoadCommitted ::
-    WebView -> (WebFrame -> IO ()) -> IO (ConnectId WebView)
-onWebViewLoadCommitted =
+onWebViewLoadCommitted, afterWebViewLoadCommitted
+    :: MonadIO m
+    => WebView
+    -> (WebFrame -> IO ())
+    -> m (ConnectId WebView)
+onWebViewLoadCommitted = liftIO $
     connect_OBJECT__NONE "load-committed" False
-afterWebViewLoadCommitted =
+afterWebViewLoadCommitted = liftIO $
     connect_OBJECT__NONE "load-committed" True
 -}
 
@@ -971,105 +1235,130 @@ afterWebViewLoadCommitted =
 "new-window-policy-decision-requested" : gboolean user_function (WebKitWebView *web_view, WebKitWebFrame *frame, WebKitNetworkRequest *request, WebKitWebNavigationAction *navigation_action, WebKitWebPolicyDecision *policy_decision, gpointer user_data) : Run Last
 -}
 
-onWebViewMimeTypePolicyDecisionRequested, afterWebViewMimeTypePolicyDecisionRequested 
-    :: WebView
-    -> (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool) 
-    -> IO (ConnectId WebView)
-onWebViewMimeTypePolicyDecisionRequested web_view f =
-    on web_view (Signal (connectGeneric "mime-type-policy-decision-requested")) 
+onWebViewMimeTypePolicyDecisionRequested, afterWebViewMimeTypePolicyDecisionRequested
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewMimeTypePolicyDecisionRequested web_view f = liftIO $
+    on web_view (Signal (connectGeneric "mime-type-policy-decision-requested"))
         (webViewMimeTypePolicyDecisionRequestedWrapper f)
-afterWebViewMimeTypePolicyDecisionRequested web_view f =
-    after web_view (Signal (connectGeneric "mime-type-policy-decision-requested")) 
+afterWebViewMimeTypePolicyDecisionRequested web_view f = liftIO $
+    after web_view (Signal (connectGeneric "mime-type-policy-decision-requested"))
         (webViewMimeTypePolicyDecisionRequestedWrapper f)
 
-webViewMimeTypePolicyDecisionRequestedWrapper 
+webViewMimeTypePolicyDecisionRequestedWrapper
     :: (WebView -> WebFrame -> NetworkRequest -> String -> WebPolicyDecision -> IO Bool)
-    -> Ptr WebView 
-    -> Ptr WebFrame 
-    -> Ptr NetworkRequest 
-    -> CString 
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> Ptr NetworkRequest
+    -> CString
     -> Ptr WebPolicyDecision
     -> IO Bool
 webViewMimeTypePolicyDecisionRequestedWrapper f z1 z2 z3 z4 z5 = do
     x1 <- makeWebView $ return z1
-    x2 <- makeWebFrame $ return z2 
+    x2 <- makeWebFrame $ return z2
     x3 <- makeNetworkRequest $ return z3
     x4 <- peekCString z4
     x5 <- makeWebPolicyDecision $ return z5
     f x1 x2 x3 x4 x5
 
 
-onWebViewNavigationPolicyDecisionRequested, afterWebViewNavigationPolicyDecisionRequested ::
-    WebView -> (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) -> IO (ConnectId WebView)
-onWebViewNavigationPolicyDecisionRequested web_view f =
-    on web_view (Signal (connectGeneric "navigation-policy-decision-requested")) 
+onWebViewNavigationPolicyDecisionRequested, afterWebViewNavigationPolicyDecisionRequested
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ())
+    -> m (ConnectId WebView)
+onWebViewNavigationPolicyDecisionRequested web_view f = liftIO $
+    on web_view (Signal (connectGeneric "navigation-policy-decision-requested"))
         (webViewNavigationPolicyDecisionRequestedWrapper f)
-afterWebViewNavigationPolicyDecisionRequested web_view f =
-    after web_view (Signal (connectGeneric "navigation-policy-decision-requested")) 
+afterWebViewNavigationPolicyDecisionRequested web_view f = liftIO $
+    after web_view (Signal (connectGeneric "navigation-policy-decision-requested"))
         (webViewNavigationPolicyDecisionRequestedWrapper f)
 
-webViewNavigationPolicyDecisionRequestedWrapper ::
-    (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ()) 
-    -> Ptr WebView -> Ptr WebFrame -> Ptr NetworkRequest -> Ptr WebNavigationAction -> Ptr WebPolicyDecision -> IO ()
+webViewNavigationPolicyDecisionRequestedWrapper
+    :: (WebView -> WebFrame -> NetworkRequest -> WebNavigationAction -> WebPolicyDecision -> IO ())
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> Ptr NetworkRequest
+    -> Ptr WebNavigationAction
+    -> Ptr WebPolicyDecision
+    -> IO ()
 webViewNavigationPolicyDecisionRequestedWrapper f x1 x2 x3 x4 x5 = do
-        y1 <- makeWebView $ return x1
-        y2 <- makeWebFrame $ return x2
-        y3 <- makeNetworkRequest $ return x3
-        y4 <- makeWebNavigationAction $ return x4
-        y5 <- makeWebPolicyDecision $ return x5
-        f y1 y2 y3 y4 y5 
+    y1 <- makeWebView $ return x1
+    y2 <- makeWebFrame $ return x2
+    y3 <- makeNetworkRequest $ return x3
+    y4 <- makeWebNavigationAction $ return x4
+    y5 <- makeWebPolicyDecision $ return x5
+    f y1 y2 y3 y4 y5
 
-onWebViewPasteClipboard, afterWebViewPasteClipboard ::
-    WebView -> IO () -> IO (ConnectId WebView)
-onWebViewPasteClipboard =
-    connect_NONE__NONE "paste-clipboard" False
-afterWebViewPasteClipboard =
-    connect_NONE__NONE "paste-clipboard" True
+onWebViewPasteClipboard, afterWebViewPasteClipboard
+    :: MonadIO m
+    => WebView
+    -> IO ()
+    -> m (ConnectId WebView)
+onWebViewPasteClipboard wv h = liftIO $
+    connect_NONE__NONE "paste-clipboard" False wv h
+afterWebViewPasteClipboard wv h = liftIO $
+    connect_NONE__NONE "paste-clipboard" True wv h
 
-onWebViewPopulatePopup, afterWebViewPopulatePopup ::
-    WebView -> (WebView -> Menu -> IO ()) -> IO (ConnectId WebView)
-onWebViewPopulatePopup web_view f =
-    on web_view (Signal (connectGeneric "populater-popup")) 
+onWebViewPopulatePopup, afterWebViewPopulatePopup
+    :: MonadIO m
+    => WebView
+    -> (WebView -> Menu -> IO ())
+    -> m (ConnectId WebView)
+onWebViewPopulatePopup web_view f = liftIO $
+    on web_view (Signal (connectGeneric "populater-popup"))
         (webViewPopulatePopupWrapper f)
-afterWebViewPopulatePopup web_view f =
-    after web_view (Signal (connectGeneric "populater-popup")) 
+afterWebViewPopulatePopup web_view f = liftIO $
+    after web_view (Signal (connectGeneric "populater-popup"))
         (webViewPopulatePopupWrapper f)
 
-webViewPopulatePopupWrapper :: 
-    (WebView -> Menu -> IO ()) 
-    -> Ptr WebView -> Ptr Menu -> IO ()
+webViewPopulatePopupWrapper
+    :: (WebView -> Menu -> IO ())
+    -> Ptr WebView
+    -> Ptr Menu
+    -> IO ()
 webViewPopulatePopupWrapper f webViewPtr menuPtr = do
-    x1 <- makeWebView $ return webViewPtr 
+    x1 <- makeWebView $ return webViewPtr
     x2 <- makeNewObject (Menu, objectUnref) $ return menuPtr
-    f x1 x2 
+    f x1 x2
 
-onWebViewPrintRequested, afterWebViewPrintRequested ::
-    WebView -> (WebView -> WebFrame -> IO Bool) -> IO (ConnectId WebView)
-onWebViewPrintRequested web_view f =
+onWebViewPrintRequested, afterWebViewPrintRequested
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewPrintRequested web_view f = liftIO $
     on web_view (Signal (connectGeneric "print-requested"))
     (onWebViewPrintRequestedWrapper f)
-afterWebViewPrintRequested web_view f =
+afterWebViewPrintRequested web_view f = liftIO $
     after web_view (Signal (connectGeneric "print-requested"))
     (onWebViewPrintRequestedWrapper f)
 
-onWebViewPrintRequestedWrapper ::
-    (WebView -> WebFrame -> IO Bool)
-    -> Ptr WebView -> Ptr WebFrame -> IO Bool
+onWebViewPrintRequestedWrapper
+    :: (WebView -> WebFrame -> IO Bool)
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> IO Bool
 onWebViewPrintRequestedWrapper f webViewPtr webFramePtr = do
     x1 <- makeWebView $ return webViewPtr
     x2 <- makeWebFrame $ return webFramePtr
     f x1 x2
 
-onWebViewRedo, afterWebViewRedo :: 
-    WebView -> (WebView -> IO ()) -> IO (ConnectId WebView) 
-onWebViewRedo web_view f =
-    on web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
-        x <-  makeWebView $ return wv 
-        f x 
-afterWebViewRedo web_view f =
-    after web_view (Signal (connectGeneric "redo")) $ \ wv -> do 
-        x <-  makeWebView $ return wv 
-        f x 
+onWebViewRedo, afterWebViewRedo
+    :: MonadIO m
+    => WebView
+    -> (WebView -> IO ())
+    -> m (ConnectId WebView)
+onWebViewRedo web_view f = liftIO $
+    on web_view (Signal (connectGeneric "redo")) $ \ wv -> do
+        x <-  makeWebView $ return wv
+        f x
+afterWebViewRedo web_view f = liftIO $
+    after web_view (Signal (connectGeneric "redo")) $ \ wv -> do
+        x <-  makeWebView $ return wv
+        f x
 {- | Emitted when a request is about to be sent. You can modify the request
      while handling this signal. You can set the URI in the 'NetworkRequest'
      object itself, and add/remove/replace headers using the 'Message' object it
@@ -1082,26 +1371,31 @@ afterWebViewRedo web_view f =
      then this is not a redirected request.
 
      The 'Resource' object will be the same throughout all the lifetime of the
-     resource, but the contents may change from inbetween signal emissions. 
+     resource, but the contents may change from inbetween signal emissions.
 -}
-onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting :: 
-   WebView -- ^ the 'WebView' to bind on
-   -> (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ()) 
-   -> IO (ConnectId WebView)
-onWebViewResourceRequestStarting wV f = 
-    on wV 
-        (Signal (connectGeneric "resource-request-starting")) 
-            (webViewResourceRequestStartingWrapper f) 
-afterWebViewResourceRequestStarting wV f = 
-    after wV 
-        (Signal (connectGeneric "resource-request-starting")) 
-            (webViewResourceRequestStartingWrapper f) 
+onWebViewResourceRequestStarting,afterWebViewResourceRequestStarting
+    :: MonadIO m
+    => WebView -- ^ the 'WebView' to bind on
+    -> (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ())
+    -> m (ConnectId WebView)
+onWebViewResourceRequestStarting wV f = liftIO $
+    on wV
+        (Signal (connectGeneric "resource-request-starting"))
+            (webViewResourceRequestStartingWrapper f)
+afterWebViewResourceRequestStarting wV f = liftIO $
+    after wV
+        (Signal (connectGeneric "resource-request-starting"))
+            (webViewResourceRequestStartingWrapper f)
 
-webViewResourceRequestStartingWrapper :: 
-   (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ()) 
-   -> Ptr WebView -> Ptr WebFrame -> Ptr WebResource -> Ptr NetworkRequest -> Ptr NetworkResponse
-   -> IO ()
-webViewResourceRequestStartingWrapper  
+webViewResourceRequestStartingWrapper
+    :: (WebView -> WebFrame -> WebResource -> NetworkRequest -> Maybe NetworkResponse -> IO ())
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> Ptr WebResource
+    -> Ptr NetworkRequest
+    -> Ptr NetworkResponse
+    -> IO ()
+webViewResourceRequestStartingWrapper
     f web_view web_frame web_resource network_request network_response = do
     x1 <- makeWebView $ return web_view
     x2 <- makeWebFrame $ return web_frame
@@ -1113,19 +1407,26 @@ webViewResourceRequestStartingWrapper
       else
         f x1 x2 x3 x4 Nothing
 
-onWebViewScriptPrompt, afterWebViewScriptPrompt :: 
-    WebView -> (WebView -> WebFrame -> String -> String -> String -> IO Bool) 
-    -> IO (ConnectId WebView)
-onWebViewScriptPrompt web_view f = 
-    on web_view (Signal (connectGeneric "script-prompt")) 
+onWebViewScriptPrompt, afterWebViewScriptPrompt
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> String -> String -> String -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewScriptPrompt web_view f = liftIO $
+    on web_view (Signal (connectGeneric "script-prompt"))
         (webViewScriptPromptWrapper f)
-afterWebViewScriptPrompt web_view f = 
-    after web_view (Signal (connectGeneric "script-prompt")) 
+afterWebViewScriptPrompt web_view f = liftIO $
+    after web_view (Signal (connectGeneric "script-prompt"))
         (webViewScriptPromptWrapper f)
 
-webViewScriptPromptWrapper :: 
-    (WebView -> WebFrame -> String -> String -> String -> IO Bool) 
-    -> Ptr WebView -> Ptr WebFrame -> CString -> CString -> CString -> IO Bool     
+webViewScriptPromptWrapper
+    :: (WebView -> WebFrame -> String -> String -> String -> IO Bool)
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> CString
+    -> CString
+    -> CString
+    -> IO Bool
 webViewScriptPromptWrapper f webViewPtr webFramePtr message def text = do
     x1 <- makeWebView $ return webViewPtr
     x2 <- makeWebFrame $ return webFramePtr
@@ -1134,90 +1435,117 @@ webViewScriptPromptWrapper f webViewPtr webFramePtr message def text = do
     x5 <- peekCString text
     f x1 x2 x3 x4 x5
 
-onWebViewScriptAlert, afterWebViewScriptAlert :: 
-    WebView -> (WebView -> WebFrame -> String -> IO Bool) 
-    -> IO (ConnectId WebView)
-onWebViewScriptAlert web_view f =
+onWebViewScriptAlert, afterWebViewScriptAlert
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> String -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewScriptAlert web_view f = liftIO $
     on web_view (Signal (connectGeneric "script-alert"))
         (webViewScriptAlertWrapper f)
-afterWebViewScriptAlert web_view f =
+afterWebViewScriptAlert web_view f = liftIO $
     after web_view (Signal (connectGeneric "script-alert"))
         (webViewScriptAlertWrapper f)
 
-webViewScriptAlertWrapper :: 
-    (WebView -> WebFrame -> String -> IO Bool) 
-    -> Ptr WebView -> Ptr WebFrame -> CString -> IO Bool
+webViewScriptAlertWrapper
+    :: (WebView -> WebFrame -> String -> IO Bool)
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> CString
+    -> IO Bool
 webViewScriptAlertWrapper f webViewPtr webFramePtr message = do
-    x1 <- makeWebView $ return webViewPtr    
+    x1 <- makeWebView $ return webViewPtr
     x2 <- makeWebFrame $ return webFramePtr
     x3 <- peekCString message
     f x1 x2 x3
 
-onWebViewScriptConfirm, afterWebViewScriptConfirm :: 
-    WebView -> (WebView -> WebFrame -> String -> Bool -> IO Bool)
-    -> IO (ConnectId WebView)
-onWebViewScriptConfirm web_view f =
+onWebViewScriptConfirm, afterWebViewScriptConfirm
+    :: MonadIO m
+    => WebView
+    -> (WebView -> WebFrame -> String -> Bool -> IO Bool)
+    -> m (ConnectId WebView)
+onWebViewScriptConfirm web_view f = liftIO $
     on web_view (Signal (connectGeneric "script-confirm"))
         (webViewScriptConfirmWrapper f)
-afterWebViewScriptConfirm web_view f =
+afterWebViewScriptConfirm web_view f = liftIO $
     after web_view (Signal (connectGeneric "script-confirm"))
         (webViewScriptConfirmWrapper f)
 
-webViewScriptConfirmWrapper ::
-    (WebView -> WebFrame -> String -> Bool -> IO Bool)
-    -> Ptr WebView -> Ptr WebFrame -> CString -> Bool -> IO Bool
+webViewScriptConfirmWrapper
+    :: (WebView -> WebFrame -> String -> Bool -> IO Bool)
+    -> Ptr WebView
+    -> Ptr WebFrame
+    -> CString
+    -> Bool
+    -> IO Bool
 webViewScriptConfirmWrapper f webViewPtr webFramePtr message confirm = do
     x1 <- makeWebView $ return webViewPtr
-    x2 <- makeWebFrame $ return webFramePtr 
+    x2 <- makeWebFrame $ return webFramePtr
     x3 <- peekCString message
     f x1 x2 x3 confirm
 
-onWebViewSelectAll, afterWebViewSelectAll ::
-    WebView -> IO () -> IO (ConnectId WebView)
-onWebViewSelectAll web_view f = 
+onWebViewSelectAll, afterWebViewSelectAll
+    :: MonadIO m
+    => WebView
+    -> IO ()
+    -> m (ConnectId WebView)
+onWebViewSelectAll web_view f = liftIO $
     on web_view (Signal (connectGeneric "select-all")) (\_ -> f)
-afterWebViewSelectAll web_view f =
+afterWebViewSelectAll web_view f = liftIO $
     after web_view (Signal (connectGeneric "select-all")) (\_ -> f)
 
-onWebViewSelectionChanged, afterWebViewSelectionChanged ::
-    WebView -> IO () -> IO (ConnectId WebView)
-onWebViewSelectionChanged =
-    connect_NONE__NONE "selection-changed" False
-afterWebViewSelectionChanged =
-    connect_NONE__NONE "selection-changed" True
+onWebViewSelectionChanged, afterWebViewSelectionChanged
+    :: MonadIO m
+    => WebView
+    -> IO ()
+    -> m (ConnectId WebView)
+onWebViewSelectionChanged wv h = liftIO $
+    connect_NONE__NONE "selection-changed" False wv h
+afterWebViewSelectionChanged wv h = liftIO $
+    connect_NONE__NONE "selection-changed" True wv h
 
-onWebViewSetCrollAdjustments,afterWebViewSetCrollAdjustments ::
-    WebView -> (WebView -> Adjustment -> Adjustment -> IO ()) 
-    -> IO (ConnectId WebView)
-onWebViewSetCrollAdjustments web_view f =
+onWebViewSetCrollAdjustments,afterWebViewSetCrollAdjustments
+    :: MonadIO m
+    => WebView
+    -> (WebView -> Adjustment -> Adjustment -> IO ())
+    -> m (ConnectId WebView)
+onWebViewSetCrollAdjustments web_view f = liftIO $
     on web_view (Signal (connectGeneric "set-scroll-adjustments"))
         (webViewSetCrollAdjustmentsWrapper f)
-afterWebViewSetCrollAdjustments web_view f =
+afterWebViewSetCrollAdjustments web_view f = liftIO $
     after web_view (Signal (connectGeneric "set-scroll-adjustments"))
         (webViewSetCrollAdjustmentsWrapper f)
 
-webViewSetCrollAdjustmentsWrapper ::
-    (WebView -> Adjustment -> Adjustment -> IO ()) 
-    -> Ptr WebView -> Ptr Adjustment -> Ptr Adjustment -> IO ()
+webViewSetCrollAdjustmentsWrapper
+    :: (WebView -> Adjustment -> Adjustment -> IO ())
+    -> Ptr WebView
+    -> Ptr Adjustment
+    -> Ptr Adjustment
+    -> IO ()
 webViewSetCrollAdjustmentsWrapper f webViewPtr gtkAdj1Ptr gtkAdj2Ptr = do
     x1 <- makeWebView $ return webViewPtr
     x2 <- makeNewObject (Adjustment, objectUnref)  $ return gtkAdj1Ptr
     x3 <- makeNewObject (Adjustment, objectUnref)  $ return gtkAdj2Ptr
-    f x1 x2 x3 
+    f x1 x2 x3
 
-onWebViewStatusbarTextChanged, afterWebViewStatusbarTextChanged ::
-    WebView -> (String -> IO ()) -> IO (ConnectId WebView)
-onWebViewStatusbarTextChanged web_view f =
+onWebViewStatusbarTextChanged, afterWebViewStatusbarTextChanged
+    :: MonadIO m
+    => WebView
+    -> (String -> IO ())
+    -> m (ConnectId WebView)
+onWebViewStatusbarTextChanged web_view f = liftIO $
     on web_view (Signal (connectGeneric "status-bar-text-changed")) (\_ -> f)
-afterWebViewStatusbarTextChanged web_view f =
+afterWebViewStatusbarTextChanged web_view f = liftIO $
      after web_view (Signal (connectGeneric "status-bar-text-changed")) (\_ -> f)
 
 {- DEPRECATED
-onWebViewTitleChanged, afterWebViewTitleChanged ::
+onWebViewTitleChanged, afterWebViewTitleChanged
+    :: MonadIO m
+    =>
     WebView -> (WebFrame -> String -> IO ()) -> IO (ConnectId WebView)
-onWebViewTitleChanged =
+onWebViewTitleChanged = liftIO $
     connect_OBJECT_STRING__NONE "title-changed" False
-afterWebViewTitleChanged =
+afterWebViewTitleChanged = liftIO $
     connect_OBJECT_STRING__NONE "title-changed" True
 -}
 
@@ -1226,25 +1554,31 @@ afterWebViewTitleChanged =
 "window-object-cleared" : void user_function (WebKitWebView *web_view, WebKitWebFrame *frame, gpointer context, gpointer arg3, gpointer user_data) : Run Last / Action
 -}
 
-onWebViewReady,afterWebViewReady :: 
-    WebView -> (WebView -> IO ())
-    -> IO (ConnectId WebView)
-onWebViewReady web_view f =
-    on web_view (Signal (connectGeneric "web-view-ready")) $ \ wv -> do 
-        x <-  makeWebView $ return wv 
-        f x 
-afterWebViewReady web_view f =
-    after web_view (Signal (connectGeneric "web-view-ready")) $ \ wv -> do 
-        x <-  makeWebView $ return wv 
-        f x 
+onWebViewReady,afterWebViewReady
+    :: MonadIO m
+    => WebView
+    -> (WebView -> IO ())
+    -> m (ConnectId WebView)
+onWebViewReady web_view f = liftIO $
+    on web_view (Signal (connectGeneric "web-view-ready")) $ \ wv -> do
+        x <-  makeWebView $ return wv
+        f x
+afterWebViewReady web_view f = liftIO $
+    after web_view (Signal (connectGeneric "web-view-ready")) $ \ wv -> do
+        x <-  makeWebView $ return wv
+        f x
 
-onWebViewUndo, afterWebViewUndo :: 
-    WebView -> (WebView -> IO ()) -> IO (ConnectId WebView) 
-onWebViewUndo web_view f =
-    on web_view (Signal (connectGeneric "undo")) $ \ wv -> do 
-        x <-  makeWebView $ return wv 
-        f x 
-afterWebViewUndo web_view f =
-    after web_view (Signal (connectGeneric "undo")) $ \ wv -> do 
-        x <-  makeWebView $ return wv 
-        f x 
+onWebViewUndo, afterWebViewUndo
+    :: MonadIO m
+    => WebView
+    -> (WebView -> IO ())
+    -> m (ConnectId WebView)
+onWebViewUndo web_view f = liftIO $
+    on web_view (Signal (connectGeneric "undo")) $ \ wv -> do
+        x <-  makeWebView $ return wv
+        f x
+afterWebViewUndo web_view f = liftIO $
+    after web_view (Signal (connectGeneric "undo")) $ \ wv -> do
+        x <-  makeWebView $ return wv
+        f x
+

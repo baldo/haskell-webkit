@@ -6,7 +6,7 @@ A 'WebHistoryItem' consists out of a title and an uri. It can be part of the
 'WebBackForwardList' and the global history. The global history is used for
 coloring the links of visited sites. A 'WebHistoryItem' constructed by
 'webHistoryItemNew' and 'webHistoryItemNewWithData' is automatically added to
-the global history. 
+the global history.
 -}
 
 {# context lib="libwebkit" prefix="webkit_" #}
@@ -14,7 +14,7 @@ the global history.
 module Graphics.UI.Gtk.WebKit.WebHistoryItem
     ( WebHistoryItem
 
-    , webHistoryItemGetType     
+    , webHistoryItemGetType
     , webHistoryItemCopy
     , webHistoryItemGetAlternateTitle
     , webHistoryItemSetAlternateTitle
@@ -28,11 +28,15 @@ module Graphics.UI.Gtk.WebKit.WebHistoryItem
 
 #include <webkit/webkitwebhistoryitem.h>
 
-import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
+    ( GType
+    )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebHistoryItem
@@ -41,82 +45,94 @@ import Control.Monad
     , withWebHistoryItem
     )
 
-webHistoryItemGetType :: IO GType
-webHistoryItemGetType =
+webHistoryItemGetType
+    :: MonadIO m
+    => m GType
+webHistoryItemGetType = liftIO $
     {#call web_history_item_get_type#}
 
 -- Property get/set functions are aready provided by WebKit :)
 
 -- | Makes a copy of the item for use with other 'WebView's.
 webHistoryItemCopy
-    :: WebHistoryItem    -- ^ an item
-    -> IO WebHistoryItem -- ^ the new item
-webHistoryItemCopy historyItem =
+    :: MonadIO m
+    => WebHistoryItem    -- ^ an item
+    -> m WebHistoryItem  -- ^ the new item
+webHistoryItemCopy historyItem = liftIO $
     withWebHistoryItem historyItem $ \ptr ->
         makeWebHistoryItem $ {#call web_history_item_copy#} ptr
 
 -- | Returns the alternate title of the 'WebHistoryItem'.
 webHistoryItemGetAlternateTitle
-    :: WebHistoryItem -- ^ an item
-    -> IO String      -- ^ its alternate title
-webHistoryItemGetAlternateTitle  historyItem = 
+    :: MonadIO m
+    => WebHistoryItem -- ^ an item
+    -> m String       -- ^ its alternate title
+webHistoryItemGetAlternateTitle  historyItem = liftIO $
     withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_alternate_title#} ptr >>= peekCString
 
 webHistoryItemGetLastVisitedTime
-    :: WebHistoryItem
-    -> IO Double
-webHistoryItemGetLastVisitedTime historyItem =
+    :: MonadIO m
+    => WebHistoryItem
+    -> m Double
+webHistoryItemGetLastVisitedTime historyItem = liftIO $
     withWebHistoryItem historyItem $ \ptr ->
-         liftM realToFrac $ {#call web_history_item_get_last_visited_time#} ptr
+        {#call web_history_item_get_last_visited_time#} ptr >>=
+            return . realToFrac
 
 -- | Returns the original URI of the 'WebHistoryItem'.
 webHistoryItemGetOrginalUri
-    :: WebHistoryItem -- ^ an item
-    -> IO String      -- ^ its original URI
-webHistoryItemGetOrginalUri historyItem =
+    :: MonadIO m
+    => WebHistoryItem -- ^ an item
+    -> m String       -- ^ its original URI
+webHistoryItemGetOrginalUri historyItem = liftIO $
     withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_original_uri#} ptr >>= peekCString
 
 -- | Returns the title of the 'WebHistoryItem'.
 webHistoryItemGetTitle
-    :: WebHistoryItem -- ^ an item
-    -> IO String      -- ^ its title
-webHistoryItemGetTitle historyItem =
+    :: MonadIO m
+    => WebHistoryItem -- ^ an item
+    -> m String       -- ^ its title
+webHistoryItemGetTitle historyItem = liftIO $
     withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_title#} ptr >>= peekCString
 
 -- | Returns the URI of the 'WebHistoryItem'.
 webHistoryItemGetUri
-    :: WebHistoryItem -- ^ an item
-    -> IO String      -- ^ its URI
-webHistoryItemGetUri historyItem =
+    :: MonadIO m
+    => WebHistoryItem -- ^ an item
+    -> m String       -- ^ its URI
+webHistoryItemGetUri historyItem = liftIO $
     withWebHistoryItem historyItem $ \ptr ->
         {#call web_history_item_get_uri#} ptr >>= peekCString
 
 -- | Creates a new 'WebHistoryItem'.
 webHistoryItemNew
-    :: IO WebHistoryItem -- ^ the new item
-webHistoryItemNew = 
+    :: MonadIO m
+    => m WebHistoryItem -- ^ the new item
+webHistoryItemNew = liftIO $
     makeWebHistoryItem $ {#call web_history_item_new#}
 
 -- | Creates a new 'WebHistoryItem' with the given URI and title.
 webHistoryItemNewWithData
-    :: String            -- ^ the URI of the page
-    -> String            -- ^ the title of the page
-    -> IO WebHistoryItem -- ^ the new item
-webHistoryItemNewWithData uri title =
+    :: MonadIO m
+    => String           -- ^ the URI of the page
+    -> String           -- ^ the title of the page
+    -> m WebHistoryItem -- ^ the new item
+webHistoryItemNewWithData uri title = liftIO $
     withCString uri $ \uptr ->
         withCString title $ \tptr ->
-            makeWebHistoryItem 
+            makeWebHistoryItem
             $ {#call web_history_item_new_with_data#} uptr tptr
 
 -- | Sets an alternate title for the 'WebHistoryItem'.
 webHistoryItemSetAlternateTitle
-    :: WebHistoryItem -- ^ an item
+    :: MonadIO m
+    => WebHistoryItem -- ^ an item
     -> String         -- ^ the alternate title
-    -> IO ()
-webHistoryItemSetAlternateTitle historyItem title =
+    -> m ()
+webHistoryItemSetAlternateTitle historyItem title = liftIO $
     withCString title $ \cTitle ->
         withWebHistoryItem historyItem $ \ptr ->
             {#call web_history_item_set_alternate_title#} ptr cTitle

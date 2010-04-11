@@ -23,7 +23,7 @@ module Graphics.UI.Gtk.WebKit.WebDataSource
 
     , webDataSourceGetType
     , webDataSourceNew
-    , webDataSourceNewWithRequest 
+    , webDataSourceNewWithRequest
     , webDataSourceIsLoading
     , webDataSourceGetWebFrame
     , webDataSourceGetUnreachableUri
@@ -37,35 +37,40 @@ module Graphics.UI.Gtk.WebKit.WebDataSource
 
 #include <webkit/webkitwebdatasource.h>
 
-import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
-import System.Glib.GList 
-    ( fromGList 
+    ( GType
+    )
+import System.Glib.GList
+    ( fromGList
     )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebDataSource
     , NetworkRequest
     , WebResource
-    , WebFrame 
+    , WebFrame
 
     , withWebDataSource
     , makeWebDataSource
-    
+
     , makeNetworkRequest
     , withNetworkRequest
-    
+
     , makeWebResource
-    
+
     , makeWebFrame
     )
 
 webDataSourceGetType
-    :: IO GType
-webDataSourceGetType =
+    :: MonadIO m
+    => m GType
+webDataSourceGetType = liftIO $
     {#call web_data_source_get_type#}
 
 {- | Returns the raw data that represents the the frame's content. The data
@@ -75,10 +80,11 @@ webDataSourceGetType =
      loading.
 -}
 webDataSourceGetData
-    :: WebDataSource     -- ^ the data source
-    -> IO (Maybe String) -- ^ 'Just' the data or 'Nothing' if no data has been
-                         --   loaded
-webDataSourceGetData source = 
+    :: MonadIO m
+    => WebDataSource    -- ^ the data source
+    -> m (Maybe String) -- ^ 'Just' the data or 'Nothing' if no data has been
+                        --   loaded
+webDataSourceGetData source = liftIO $
     withWebDataSource source $ \sptr ->
         {#call web_data_source_get_data#} sptr >>=
             {#get GString->str#} >>= maybePeek peekCString
@@ -87,9 +93,10 @@ webDataSourceGetData source =
      text encoding of the response.
 -}
 webDataSourceGetEncoding
-    :: WebDataSource -- ^ the data source
-    -> IO String     -- ^ the encoding
-webDataSourceGetEncoding source =
+    :: MonadIO m
+    => WebDataSource -- ^ the data source
+    -> m String      -- ^ the encoding
+webDataSourceGetEncoding source = liftIO $
     withWebDataSource source $ \ptr ->
         {#call web_data_source_get_encoding#} ptr >>= peekCString
 
@@ -99,22 +106,24 @@ webDataSourceGetEncoding source =
      'webDataSourceGetRequest' for getting the \"committed\" request.
 -}
 webDataSourceGetInitialRequest
-    :: WebDataSource     -- ^ the data source
-    -> IO NetworkRequest -- ^ the request
-webDataSourceGetInitialRequest source =
+    :: MonadIO m
+    => WebDataSource    -- ^ the data source
+    -> m NetworkRequest -- ^ the request
+webDataSourceGetInitialRequest source = liftIO $
     withWebDataSource source $ \ptr ->
         makeNetworkRequest $
-            {#call web_data_source_get_initial_request#} ptr 
+            {#call web_data_source_get_initial_request#} ptr
 
 -- | Returns the main 'WebResource' of the 'WebDataSource'.
 webDataSourceGetMainResource
-    :: WebDataSource  -- ^ the data source
-    -> IO WebResource -- ^ a new 'WebResource' representing the main resource of
-                      --   the data source
-webDataSourceGetMainResource source =
+    :: MonadIO m
+    => WebDataSource -- ^ the data source
+    -> m WebResource -- ^ a new 'WebResource' representing the main resource of
+                     --   the data source
+webDataSourceGetMainResource source = liftIO $
     withWebDataSource source $ \ptr ->
         makeWebResource $
-            {#call web_data_source_get_main_resource#} ptr 
+            {#call web_data_source_get_main_resource#} ptr
 
 {- | Returns a 'NetworkRequest' that was used to create this 'WebDataSource'.
      The 'NetworkRequest' returned by this function is the request that was
@@ -122,11 +131,12 @@ webDataSourceGetMainResource source =
      'webDataSourceGetInitialRequest'.
 -}
 webDataSourceGetRequest
-    :: WebDataSource             -- ^ the data source
-    -> IO (Maybe NetworkRequest) -- ^ 'Just' the request or 'Nothing' if the
-                                 --   data source is not attached to a frame or
-                                 --   the frame hasn't been loaded
-webDataSourceGetRequest source =
+    :: MonadIO m
+    => WebDataSource            -- ^ the data source
+    -> m (Maybe NetworkRequest) -- ^ 'Just' the request or 'Nothing' if the
+                                --   data source is not attached to a frame or
+                                --   the frame hasn't been loaded
+webDataSourceGetRequest source = liftIO $
     withWebDataSource source $ maybePeek $ \ptr ->
         makeNetworkRequest $
             {#call web_data_source_get_request#} ptr
@@ -135,63 +145,69 @@ webDataSourceGetRequest source =
      'WebDataSource' is attached.
 -}
 webDataSourceGetSubresources
-    :: WebDataSource    -- ^ the data source
-    -> IO [WebResource] -- ^ the 'WebResource's
-webDataSourceGetSubresources source =
+    :: MonadIO m
+    => WebDataSource   -- ^ the data source
+    -> m [WebResource] -- ^ the 'WebResource's
+webDataSourceGetSubresources source = liftIO $
     withWebDataSource source $ \ptr ->
         {#call web_data_source_get_subresources#} ptr >>=
             fromGList >>=
-                mapM (makeWebResource . return) 
+                mapM (makeWebResource . return)
 
 {- | Return the unreachable URI of the data source. The data source will have an
      unreachable URL if it was created using 'webFrameLoadAlternateHtmlString'.
 -}
 webDataSourceGetUnreachableUri
-    :: WebDataSource     -- ^ the data source
-    -> IO (Maybe String) -- ^ 'Just' the unreachable URL or 'Nothing' if there
-                         --   is no unreachable URL. 
-webDataSourceGetUnreachableUri source =
+    :: MonadIO m
+    => WebDataSource    -- ^ the data source
+    -> m (Maybe String) -- ^ 'Just' the unreachable URL or 'Nothing' if there
+                        --   is no unreachable URL.
+webDataSourceGetUnreachableUri source = liftIO $
     withWebDataSource source $ \ptr ->
         {#call web_data_source_get_unreachable_uri#} ptr >>=
             maybePeek peekCString
 
 -- | Returns the 'WebFrame' that represents this data source
 webDataSourceGetWebFrame
-    :: WebDataSource       -- ^ the data source
-    -> IO (Maybe WebFrame) -- ^ 'Just' the 'WebFrame' that represents the data
-                           --   source or 'Nothing' if the data source is not
-                           --   attached to a frame. 
-webDataSourceGetWebFrame source =
+    :: MonadIO m
+    => WebDataSource      -- ^ the data source
+    -> m (Maybe WebFrame) -- ^ 'Just' the 'WebFrame' that represents the data
+                          --   source or 'Nothing' if the data source is not
+                          --   attached to a frame.
+webDataSourceGetWebFrame source = liftIO $
     withWebDataSource source $ maybePeek $ \ptr ->
         makeWebFrame $
-            {#call web_data_source_get_web_frame#} ptr 
+            {#call web_data_source_get_web_frame#} ptr
 
 {- | Determines whether the data source is in the process of loading its
      content.
 -}
 webDataSourceIsLoading
-    :: WebDataSource -- ^ the data source
-    -> IO Bool       -- ^ 'True' if the data source is still loading, 'False'
+    :: MonadIO m
+    => WebDataSource -- ^ the data source
+    -> m Bool        -- ^ 'True' if the data source is still loading, 'False'
                      --   otherwise
-webDataSourceIsLoading source =
+webDataSourceIsLoading source = liftIO $
     withWebDataSource source $ \ptr ->
-        liftM toBool $
-            {#call web_data_source_is_loading#} ptr 
+        {#call web_data_source_is_loading#} ptr >>=
+            return . toBool
 
 {- | Creates a new 'WebDataSource'. The URL of the 'WebDataSource' will be set
-     to \"about:blank\". 
+     to \"about:blank\".
 -}
 webDataSourceNew
-    :: IO WebDataSource -- ^ the new data source
-webDataSourceNew =
+    :: MonadIO m
+    => m WebDataSource -- ^ the new data source
+webDataSourceNew = liftIO $
     makeWebDataSource $
-        {#call web_data_source_new#} 
+        {#call web_data_source_new#}
 
-webDataSourceNewWithRequest 
-    :: NetworkRequest   -- ^ a network request
-    -> IO WebDataSource -- ^ web data source for supplied request
-webDataSourceNewWithRequest request =
+webDataSourceNewWithRequest
+    :: MonadIO m
+    => NetworkRequest  -- ^ a network request
+    -> m WebDataSource -- ^ web data source for supplied request
+webDataSourceNewWithRequest request = liftIO $
     withNetworkRequest request $ \ptr ->
-        makeWebDataSource $ 
+        makeWebDataSource $
             {#call web_data_source_new_with_request#} ptr
 

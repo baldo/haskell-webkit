@@ -26,29 +26,34 @@ For more information refer to the Web Database specification proposal at
 
 module Graphics.UI.Gtk.WebKit.WebDatabase
     ( WebDatabase
-    
+
     , webDatabaseGetType
     , webDatabaseGetSize
     , webDatabaseRemove
-    , webDatabaseRemoveAll 
+    , webDatabaseRemoveAll
     , webDatabaseGetSecurityOrigin
     , webDatabaseGetName
     , webDatabaseGetFilename
     , webDatabaseGetExpectedSize
     , webDatabaseGetDisplayName
-    , webDatabaseGetDefaultQuota 
-    , webDatabaseSetDefaultQuota 
-    , webDatabaseGetDirectoryPath 
-    , webDatabaseSetDirectoryPath 
+    , webDatabaseGetDefaultQuota
+    , webDatabaseSetDefaultQuota
+    , webDatabaseGetDirectoryPath
+    , webDatabaseSetDirectoryPath
 
     ) where
 
 #include <webkit/webkitwebdatabase.h>
 
-import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
-import Control.Monad
+    ( GType
+    )
+
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebDatabase
@@ -59,15 +64,17 @@ import Control.Monad
     )
 
 webDatabaseGetType
-    :: IO GType
-webDatabaseGetType =
+    :: MonadIO m
+    => m GType
+webDatabaseGetType = liftIO $
     {#call web_database_get_type#}
 
 -- | Returns the name of the 'WebDatabase' as seen by the user.
 webDatabaseGetDisplayName
-    :: WebDatabase -- ^ the database
-    -> IO String   -- ^ the name of the database as seen by the user.
-webDatabaseGetDisplayName database =
+    :: MonadIO m
+    => WebDatabase -- ^ the database
+    -> m String    -- ^ the name of the database as seen by the user.
+webDatabaseGetDisplayName database = liftIO $
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_display_name#} ptr >>= peekCString
 
@@ -76,74 +83,95 @@ webDatabaseGetDisplayName database =
      expected size of the database to optimize the user experience.
 -}
 webDatabaseGetExpectedSize
-    :: WebDatabase -- ^ the database
-    -> IO Integer  -- ^ the expected size of the database in bytes 
-webDatabaseGetExpectedSize database =
+    :: MonadIO m
+    => WebDatabase -- ^ the database
+    -> m Integer   -- ^ the expected size of the database in bytes
+webDatabaseGetExpectedSize database = liftIO $
     withWebDatabase database $ \ptr ->
-        liftM toInteger $
-            {#call webkit_web_database_get_expected_size#} ptr
+        {#call webkit_web_database_get_expected_size#} ptr >>=
+            return . toInteger
 
 -- | Returns the absolute filename to the 'WebDatabase' file on disk.
 webDatabaseGetFilename
-    :: WebDatabase -- ^ the database
-    -> IO String   -- ^ the absolute filename of the database
-webDatabaseGetFilename database =
+    :: MonadIO m
+    => WebDatabase -- ^ the database
+    -> m String    -- ^ the absolute filename of the database
+webDatabaseGetFilename database = liftIO $
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_filename#} ptr >>= peekCString
 
 -- | Returns the canonical name of the 'WebDatabase'.
 webDatabaseGetName
-    :: WebDatabase -- ^ the database
-    -> IO String   -- ^ the name of the database
-webDatabaseGetName database =
+    :: MonadIO m
+    => WebDatabase -- ^ the database
+    -> m String    -- ^ the name of the database
+webDatabaseGetName database = liftIO $
     withWebDatabase database $ \ptr ->
         {#call webkit_web_database_get_name#} ptr >>= peekCString
 
 -- | Returns the 'SecurityOrigin' of the 'WebDatabase'.
 webDatabaseGetSecurityOrigin
-    :: WebDatabase       -- ^ the database
-    -> IO SecurityOrigin -- ^ the security origin of the database 
-webDatabaseGetSecurityOrigin database =
+    :: MonadIO m
+    => WebDatabase       -- ^ the database
+    -> m SecurityOrigin  -- ^ the security origin of the database
+webDatabaseGetSecurityOrigin database = liftIO $
     withWebDatabase database $ \ptr ->
         makeSecurityOrigin $
             {#call webkit_web_database_get_security_origin#} ptr
 
 -- | Returns the actual size of the 'WebDatabase' space on disk in bytes.
 webDatabaseGetSize
-    :: WebDatabase -- ^ the database
-    -> IO Integer  -- ^ the actual size of the database in bytes
-webDatabaseGetSize database =
+    :: MonadIO m
+    => WebDatabase -- ^ the database
+    -> m Integer   -- ^ the actual size of the database in bytes
+webDatabaseGetSize database = liftIO $
     withWebDatabase database $ \ptr ->
-        liftM toInteger $ {#call webkit_web_database_get_size#} ptr
+        {#call webkit_web_database_get_size#} ptr >>=
+            return . toInteger
 
 {- | Removes the 'WebDatabase' from its 'SecurityOrigin' and destroys all data
      stored in the database.
 -}
 webDatabaseRemove
-    :: WebDatabase -- ^ the database to remove
-    -> IO ()
-webDatabaseRemove database =
+    :: MonadIO m
+    => WebDatabase -- ^ the database to remove
+    -> m ()
+webDatabaseRemove database = liftIO $
     withWebDatabase database $ \ptr ->
        {#call webkit_web_database_remove#} ptr
 
-webDatabaseRemoveAll :: IO ()
-webDatabaseRemoveAll =
+webDatabaseRemoveAll
+    :: MonadIO m
+    => m ()
+webDatabaseRemoveAll = liftIO $
     {#call remove_all_web_databases#}
 
-webDatabaseGetDefaultQuota :: IO Int
-webDatabaseGetDefaultQuota = 
-    liftM fromIntegral $
-        {#call get_default_web_database_quota#}
+webDatabaseGetDefaultQuota
+    :: MonadIO m
+    => m Int
+webDatabaseGetDefaultQuota = liftIO $
+    {#call get_default_web_database_quota#} >>=
+        return . fromIntegral
 
-webDatabaseSetDefaultQuota :: Int -> IO ()
-webDatabaseSetDefaultQuota quota =
+webDatabaseSetDefaultQuota
+    :: MonadIO m
+    => Int
+    -> m ()
+webDatabaseSetDefaultQuota quota = liftIO $
     {#call set_default_web_database_quota#} (fromIntegral quota)
 
-webDatabaseGetDirectoryPath :: IO String
-webDatabaseGetDirectoryPath = 
-        {#call get_web_database_directory_path#} >>= peekCString
+webDatabaseGetDirectoryPath
+    :: MonadIO m
+    => m String
+webDatabaseGetDirectoryPath = liftIO $
+    {#call get_web_database_directory_path#} >>=
+        peekCString
 
-webDatabaseSetDirectoryPath :: String -> IO ()
-webDatabaseSetDirectoryPath directory =
+webDatabaseSetDirectoryPath
+    :: MonadIO m
+    => String
+    -> m ()
+webDatabaseSetDirectoryPath directory = liftIO $
     withCString directory $ \ dir ->
         {#call set_web_database_directory_path#} dir
+

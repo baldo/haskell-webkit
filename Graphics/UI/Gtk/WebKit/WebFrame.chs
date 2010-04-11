@@ -8,13 +8,13 @@ A 'WebView' contains a main 'WebFrame'. A 'WebFrame' contains the content of one
 URI. The URI and name of the frame can be retrieved, the load status and
 progress can be observed using the signals and can be controlled
 using the methods of the 'WebFrame'. A 'WebFrame' can have any number of
-children and one child can be found by using 'webFrameFindFrame'. 
+children and one child can be found by using 'webFrameFindFrame'.
 -}
 
 module Graphics.UI.Gtk.WebKit.WebFrame
     ( WebFrame
 
-    , webFrameGetType 
+    , webFrameGetType
 
     , webFrameGetWebView
 
@@ -36,7 +36,7 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 
     , webFrameFindFrame
 
-    , webFrameGetGlobalContext 
+    , webFrameGetGlobalContext
 
     --, webFramePrintFull -- TODO
     , webFramePrint
@@ -44,7 +44,7 @@ module Graphics.UI.Gtk.WebKit.WebFrame
     , webFrameGetLoadStatus
 
     , webFrameGetHorizontalScrollbarPolicy
-    , webFrameGetVerticalScrollbarPolicy 
+    , webFrameGetVerticalScrollbarPolicy
 
     , webFrameGetDataSource
     , webFrameGetProvisionalDataSource
@@ -54,14 +54,18 @@ module Graphics.UI.Gtk.WebKit.WebFrame
 
 #include <webkit/webkitwebframe.h>
 
-import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
-import Graphics.UI.Gtk.General.Enums 
-	( PolicyType (..)
-	)
+    ( GType
+    )
+import Graphics.UI.Gtk.General.Enums
+    ( PolicyType (..)
+    )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebFrame
@@ -85,13 +89,15 @@ import Control.Monad
     ( LoadStatus (..)
     )
 
-{#import Language.JavaScript.JavaScriptCore.General.Types#} 
+{#import Language.JavaScript.JavaScriptCore.General.Types#}
     ( GlobalContextRef (..)
     , makeGlobalContextRef
     )
 
-webFrameGetType :: IO GType 
-webFrameGetType =
+webFrameGetType
+    :: MonadIO m
+    => m GType
+webFrameGetType = liftIO $
     {#call web_frame_get_type#}
 
 {- DEPRECATED
@@ -105,44 +111,49 @@ webkit_web_view_open
      that contains the frame.
 -}
 webFrameGetWebView
-    :: WebFrame   -- ^ a frame
-    -> IO WebView -- ^ the 'WebView' managing the frame
-webFrameGetWebView frame =
+    :: MonadIO m
+    => WebFrame  -- ^ a frame
+    -> m WebView -- ^ the 'WebView' managing the frame
+webFrameGetWebView frame = liftIO $
     withWebFrame frame $ \ptr ->
         makeWebView $ {#call web_frame_get_web_view#} ptr
 
 -- | Returns the frame's name.
 webFrameGetName
-    :: WebFrame  -- ^ a frame
-    -> IO String -- ^ its name
-webFrameGetName frame =
+    :: MonadIO m
+    => WebFrame -- ^ a frame
+    -> m String -- ^ its name
+webFrameGetName frame = liftIO $
     withWebFrame frame $ \ptr ->
         {#call web_frame_get_name#} ptr
             >>= peekCString
 
 -- | Returns the frame's document title.
 webFrameGetTitle
-    :: WebFrame  -- ^ a frame
-    -> IO String -- ^ its title
-webFrameGetTitle frame =
+    :: MonadIO m
+    => WebFrame -- ^ a frame
+    -> m String -- ^ its title
+webFrameGetTitle frame = liftIO $
     withWebFrame frame $ \ptr ->
         {#call web_frame_get_title#} ptr
             >>= peekCString
 
 -- | Returns the current URI of the contents displayed by the frame.
 webFrameGetUri
-    :: WebFrame  -- ^ a frame
-    -> IO String -- ^ the URI
-webFrameGetUri frame =
+    :: MonadIO m
+    => WebFrame -- ^ a frame
+    -> m String -- ^ the URI
+webFrameGetUri frame = liftIO $
     withWebFrame frame $ \ptr ->
         {#call web_frame_get_uri#} ptr
             >>= peekCString
 
 -- | Returns the frame's parent frame, or 'Nothing' if it has none.
 webFrameGetParent
-    :: WebFrame            -- ^ a frame
-    -> IO (Maybe WebFrame) -- ^ 'Just' its parent or 'Nothing'
-webFrameGetParent frame =
+    :: MonadIO m
+    => WebFrame           -- ^ a frame
+    -> m (Maybe WebFrame) -- ^ 'Just' its parent or 'Nothing'
+webFrameGetParent frame = liftIO $
     withWebFrame frame $ maybePeek $ \ptr ->
         makeWebFrame $ {#call web_frame_get_parent#} ptr
 
@@ -151,18 +162,20 @@ webFrameGetParent frame =
      not created by a load. You must unref the object when you are done with it.
 -}
 webFrameGetNetworkResponse
-    :: WebFrame                   -- ^ a frame
-    -> IO (Maybe NetworkResponse) -- ^ 'Just' the 'NetworkResponse' or 'Nothing'
-webFrameGetNetworkResponse frame =
+    :: MonadIO m
+    => WebFrame                  -- ^ a frame
+    -> m (Maybe NetworkResponse) -- ^ 'Just' the 'NetworkResponse' or 'Nothing'
+webFrameGetNetworkResponse frame = liftIO $
     withWebFrame frame $ maybePeek $ \ptr ->
         makeNetworkResponse $ {#call web_frame_get_network_response#} ptr
 
 -- | Requests loading of the specified URI string.
 webFrameLoadUri
-    :: WebFrame -- ^ a frame
+    :: MonadIO m
+    => WebFrame -- ^ a frame
     -> String   -- ^ an URI string
-    -> IO ()
-webFrameLoadUri frame uri = do
+    -> m ()
+webFrameLoadUri frame uri = liftIO $
     withCString uri $ \c_uri ->
         withWebFrame frame $ \ptr ->
             {#call web_frame_load_uri#} ptr c_uri
@@ -175,13 +188,14 @@ webFrameLoadUri frame uri = do
      If no encoding is given, \"UTF-8\" is assumed.
 -}
 webFrameLoadString
-    :: WebFrame     -- ^ a frame
+    :: MonadIO m
+    => WebFrame     -- ^ a frame
     -> String       -- ^ an URI string
     -> Maybe String -- ^ 'Just' MIME type or 'Nothing'
     -> Maybe String -- ^ 'Just' encoding or 'Nothing'
     -> String       -- ^ the base URI for relative locations
-    -> IO ()
-webFrameLoadString frame content mime_type encoding base_uri = do
+    -> m ()
+webFrameLoadString frame content mime_type encoding base_uri = liftIO $
     withCString content $ \c_content ->
         maybeWith withCString mime_type $ \c_mime_type ->
             maybeWith withCString encoding $ \c_encoding ->
@@ -194,14 +208,15 @@ webFrameLoadString frame content mime_type encoding base_uri = do
      Using this method will preserve the back-forward list.
 -}
 webFrameLoadAlternateString
-    :: WebFrame -- ^ a frame
+    :: MonadIO m
+    => WebFrame -- ^ a frame
     -> String   -- ^ the alternate content to display as the main page
                 --   of the frame
     -> String   -- ^ the base URI for relative locations, has to be an
                 --   absolute URI
-    -> String   -- ^ the URL for the alternate page content 
-    -> IO ()
-webFrameLoadAlternateString frame content base_url unreachable_url = do
+    -> String   -- ^ the URL for the alternate page content
+    -> m ()
+webFrameLoadAlternateString frame content base_url unreachable_url = liftIO $
     withCString content $ \c_content ->
         withCString base_url $ \c_base_url->
             withCString unreachable_url $ \c_unreachable_url ->
@@ -216,27 +231,30 @@ webFrameLoadAlternateString frame content base_url unreachable_url = do
      stop the load. This function is typically invoked on the main frame.
 -}
 webFrameLoadRequest
-    :: WebFrame       -- ^ a frame
+    :: MonadIO m
+    => WebFrame       -- ^ a frame
     -> NetworkRequest -- ^ a request
-    -> IO ()
-webFrameLoadRequest frame request =
+    -> m ()
+webFrameLoadRequest frame request = liftIO $
     withWebFrame frame $ \pFrame ->
         withNetworkRequest request $ \pRequest ->
-            {#call web_frame_load_request#} pFrame pRequest 
+            {#call web_frame_load_request#} pFrame pRequest
 
 -- | Stops any pending loads on frame's data source, and those of its children.
 webFrameStopLoading
-    :: WebFrame -- ^ a frame
-    -> IO ()
-webFrameStopLoading frame =
+    :: MonadIO m
+    => WebFrame -- ^ a frame
+    -> m ()
+webFrameStopLoading frame = liftIO $
     withWebFrame frame $ \ptr ->
         {#call web_frame_stop_loading#} ptr
 
 -- | Reloads the initial request.
 webFrameReload
-    :: WebFrame -- ^ a frame
-    -> IO ()
-webFrameReload frame =
+    :: MonadIO m
+    => WebFrame -- ^ a frame
+    -> m ()
+webFrameReload frame = liftIO $
     withWebFrame frame $ \ptr ->
         {#call web_frame_reload#} ptr
 
@@ -252,10 +270,11 @@ webFrameReload frame =
      hierarchies. Returns 'Nothing' if no match is found.
 -}
 webFrameFindFrame
-    :: WebFrame            -- ^ the 'WebFrame' to search in
-    -> String              -- ^ the name of the frame to search for
-    -> IO (Maybe WebFrame) -- ^ the matching frame
-webFrameFindFrame frame name = do
+    :: MonadIO m
+    => WebFrame           -- ^ the 'WebFrame' to search in
+    -> String             -- ^ the name of the frame to search for
+    -> m (Maybe WebFrame) -- ^ the matching frame
+webFrameFindFrame frame name = liftIO $
     withCString name $ maybePeek $ \c_name ->
         withWebFrame frame $ \ptr ->
             makeWebFrame $
@@ -287,14 +306,15 @@ GtkPrintOperationResult web_frame_print_full (WebKitWebFrame *frame, GtkPrintOpe
      between the WebKit and JavaScriptCore APIs.
 -}
 webFrameGetGlobalContext
-    :: WebFrame            -- ^ a frame
-    -> IO GlobalContextRef -- ^ the global JavaScript context 
-webFrameGetGlobalContext frame =
+    :: MonadIO m
+    => WebFrame           -- ^ a frame
+    -> m GlobalContextRef -- ^ the global JavaScript context
+webFrameGetGlobalContext frame = liftIO $
     withWebFrame frame $ \ptr ->
        makeGlobalContextRef $
-            webkit_web_frame_get_global_context ptr 
+            webkit_web_frame_get_global_context ptr
 
--- need this self written import because c2hs has convertion problems 
+-- need this self written import because c2hs has convertion problems
 foreign import ccall safe "webkitwebframe.h webkit_web_frame_get_global_context"
     webkit_web_frame_get_global_context :: ((Ptr (WebFrame)) -> (IO (Ptr (GlobalContextRef))))
 
@@ -302,9 +322,10 @@ foreign import ccall safe "webkitwebframe.h webkit_web_frame_get_global_context"
      If you need more control over the printing process, see 'webFramePrintFull'.
 -}
 webFramePrint
-    :: WebFrame -- ^ a frame
-    -> IO ()
-webFramePrint frame =
+    :: MonadIO m
+    => WebFrame -- ^ a frame
+    -> m ()
+webFramePrint frame = liftIO $
     withWebFrame frame $ \ptr ->
         {#call web_frame_print#} ptr
 
@@ -312,42 +333,46 @@ webFramePrint frame =
                                                          GtkPrintOperation *operation,
                                                          GtkPrintOperationAction action,
                                                          GError **error);
-	This needs implementation of the printing part of gtk in gtk2hs..
+    This needs implementation of the printing part of gtk in gtk2hs..
 -}
 
 
 -- | Determines the current status of the load.
 webFrameGetLoadStatus
-    :: WebFrame      -- ^ a frame
-    -> IO LoadStatus -- ^ the 'LoadStatus'
-webFrameGetLoadStatus frame =
+    :: MonadIO m
+    => WebFrame     -- ^ a frame
+    -> m LoadStatus -- ^ the 'LoadStatus'
+webFrameGetLoadStatus frame = liftIO $
     withWebFrame frame $ \ptr ->
-        liftM (toEnum . fromIntegral) $
-            {#call web_frame_get_load_status#} ptr
+        {#call web_frame_get_load_status#} ptr >>=
+            return . toEnum . fromIntegral
 
-webFrameGetHorizontalScrollbarPolicy 
-	:: WebFrame 	-- ^ a frame
- 	-> IO PolicyType -- ^ horizontal scrollbar policy
-webFrameGetHorizontalScrollbarPolicy frame =
-	withWebFrame frame $ \ptr ->
-		liftM (toEnum . fromIntegral) $
-			{#call web_frame_get_horizontal_scrollbar_policy#} ptr
+webFrameGetHorizontalScrollbarPolicy
+    :: MonadIO m
+    => WebFrame     -- ^ a frame
+    -> m PolicyType -- ^ horizontal scrollbar policy
+webFrameGetHorizontalScrollbarPolicy frame = liftIO $
+    withWebFrame frame $ \ptr ->
+        {#call web_frame_get_horizontal_scrollbar_policy#} ptr >>=
+            return . toEnum . fromIntegral
 
-webFrameGetVerticalScrollbarPolicy 
-	:: WebFrame 	-- ^ a frame
- 	-> IO PolicyType -- ^ vertical scrollbar policy
-webFrameGetVerticalScrollbarPolicy frame =
-	withWebFrame frame $ \ptr ->
-		liftM (toEnum . fromIntegral) $
-			{#call web_frame_get_vertical_scrollbar_policy#} ptr
+webFrameGetVerticalScrollbarPolicy
+    :: MonadIO m
+    => WebFrame     -- ^ a frame
+    -> m PolicyType -- ^ vertical scrollbar policy
+webFrameGetVerticalScrollbarPolicy frame = liftIO $
+    withWebFrame frame $ \ptr ->
+        {#call web_frame_get_vertical_scrollbar_policy#} ptr >>=
+            return . toEnum . fromIntegral
 
 
 
 -- | Returns the committed data source.
 webFrameGetDataSource
-    :: WebFrame         -- ^ a frame
-    -> IO WebDataSource -- ^ the committed 'WebDataSource'
-webFrameGetDataSource frame =
+    :: MonadIO m
+    => WebFrame        -- ^ a frame
+    -> m WebDataSource -- ^ the committed 'WebDataSource'
+webFrameGetDataSource frame = liftIO $
     withWebFrame frame $ \ptr ->
         makeWebDataSource $ {#call web_frame_get_data_source#} ptr
 
@@ -357,16 +382,18 @@ webFrameGetDataSource frame =
      'webFrameGetDataSource' to get the committed data source.
 -}
 webFrameGetProvisionalDataSource
-    :: WebFrame         -- ^ a frame
-    -> IO WebDataSource -- ^ the provisional data source
-webFrameGetProvisionalDataSource frame =
+    :: MonadIO m
+    => WebFrame        -- ^ a frame
+    -> m WebDataSource -- ^ the provisional data source
+webFrameGetProvisionalDataSource frame = liftIO $
      withWebFrame frame $ \ptr ->
         makeWebDataSource $ {#call web_frame_get_provisional_data_source#} ptr
 
 -- | Returns the frame's 'SecurityOrigin'.
 webFrameGetSecurityOrigin
-    :: WebFrame          -- ^ a frame
-    -> IO SecurityOrigin -- ^ its 'SecurityOrigin'
-webFrameGetSecurityOrigin frame =
+    :: MonadIO m
+    => WebFrame         -- ^ a frame
+    -> m SecurityOrigin -- ^ its 'SecurityOrigin'
+webFrameGetSecurityOrigin frame = liftIO $
     withWebFrame frame $ \ptr ->
         makeSecurityOrigin $ {#call web_frame_get_security_origin#} ptr
