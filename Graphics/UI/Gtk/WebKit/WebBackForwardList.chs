@@ -37,13 +37,18 @@ module Graphics.UI.Gtk.WebKit.WebBackForwardList
 
 #include <webkit/webkitwebbackforwardlist.h>
 
-import Foreign.C
 import System.Glib.FFI
 import System.Glib.GType
-
+    ( GType
+    )
 import System.Glib.GList
+    ( fromGList
+    )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( WebBackForwardList
@@ -58,8 +63,9 @@ import Control.Monad
     )
 
 webBackForwardListGetType
-    :: IO GType
-webBackForwardListGetType =
+    :: MonadIO m
+    => m GType
+webBackForwardListGetType = liftIO $
     {#call web_back_forward_list_get_type#}
 
 {- | Adds the item to the 'WebBackForwardList'.
@@ -68,112 +74,126 @@ webBackForwardListGetType =
      you don't need to keep a reference once you've added it to the list.
 -}
 webBackForwardListAddItem
-    :: WebBackForwardList -- ^ the 'WebBackForwardList'
+    :: MonadIO m
+    => WebBackForwardList -- ^ the 'WebBackForwardList'
     -> WebHistoryItem     -- ^ the 'WebHistoryItem' to add
-    -> IO ()
-webBackForwardListAddItem list item = 
+    -> m ()
+webBackForwardListAddItem list item = liftIO $
     withWebBackForwardList list $ \lptr ->
         withWebHistoryItem item $ \iptr ->
             {#call web_back_forward_list_add_item#} lptr iptr
 
 -- | Checks if 'WebHistoryItem' is in the 'WebBackForwardList'.
 webBackForwardListContainsItem
-    :: WebBackForwardList -- ^ a 'WebBackForwardList'
+    :: MonadIO m
+    => WebBackForwardList -- ^ a 'WebBackForwardList'
     -> WebHistoryItem     -- ^ a 'WebHistoryItem'
-    -> IO Bool            -- ^ 'True' if 'WebHistoryItem' is in
+    -> m Bool             -- ^ 'True' if 'WebHistoryItem' is in
                           --   'WebBackForwardList', otherwise 'False'
-webBackForwardListContainsItem list item =
+webBackForwardListContainsItem list item = liftIO $
     withWebBackForwardList list $ \lptr ->
         withWebHistoryItem item $ \iptr ->
-            liftM toBool $  {#call web_back_forward_list_contains_item#} lptr iptr 
+            {#call web_back_forward_list_contains_item#} lptr iptr >>=
+                return . toBool
 
 -- | Returns the item that precedes the current item.
 webBackForwardListGetBackItem
-    :: WebBackForwardList -- ^ a 'WebBackForwardList'
-    -> IO WebHistoryItem  -- ^ the 'WebHistoryItem' preceding the current item
-webBackForwardListGetBackItem list =
+    :: MonadIO m
+    => WebBackForwardList -- ^ a 'WebBackForwardList'
+    -> m WebHistoryItem   -- ^ the 'WebHistoryItem' preceding the current item
+webBackForwardListGetBackItem list = liftIO $
    withWebBackForwardList list $ \ptr ->
-        makeWebHistoryItem $ {#call web_back_forward_list_get_back_item#} ptr 
+        makeWebHistoryItem $ {#call web_back_forward_list_get_back_item#} ptr
 
 -- | Returns the number of items that preced the current item.
 webBackForwardListGetBackLength
-    :: WebBackForwardList -- ^ 'WebBackForwardList'
-    -> IO Int             -- ^ the number of items preceding the current item 
-webBackForwardListGetBackLength list = 
+    :: MonadIO m
+    => WebBackForwardList -- ^ 'WebBackForwardList'
+    -> m Int              -- ^ the number of items preceding the current item
+webBackForwardListGetBackLength list = liftIO $
     withWebBackForwardList list $ \ptr ->
-        liftM fromIntegral $ {#call web_back_forward_list_get_back_length#} ptr
+        {#call web_back_forward_list_get_back_length#} ptr >>=
+            return . fromIntegral
 
 {- | Returns a list of items that precede the current item, limited by a given
      limit.
 -}
 webBackForwardListGetBackListWithLimit
-    :: WebBackForwardList  -- ^ the list
-    -> Int                 -- ^ the limit
-    -> IO [WebHistoryItem] -- ^ the preceding items
-webBackForwardListGetBackListWithLimit list limit =
+    :: MonadIO m
+    => WebBackForwardList -- ^ the list
+    -> Int                -- ^ the limit
+    -> m [WebHistoryItem] -- ^ the preceding items
+webBackForwardListGetBackListWithLimit list limit = liftIO $
     withWebBackForwardList list $ \ptr ->
         {#call web_back_forward_list_get_back_list_with_limit#} ptr (fromIntegral limit)
-            >>= fromGList >>= mapM (makeWebHistoryItem . return) 
+            >>= fromGList >>= mapM (makeWebHistoryItem . return)
 
 -- | Returns the current item.
 webBackForwardListGetCurrentItem
-    :: WebBackForwardList        -- ^ the list
-    -> IO (Maybe WebHistoryItem) -- ^ 'Nothing' if the list is empty, 'Just'
-                                 --   the item otherwise
-webBackForwardListGetCurrentItem list =
+    :: MonadIO m
+    => WebBackForwardList       -- ^ the list
+    -> m (Maybe WebHistoryItem) -- ^ 'Nothing' if the list is empty, 'Just'
+                                --   the item otherwise
+webBackForwardListGetCurrentItem list = liftIO $
     withWebBackForwardList list $ \ptr -> do
         item <- {#call web_back_forward_list_get_current_item#} ptr
         maybePeek (makeWebHistoryItem . return) item
 
 -- | Returns the item that succeeds the current item.
 webBackForwardListGetForwardItem
-    :: WebBackForwardList         -- ^ the list
-    -> IO (Maybe WebHistoryItem)  -- ^ 'Nothing' if there is no next item,
-                                  --   'Just' the item otherwise
-webBackForwardListGetForwardItem list = 
+    :: MonadIO m
+    => WebBackForwardList       -- ^ the list
+    -> m (Maybe WebHistoryItem) -- ^ 'Nothing' if there is no next item,
+                                --   'Just' the item otherwise
+webBackForwardListGetForwardItem list = liftIO $
     withWebBackForwardList list $ \ptr -> do
         item <- {#call web_back_forward_list_get_forward_item#} ptr
         maybePeek (makeWebHistoryItem . return) item
 
 -- | Returns the number of items that succeed the current item.
 webBackForwardListGetForwardLength
-    :: WebBackForwardList -- ^ the list
-    -> IO Int             -- ^ number of items that succeed the current item
-webBackForwardListGetForwardLength list = 
+    :: MonadIO m
+    => WebBackForwardList -- ^ the list
+    -> m Int              -- ^ number of items that succeed the current item
+webBackForwardListGetForwardLength list = liftIO $
     withWebBackForwardList list $ \ptr ->
-        liftM fromIntegral $
-            {#call web_back_forward_list_get_forward_length#} ptr
+        {#call web_back_forward_list_get_forward_length#} ptr >>=
+            return . fromIntegral
 
 {- | Returns a list of items that succeed the current item, limited by a given
      limit.
 -}
 webBackForwardListGetForwardListWithLimit
-    :: WebBackForwardList  -- ^ the list
-    -> Int                 -- ^ the limit
-    -> IO [WebHistoryItem] -- ^ succeeding items
-webBackForwardListGetForwardListWithLimit list limit =
+    :: MonadIO m
+    => WebBackForwardList -- ^ the list
+    -> Int                -- ^ the limit
+    -> m [WebHistoryItem] -- ^ succeeding items
+webBackForwardListGetForwardListWithLimit list limit = liftIO $
     withWebBackForwardList list $ \ptr ->
         {#call web_back_forward_list_get_forward_list_with_limit#} ptr
             (fromIntegral limit)
                 >>= fromGList
-                    >>= mapM (makeWebHistoryItem . return) 
+                    >>= mapM (makeWebHistoryItem . return)
 
 -- | Returns the maximum limit of the 'WebBackForwardList'.
 webBackForwardListGetLimit
-    :: WebBackForwardList -- ^ a 'WebBackForwardList'
-    -> IO Int             -- ^ the number of 'WebHistoryItem's the
+    :: MonadIO m
+    => WebBackForwardList -- ^ a 'WebBackForwardList'
+    -> m Int              -- ^ the number of 'WebHistoryItem's the
                           --   'WebBackForwardList' can hold
-webBackForwardListGetLimit list = 
+webBackForwardListGetLimit list = liftIO $
     withWebBackForwardList list $ \ptr ->
-        liftM fromIntegral $ {#call web_back_forward_list_get_limit#} ptr
+        {#call web_back_forward_list_get_limit#} ptr >>=
+            return . fromIntegral
 
 -- | Returns the item at a given index relative to the current item.
 webBackForwardListGetNthItem
-    :: WebBackForwardList        -- ^ the list
-    -> Int                       -- ^ index of the item
-    -> IO (Maybe WebHistoryItem) -- ^ 'Just' the corresponding item if existing,
-                                 --   'Nothing' otherwise
-webBackForwardListGetNthItem list index = 
+    :: MonadIO m
+    => WebBackForwardList       -- ^ the list
+    -> Int                      -- ^ index of the item
+    -> m (Maybe WebHistoryItem) -- ^ 'Just' the corresponding item if existing,
+                                --   'Nothing' otherwise
+webBackForwardListGetNthItem list index = liftIO $
     withWebBackForwardList list $ \ptr -> do
         item <- {#call web_back_forward_list_get_nth_item#} ptr
                     (fromIntegral index)
@@ -181,26 +201,29 @@ webBackForwardListGetNthItem list index =
 
 -- | Steps backward in the 'WebBackForwardList'.
 webBackForwardListGoBack
-    :: WebBackForwardList -- ^ the 'WebBackForwardList'
-    -> IO ()
-webBackForwardListGoBack list = 
+    :: MonadIO m
+    => WebBackForwardList -- ^ the 'WebBackForwardList'
+    -> m ()
+webBackForwardListGoBack list = liftIO $
     withWebBackForwardList list $ \ptr ->
         {#call web_back_forward_list_go_back#} ptr
 
 -- | Steps forward in the 'WebBackForwardList'.
 webBackForwardListGoForward
-    :: WebBackForwardList -- ^ the 'WebBackForwardList'
-    -> IO ()
-webBackForwardListGoForward list = 
+    :: MonadIO m
+    => WebBackForwardList -- ^ the 'WebBackForwardList'
+    -> m ()
+webBackForwardListGoForward list = liftIO $
     withWebBackForwardList list $ \ptr ->
         {#call web_back_forward_list_go_forward#} ptr
 
 -- | Go to the specified 'WebHistoryItem' in the 'WebBackForwardList'.
 webBackForwardListGoToItem
-    :: WebBackForwardList -- ^ the 'WebBackForwardList'
-    -> WebHistoryItem     -- ^ the 'WebHistoryItem' to go to 
-    -> IO ()
-webBackForwardListGoToItem list item = 
+    :: MonadIO m
+    => WebBackForwardList -- ^ the 'WebBackForwardList'
+    -> WebHistoryItem     -- ^ the 'WebHistoryItem' to go to
+    -> m ()
+webBackForwardListGoToItem list item = liftIO $
     withWebBackForwardList list $ \lptr ->
         withWebHistoryItem item $ \iptr ->
             {#call web_back_forward_list_go_to_item#} lptr iptr
@@ -209,9 +232,10 @@ webBackForwardListGoToItem list item =
      'WebView'.
 -}
 webBackForwardListNewWithWebView
-    :: WebView               -- ^ a 'WebView'
-    -> IO WebBackForwardList -- ^ the list
-webBackForwardListNewWithWebView view =
+    :: MonadIO m
+    => WebView              -- ^ a 'WebView'
+    -> m WebBackForwardList -- ^ the list
+webBackForwardListNewWithWebView view = liftIO $
     withWebView view $ \ptr ->
         makeWebBackForwardList $
             {#call web_back_forward_list_new_with_web_view#} ptr
@@ -221,10 +245,11 @@ webBackForwardListNewWithWebView view =
      a new item has been added.
 -}
 webBackForwardListSetLimit
-    :: WebBackForwardList -- ^ a 'WebBackForwardList'
+    :: MonadIO m
+    => WebBackForwardList -- ^ a 'WebBackForwardList'
     -> Int                -- ^ the new limit
-    -> IO ()
-webBackForwardListSetLimit list limit = 
+    -> m ()
+webBackForwardListSetLimit list limit = liftIO $
     withWebBackForwardList list $ \ptr ->
             {#call web_back_forward_list_set_limit#} ptr (fromIntegral limit)
 

@@ -20,13 +20,18 @@ module Graphics.UI.Gtk.WebKit.NetworkResponse
 
     , networkResponseGetMessage
     ) where
- 
+
 #include <webkit/webkitnetworkresponse.h>
 
-import Foreign.C
 import System.Glib.FFI
-
 import System.Glib.GType
+    ( GType
+    )
+
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkResponse
@@ -37,20 +42,23 @@ import System.Glib.GType
 
 {#import Network.Soup.General.Types#}
     ( Message
-    
+
     , makeMessage
     )
 
-networkResponseGetType :: IO GType
-networkResponseGetType =
+networkResponseGetType
+    :: MonadIO m
+    => m GType
+networkResponseGetType = liftIO $
     {#call network_response_get_type#}
 
 -- | Creates a new 'NetworkResponse' initialized with an URI.
 networkResponseNew
-    :: String                     -- ^ an URI
-    -> IO (Maybe NetworkResponse) -- ^ 'Just' a new 'NetworkResponse', or
-                                  --   'Nothing' if the URI is invalid.
-networkResponseNew uri =
+    :: MonadIO m
+    => String                    -- ^ an URI
+    -> m (Maybe NetworkResponse) -- ^ 'Just' a new 'NetworkResponse', or
+                                 --   'Nothing' if the URI is invalid.
+networkResponseNew uri = liftIO $
     withCString uri $ \c_uri -> do
         ptr <- {#call network_response_new#} c_uri
         let ptr' = castPtr ptr
@@ -58,9 +66,10 @@ networkResponseNew uri =
 
 -- | Returns the URI belonging to the given 'NetworkResponse'
 networkResponseGetUri
-    :: NetworkResponse -- ^ the 'NetworkResponse'
-    -> IO String       -- ^ the URI
-networkResponseGetUri response =
+    :: MonadIO m
+    => NetworkResponse -- ^ the 'NetworkResponse'
+    -> m String        -- ^ the URI
+networkResponseGetUri response = liftIO $
     withNetworkResponse response $ \ptr ->
         {#call network_response_get_uri#} ptr
             >>= peekCString
@@ -70,19 +79,21 @@ networkResponseGetUri response =
      call.
 -}
 networkResponseSetUri
-    :: NetworkResponse -- ^ the 'NetworkResponse'
+    :: MonadIO m
+    => NetworkResponse -- ^ the 'NetworkResponse'
     -> String          -- ^ the URI
-    -> IO ()
-networkResponseSetUri response uri = do
+    -> m ()
+networkResponseSetUri response uri = liftIO $
     withCString uri $ \c_uri ->
         withNetworkResponse response $ \ptr ->
             {#call network_response_set_uri#} ptr c_uri
 
 -- | Returns the to the 'NetworkResponse' associated 'Message'.
 networkResponseGetMessage
-    :: NetworkResponse -- ^ the 'NetworkResponse'
-    -> IO Message      -- ^ the 'Message'
-networkResponseGetMessage response =
+    :: MonadIO m
+    => NetworkResponse -- ^ the 'NetworkResponse'
+    -> m Message       -- ^ the 'Message'
+networkResponseGetMessage response = liftIO $
     withNetworkResponse response $ \ptr ->
         makeMessage $ {#call network_response_get_message#} ptr
 

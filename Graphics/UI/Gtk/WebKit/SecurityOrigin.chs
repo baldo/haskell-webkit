@@ -35,13 +35,18 @@ module Graphics.UI.Gtk.WebKit.SecurityOrigin
 
 #include <webkit/webkitsecurityorigin.h>
 
-import Foreign.C
 import System.Glib.FFI
-
 import System.Glib.GList
+    ( fromGList
+    )
 import System.Glib.GType
+    ( GType
+    )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( SecurityOrigin
@@ -53,62 +58,75 @@ import Control.Monad
 
 -- | Returns a list of all 'WebDatabase's in the 'SecurityOrigin'.
 securityOriginGetAllWebDatabase
-    :: SecurityOrigin   -- ^ the 'SecurityOrigin'
-    -> IO [WebDatabase] -- ^ the 'WebDatabase's
-securityOriginGetAllWebDatabase origin = 
-    withSecurityOrigin origin $ \ptr -> 
+    :: MonadIO m
+    => SecurityOrigin   -- ^ the 'SecurityOrigin'
+    -> m [WebDatabase]  -- ^ the 'WebDatabase's
+securityOriginGetAllWebDatabase origin = liftIO $
+    withSecurityOrigin origin $ \ptr ->
         {#call security_origin_get_all_web_databases#} ptr
             >>= fromGList >>= mapM (makeWebDatabase . return)
 
 -- | Returns the hostname for the 'SecurityOrigin'.
 securityOriginGetHost
-    :: SecurityOrigin -- ^ the 'SecurityOrigin'
-    -> IO String      -- ^ the hostname
-securityOriginGetHost origin =
+    :: MonadIO m
+    => SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> m String       -- ^ the hostname
+securityOriginGetHost origin = liftIO $
     withSecurityOrigin origin $ \ptr ->
-        {#call security_origin_get_host#} ptr >>= peekCString 
+        {#call security_origin_get_host#} ptr >>= peekCString
 
 -- | Returns the port for the 'SecurityOrigin'.
 securityOriginGetPort
-    :: SecurityOrigin -- ^ the 'SecurityOrigin'
-    -> IO Int         -- ^ the port
-securityOriginGetPort origin =
+    :: MonadIO m
+    => SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> m Int          -- ^ the port
+securityOriginGetPort origin = liftIO $
     withSecurityOrigin origin $ \ptr ->
-        liftM fromIntegral $ {#call security_origin_get_port#} ptr
+        {#call security_origin_get_port#} ptr >>=
+            return . fromIntegral
 
 -- | Returns the protocol for the 'SecurityOrigin'.
 securityOriginGetProtocol
-    :: SecurityOrigin -- ^ the 'SecurityOrigin'
-    -> IO String      -- ^ the protocol
-securityOriginGetProtocol origin =
+    :: MonadIO m
+    => SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> m String       -- ^ the protocol
+securityOriginGetProtocol origin = liftIO $
     withSecurityOrigin origin $ \ptr ->
-        {#call security_origin_get_protocol#} ptr >>= peekCString 
+        {#call security_origin_get_protocol#} ptr >>= peekCString
 
-securityOriginGetType :: IO GType 
-securityOriginGetType = 
+securityOriginGetType
+    :: MonadIO m
+    => m GType
+securityOriginGetType = liftIO $
     {#call security_origin_get_type#}
 
 {- | Returns the quota for 'WebDatabase' storage of the 'SecurityOrigin' in
      bytes.
 -}
 securityOriginGetWebDatabaseQuote
-    :: SecurityOrigin -- ^ the 'SecurityOrigin'
-    -> IO Integer     -- ^ the quota in bytes
-securityOriginGetWebDatabaseQuote origin =
+    :: MonadIO m
+    => SecurityOrigin -- ^ the 'SecurityOrigin'
+    -> m Integer      -- ^ the quota in bytes
+securityOriginGetWebDatabaseQuote origin = liftIO $
     withSecurityOrigin origin $ \ptr ->
-        liftM toInteger $ {#call security_origin_get_web_database_quota#} ptr
+        {#call security_origin_get_web_database_quota#} ptr >>=
+            return . toInteger
 
 -- | Adjust the quota for 'WebDatabase' storage of the 'SecurityOrigin'
 securityOriginSetWebDatabaseQuota
-    :: SecurityOrigin -- ^ the 'SecurityOrigin'
+    :: MonadIO m
+    => SecurityOrigin -- ^ the 'SecurityOrigin'
     -> Integer        -- ^ a new 'WebDatabase' quota in bytes
-    -> IO ()
-securityOriginSetWebDatabaseQuota origin quota =
+    -> m ()
+securityOriginSetWebDatabaseQuota origin quota = liftIO $
      withSecurityOrigin origin $ \ptr ->
         {#call security_origin_set_web_database_quota#} ptr (fromInteger quota)
 
-securityOriginGetWebDatabaseUsage :: SecurityOrigin -> IO Int
-securityOriginGetWebDatabaseUsage origin =
+securityOriginGetWebDatabaseUsage
+    :: MonadIO m
+    => SecurityOrigin
+    -> m Int
+securityOriginGetWebDatabaseUsage origin = liftIO $
     withSecurityOrigin origin $ \ptr ->
-        liftM fromIntegral $ 
-            {#call security_origin_get_web_database_usage#} ptr
+        {#call security_origin_get_web_database_usage#} ptr >>=
+            return . fromIntegral
