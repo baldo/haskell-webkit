@@ -34,7 +34,11 @@ module Graphics.UI.Gtk.WebKit.General.Enums
 #include <webkit/webkit.h>
 
 import System.Glib.FFI
+    ( CUInt
+    )
 import System.Glib.GType
+    ( GType
+    )
 
 data DOMButton = ButtonLeft
                | ButtonMiddle
