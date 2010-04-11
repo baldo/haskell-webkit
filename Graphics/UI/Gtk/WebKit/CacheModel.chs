@@ -31,8 +31,13 @@ module Graphics.UI.Gtk.WebKit.CacheModel
 #include <webkit/webkitenumtypes.h>
 
 import Foreign.C
+    ( CInt
+    )
 
-import Control.Monad
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Enums#}
     ( CacheModel (..)
@@ -40,15 +45,17 @@ import Control.Monad
 
 -- | Returns the current 'CacheModel'.
 getCacheModel
-    :: IO CacheModel -- ^ the current 'CacheModel'
-getCacheModel =
-    liftM (toEnum . fromIntegral) $
-        {#call get_cache_model#}
+    :: MonadIO m
+    => m CacheModel -- ^ the current 'CacheModel'
+getCacheModel = liftIO $
+    {#call get_cache_model#} >>=
+        return . toEnum . fromIntegral
 
 -- | Sets the 'CacheModel' for WebKit.
 setCacheModel
-    :: CacheModel -- ^ 'CacheModel' to use
-    -> IO ()
-setCacheModel cacheModel =
+    :: MonadIO m
+    => CacheModel -- ^ 'CacheModel' to use
+    -> m ()
+setCacheModel cacheModel = liftIO $
     {#call set_cache_model#} $ (fromIntegral . fromEnum) cacheModel
 
