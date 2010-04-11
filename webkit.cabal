@@ -2,11 +2,15 @@ Name:          webkit
 Version:       0.0
 Stability:     Alpha
 Synopsis:      Bindings for WebKitGTK+.
+Description:   Bindings for WebKitGTK+.
 License:       LGPL-2.1
 License-File:  LICENSE
 Build-Type:    Simple
 Cabal-Version: >=1.6
+Author:        Andreas Baldeau, Daniel Ehlers
+Maintainer:    Andreas Baldeau <andreas@baldeau.net>
 Homepage:      http://github.com/baldo/haskell-webkit
+Bug-Reports:   http://github.com/baldo/haskell-webkit/issues
 Category:      Graphics
 Tested-With:   GHC == 6.12.1
 
@@ -63,7 +67,7 @@ Library
     Pkgconfig-Depends:
         webkit-1.0  >= 1.1.22,
         libsoup-2.4 >= 2.28.2,
-        gtk+-2.0 >= 2.20.0
+        gtk+-2.0    >= 2.20.0
 
     Extensions:
         ForeignFunctionInterface
