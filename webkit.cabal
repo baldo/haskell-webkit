@@ -20,6 +20,7 @@ Source-Repository head
 Library
     Build-Depends:
         base >= 4 && < 5,
+        mtl  >= 1.0,
         glib >= 0.10.1,
         gtk  >= 0.10.1
 
