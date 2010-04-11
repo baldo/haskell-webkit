@@ -27,14 +27,22 @@ module Graphics.UI.Gtk.WebKit.NetworkRequest
 
     , networkRequestSetMessage
     ) where
- 
+
 #include <webkit/webkitnetworkrequest.h>
 
-import Foreign.C
 import System.Glib.FFI
 
 import System.Glib.GType
+    ( GType
+    )
 import System.Glib.Properties
+    ( objectSetPropertyGObject
+    )
+
+import Control.Monad.Trans
+    ( MonadIO
+    , liftIO
+    )
 
 {#import Graphics.UI.Gtk.WebKit.General.Types#}
     ( NetworkRequest
@@ -45,7 +53,7 @@ import System.Glib.Properties
 
 {#import Network.Soup.General.Types#}
     ( Message
-    
+
     , makeMessage
     )
 
@@ -53,16 +61,19 @@ import System.Glib.Properties
     ( messageGetType
     )
 
-networkRequestGetType :: IO GType
-networkRequestGetType =
+networkRequestGetType
+    :: MonadIO m
+    => m GType
+networkRequestGetType = liftIO $
     {#call network_request_get_type#}
 
 -- | Creates a new 'NetworkRequest' initialized with an URI.
 networkRequestNew
-    :: String                    -- ^ an URI
-    -> IO (Maybe NetworkRequest) -- ^ 'Just' a new 'NetworkRequest', or
-                                 --   'Nothing' if the URI is invalid. 
-networkRequestNew uri =
+    :: MonadIO m
+    => String                   -- ^ an URI
+    -> m (Maybe NetworkRequest) -- ^ 'Just' a new 'NetworkRequest', or
+                                --   'Nothing' if the URI is invalid.
+networkRequestNew uri = liftIO $
     withCString uri $ \c_uri -> do
         ptr <- {#call network_request_new#} c_uri
         let ptr' = castPtr ptr
@@ -70,9 +81,10 @@ networkRequestNew uri =
 
 -- | Returns the URI belonging to the given 'NetworkRequest'
 networkRequestGetUri
-    :: NetworkRequest -- ^ the 'NetworkRequest'
-    -> IO String      -- ^ the URI
-networkRequestGetUri request =
+    :: MonadIO m
+    => NetworkRequest -- ^ the 'NetworkRequest'
+    -> m String       -- ^ the URI
+networkRequestGetUri request = liftIO $
     withNetworkRequest request $ \ptr ->
         {#call network_request_get_uri#} ptr
             >>= peekCString
@@ -81,19 +93,21 @@ networkRequestGetUri request =
      has an associated 'Message', its URI will also be set by this call.
 -}
 networkRequestSetUri
-    :: NetworkRequest -- ^ the 'NetworkRequest'
+    :: MonadIO m
+    => NetworkRequest -- ^ the 'NetworkRequest'
     -> String         -- ^ the URI
-    -> IO ()
-networkRequestSetUri request uri = do
+    -> m ()
+networkRequestSetUri request uri = liftIO $
     withCString uri $ \c_uri ->
         withNetworkRequest request $ \ptr ->
             {#call network_request_set_uri#} ptr c_uri
 
 -- | Returns the to the 'NetworkRequest' associated 'Message'.
 networkRequestGetMessage
-    :: NetworkRequest -- ^ the 'NetworkRequest'
-    -> IO Message     -- ^ the 'Message'
-networkRequestGetMessage request =
+    :: MonadIO m
+    => NetworkRequest -- ^ the 'NetworkRequest'
+    -> m Message      -- ^ the 'Message'
+networkRequestGetMessage request = liftIO $
     withNetworkRequest request $ \ptr ->
         makeMessage $ {#call network_request_get_message#} ptr
 
@@ -101,10 +115,11 @@ networkRequestGetMessage request =
 
 -- | Associate the given 'Message' to the given 'NetworkRequest'.
 networkRequestSetMessage
-    :: NetworkRequest -- ^ the 'NetworkRequest'
+    :: MonadIO m
+    => NetworkRequest -- ^ the 'NetworkRequest'
     -> Message        -- ^ the 'Message'
-    -> IO ()
-networkRequestSetMessage request message = do
+    -> m ()
+networkRequestSetMessage request message = liftIO $ do
     mt <- messageGetType
     objectSetPropertyGObject mt "message" request message
 
