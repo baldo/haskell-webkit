@@ -1,5 +1,17 @@
 Haskell WebKit
 ==============
+Please note: Our WebKitGTK+ bindings are deprecated. You should use the bindings
+provided by gtk2hs (currently available only via darcs):
+
+    darcs get http://code.haskell.org/gtk2hs
+
+For future information have a look at: http://haskell.org/gtk2hs
+
+This file and the whole repository will remain for a while but might be removed
+in the future.
+
+Old Readme
+==========
 Haskell WebKit provides lowlevel bindings to WebKitGTK+ (http://webkitgtk.org/).
 
 Installation
